@@ -46,7 +46,8 @@ Files that ran before a late restore and needed it are **not** re-run, because r
 **5. A receipt for every action, capped, exportable.**
 Every wake-up adds one row to `fl_sporeReceipts`. Each row holds `n`, the time, the page, the kind, the file, ok, where the copy came from, the expected and actual hashes, why and how long it took. It also holds `prev`, the sha256 of the row before it.
 
-The kinds are `restored`, `still-broken`, `refused`, `not-cracked`, `not-in-manifest`, `stale`, `loop-paused` and `loop-records-dropped`.
+<!-- before (Celeste 2026-11-16, c8c6d4d0): The kinds are `restored`, `still-broken`, `refused`, `not-cracked`, `not-in-manifest`, `stale`, `loop-paused` and `loop-records-dropped`. -->
+The kinds are `restored`, `still-broken`, `refused`, `reload-needed`, `not-in-manifest`, `stale`, `loop-paused` and `loop-records-dropped`.
 
 The list is capped at 200 rows. Past the cap, the oldest 100 fold into one `folded` row that keeps how many there were, their n range, a tally of kinds and the sha256 of exactly those rows. `FLSpores.exportReceipts()` returns every current row as JSON. If storage is full, a row stays in memory for the visit and `FLSpores.unsaved()` says so in plain words.
 
@@ -69,8 +70,10 @@ The Tree's Settings freeze came from a MutationObserver whose callback changed t
 
 The first version tripped after 500 calls in a row. Hypha showed that was wrong: a buffered chat stream or an await per item calls every observer hundreds of times in about 100 ms, and that tripped 9 of the app's own observers and lost their records. The watchdog now times only an observer feeding itself:
 
-- Right after each call, it takes the records that call's own callback just made (`takeRecords`) and hands them back on the next microtask, just as the browser would have.
-- If a chain of calls that each fed themselves runs past 1.5 s, that observer rests. Busy work fed by the page (streams, bursts, slow chunks) never makes a chain, however long it runs, so it never trips.
+<!-- before (Celeste 2026-11-16, c8c6d4d0): - Right after each call, it takes the records that call's own callback just made (`takeRecords`) and hands them back on the next microtask, just as the browser would have. -->
+- Each observer gets a quiet twin: a plain observer on the same targets with the same options, whose callback does nothing. Right before a call the twin is emptied; right after, anything in it was made by that call. The observer's own records are never taken or moved, so the browser delivers them in its own order and batches. (Updated after Hypha's second walk, see below.)
+<!-- before (Celeste 2026-11-16, c8c6d4d0): If a chain of calls that each fed themselves runs past 1.5 s, that observer rests. -->
+- If a chain of calls that each fed themselves runs past 1.5 s, or past 500 calls (whichever comes first), that observer rests. Busy work fed by the page (streams, bursts, slow chunks) never makes a chain, however long it runs, so it never trips.
 - While an observer rests, its records are held, up to 5,000. More than that are dropped oldest first and counted in a receipt. When it listens again, it gets the held records.
 - It always listens again. Rests last 2, 4, 8, then 15 seconds, repeating. Every rest writes a `loop-paused` receipt with its trip number. Nothing is left off for good, and nothing is left off silently.
 - It keeps no list of observed nodes, so nothing is kept alive by it.
@@ -95,3 +98,17 @@ The pattern is the same: one module, one generator, a pinned fingerprint list pe
 - **Soft 8:** Quiet and Sophia exclusion goes by path name (`/quiet|sophia/i`). A naming rule or an explicit list would also cover a differently named file.
 - **Signing the list:** the pin stops a stale or swapped list, but anyone who controls the origin controls both. Signing with the CATALOG_SIGN key flow is the step before this goes past a prototype.
 - **Root index.html:** spores.js and 80 other scripts are already missing at the repo root on main, and root index reloads repeatedly on main too. Both issues were already there and are only recorded here.
+
+## Update after Hypha's second walk (c8c6d4d0, one narrow HOLD)
+
+- **Record order (the HOLD).** v0.1 at c8c6d4d0 took the records an observer's callback had just made and handed them back a microtask later. When the browser had another delivery queued, later records arrived first, and one batch was split into two calls. Now spores never takes an observer's own records. A quiet twin observer counts what each call made, and the browser delivers everything itself. The smoke compares spores on against spores off in the same browser, and they must match exactly in four cases:
+  - two observers that each feed themselves once;
+  - an observer feeding itself plus an outside change queued before it feeds;
+  - the same with the change queued after it feeds;
+  - takeRecords, and disconnect then observe, inside a callback.
+- **Soft 1.** If a file failed to parse but the server now sends the copy that matches, spores runs nothing, writes `reload-needed` (ok false: the page still lacks the file) and shows the reload notice.
+- **Soft 2.** The JSON filter no longer depends on one engine's wording. The error object must be a SyntaxError, and a parse error raised by a call (JSON.parse, eval, new Function) is recognised by the calling frame on its stack. The message text is only a fallback when no error object is given.
+- **Soft 3.** There is a call-count backstop: 500 self-fed calls in one chain. A real loop now rests within milliseconds instead of freezing for 1.5 s. Only self-fed calls count, so streams still show 0 trips.
+- **Soft 5.** From now on, replaced spores.js lines keep a full `// before (Celeste 2026-11-16, c8c6d4d0): …` comment, in Kirk's additive style. Lines that were never committed are not kept.
+- **Soft 6.** Records dropped while an observer rests show in `FLSpores.status()` (trips, resting now, dropped, notice). They also show in the one notice: "Part of this page got stuck and skipped N updates while it rested. Reload to catch up."
+- **Soft 4 (noted follow-up).** The wrapper costs a little per call. Each wrapped observer now has a twin, so the browser does about twice the observer bookkeeping. In the real app, 3 × 2000 buffered chunks took about 56 ms longer across 6,000 chunks, and every record still arrived. That's fine at today's sizes. Faster options for later: wrap only observers made after the first second, or only twin observers that watch attributes or subtrees.

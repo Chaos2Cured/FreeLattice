@@ -7,7 +7,9 @@
    - a listed page script fails to load (missing file, network error): the browser never ran it;
    - a listed page script fails to parse on line 1 before it finished loading, and the copy this
      page is actually served does not match its fingerprint (a wrong file was served in its place);
-   - a MutationObserver whose own callback keeps re-triggering it for more than LOOP_MS (a freeze loop).
+   before (Celeste 2026-11-16, c8c6d4d0): - a MutationObserver whose own callback keeps re-triggering it for more than LOOP_MS (a freeze loop).
+   - a MutationObserver whose own callback keeps re-triggering it for more than LOOP_MS, or more than
+     LOOP_CALLS calls in a row (a freeze loop).
    What it uses to repair:
    - only this site's own copy, checked against spores-manifest.json, whose own sha256 is pinned
      below. First the copy the service worker already holds (read only), then a fresh same-origin copy.
@@ -32,7 +34,9 @@
   var LOOP_MS = 1500;            // an observer whose own callback keeps re-triggering it this long is a freeze loop
   var REST_MS = [2000, 4000, 8000, 15000];   // pause lengths; the last repeats. Never off for good.
   var HELD_MAX = 5000;           // records kept for an observer while it rests (oldest dropped past this, and counted)
-  var limits = { loopMs: LOOP_MS, rest: REST_MS, held: HELD_MAX, cap: 200, fold: 100 };
+  var LOOP_CALLS = 500;          // or this many self-fed calls in one chain, whichever comes first (only self-fed calls count)
+  // before (Celeste 2026-11-16, c8c6d4d0): var limits = { loopMs: LOOP_MS, rest: REST_MS, held: HELD_MAX, cap: 200, fold: 100 };
+  var limits = { loopMs: LOOP_MS, loopCalls: LOOP_CALLS, rest: REST_MS, held: HELD_MAX, cap: 200, fold: 100 };
   var HONEST_LINE = 'Spore receipt could not be saved on this device (storage is full or closed). It is kept in memory for this visit.';
 
   var memReceipts = [];
@@ -42,6 +46,8 @@
   var loaded = {};
   var chain = Promise.resolve();
   var noticeShown = false;
+  var noticeText = null;
+  var status = { trips: 0, resting: 0, dropped: 0, notice: '' };   // what FLSpores.status() reports
 
   // ---------- small pure helpers (also used by the smoke in Node) ----------
 
@@ -210,8 +216,14 @@
 
   // ---------- the one notice: reload to finish ----------
 
-  function showReloadNotice() {
+  // // before (Celeste 2026-11-16, c8c6d4d0): function showReloadNotice() {
+  function showReloadNotice(text) {
     // Dependents are not re-run (that would replace their state). A reload runs everything in order.
+    // One notice only. A later message replaces the words in the same notice.
+    text = text || 'A piece of FreeLattice was repaired. Reload to finish the repair. ';
+    status.notice = text;
+    if (noticeShown && noticeText) { try { noticeText.textContent = text; } catch (e) {} return; }
+    // // before (Celeste 2026-11-16, c8c6d4d0): if (noticeShown || !root.document || !root.document.body) return;
     if (noticeShown || !root.document || !root.document.body) return;
     noticeShown = true;
     try {
@@ -222,7 +234,9 @@
         'background:#1b1830;color:#f3eefc;border:1px solid #6d5fd3;border-radius:10px;padding:10px 14px;' +
         'font:14px/1.4 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.4);max-width:92vw';
       var t = root.document.createElement('span');
-      t.textContent = 'A piece of FreeLattice was repaired. Reload to finish the repair. ';
+      // // before (Celeste 2026-11-16, c8c6d4d0): t.textContent = 'A piece of FreeLattice was repaired. Reload to finish the repair. ';
+      t.textContent = text;
+      noticeText = t;
       var go = root.document.createElement('button');
       go.type = 'button'; go.textContent = 'Reload';
       go.style.cssText = 'margin-left:8px;padding:4px 10px;border-radius:6px;border:0;background:#6d5fd3;color:#fff;cursor:pointer';
@@ -295,8 +309,12 @@
       var first = how === 'parse' ? servedMatches(abs, want) : Promise.resolve({ ok: false, got: '' });
       return first.then(function (served) {
         if (served.ok) {
-          // The served copy is the right one: the file is not cracked. Run nothing.
-          return receipt({ kind: 'not-cracked', file: file, ok: true, expected: want, got: served.got, why: why + '; but the copy served matches its fingerprint, so nothing was run', ms: Date.now() - t0 });
+          // // before (Celeste 2026-11-16, c8c6d4d0): // The served copy is the right one: the file is not cracked. Run nothing.
+          // // before (Celeste 2026-11-16, c8c6d4d0): return receipt({ kind: 'not-cracked', file: file, ok: true, expected: want, got: served.got, why: why + '; but the copy served matches its fingerprint, so nothing was run', ms: Date.now() - t0 });
+          // The copy the server sends now matches, but this page still lacks the file (the copy it ran was
+          // wrong, or the listed file itself fails to parse). Run nothing; offer the reload. Not ok.
+          showReloadNotice('A piece of FreeLattice did not load right. Reload to finish the repair. ');
+          return receipt({ kind: 'reload-needed', file: file, ok: false, expected: want, got: served.got, why: why + '; the copy this page ran was wrong, and the server now sends the right one. Nothing was run here; a reload will load it', ms: Date.now() - t0 });
         }
         var list = sources(abs, want);
         var seen = [];
@@ -349,8 +367,21 @@
     // Only a real parse failure: line 1, a SyntaxError, a listed .js file of this site, before its load
     // event. A JSON.parse error or a SyntaxError thrown at run time is not a crack.
     if (!ev || !ev.filename || ev.lineno !== 1) return;
-    var msg = String(ev.message || '');
-    if (!/SyntaxError|Unexpected token|Invalid or unexpected/i.test(msg) || /JSON/i.test(msg)) return;
+    // // before (Celeste 2026-11-16, c8c6d4d0): var msg = String(ev.message || '');
+    // // before (Celeste 2026-11-16, c8c6d4d0): if (!/SyntaxError|Unexpected token|Invalid or unexpected/i.test(msg) || /JSON/i.test(msg)) return;
+    // Engine-neutral: the error object must be a SyntaxError, and a parse error raised by a call
+    // (JSON.parse, eval, new Function) has the calling frame on its stack. A real script parse failure
+    // has no calling frame. The message wording is only a fallback when no error object is given.
+    var err = ev.error;
+    if (err) {
+      if (!(err instanceof SyntaxError)) return;
+      var stack = String(err.stack || '');
+      if (/JSON|\bparse\b|eval|Function/.test(stack.split('\n').slice(1).join('\n'))) return;
+      if (/JSON\.parse|JSON/.test(stack)) return;
+    } else {
+      var msg = String(ev.message || '');
+      if (!/SyntaxError|Unexpected token|Invalid or unexpected/i.test(msg) || /JSON/i.test(msg)) return;
+    }
     var abs, base;
     try { abs = new URL(ev.filename); base = new URL('.', root.document.baseURI); } catch (e) { return; }
     if (abs.origin !== base.origin || abs.pathname.indexOf(base.pathname) !== 0) return;
@@ -364,34 +395,50 @@
   // A burst of work (a buffered stream, an await per item) calls observers many times in a row, but
   // those calls are fed by the page, and they end. A freeze loop is an observer whose own callback
   // changes what it watches, so every call queues the next one. The watchdog only times that:
-  // right after each call it takes the records the callback itself just made (takeRecords) and hands
-  // them back on the next microtask, exactly when the browser would have. If a chain of calls that
-  // each fed themselves runs past LOOP_MS with no page turn, the observer rests. Its records are held
-  // and handed to it when it listens again. It always listens again, and every rest writes a receipt.
+  // // before (Celeste 2026-11-16, c8c6d4d0): // right after each call it takes the records the callback itself just made (takeRecords) and hands
+  // // before (Celeste 2026-11-16, c8c6d4d0): // them back on the next microtask, exactly when the browser would have. If a chain of calls that
+  // // before (Celeste 2026-11-16, c8c6d4d0): // each fed themselves runs past LOOP_MS with no page turn, the observer rests. Its records are held
+  // // before (Celeste 2026-11-16, c8c6d4d0): // and handed to it when it listens again. It always listens again, and every rest writes a receipt.
+  // To know whether a call fed itself, each observer gets a quiet twin: a plain observer on the same
+  // targets with the same options, whose callback does nothing. Right before a call the twin's queue is
+  // emptied; right after, anything in it was made by that call on what it watches. The observer's own
+  // records are never taken or moved, so the browser delivers them itself, in its own order and batches
+  // (Hypha's re-walk: taking them and handing them back a microtask later reordered them).
+  // If a chain of calls that each fed themselves runs past LOOP_MS, or past LOOP_CALLS calls, the
+  // observer rests. Records the browser delivers while it rests are held and handed to it when it
+  // listens again. It always listens again, and every rest writes a receipt. Records dropped while
+  // resting also show in FLSpores.status() and in the notice.
 
   function guardObservers() {
     var Native = root.MutationObserver;
     if (typeof Native !== 'function' || Native.__spores) return;
+    var nativeObserve = Native.prototype.observe;
     var nativeDisconnect = Native.prototype.disconnect;
     var nativeTake = Native.prototype.takeRecords;
-    var soon = typeof root.queueMicrotask === 'function' ? function (f) { root.queueMicrotask(f); } : function (f) { Promise.resolve().then(f); };
+    function quiet() {}
 
     function Guarded(callback) {
-      var state = { feedStart: 0, trips: 0, resting: false, held: [], dropped: 0, timer: 0, where: '' };
+      // before (Celeste 2026-11-16, c8c6d4d0): var state = { feedStart: 0, trips: 0, resting: false, held: [], dropped: 0, timer: 0, where: '' };
+      var state = { feedStart: 0, feedCount: 0, trips: 0, resting: false, held: [], dropped: 0, timer: 0, where: '', twin: null };
       try { state.where = String((new Error()).stack || '').split('\n').slice(2, 3).join('').trim().slice(0, 160); } catch (e) {}
+      try { state.twin = new Native(quiet); } catch (e) { state.twin = null; }
       var me;
       function hold(records) {
         for (var i = 0; i < records.length; i++) state.held.push(records[i]);
         if (state.held.length > limits.held) { state.dropped += state.held.length - limits.held; state.held.splice(0, state.held.length - limits.held); }
       }
-      function rest(records) {
+      function rest() {
+        var chainMs = state.feedStart ? now() - state.feedStart : 0, chainCalls = state.feedCount;
         state.resting = true;
         state.trips++;
+        status.trips++; status.resting++;
         state.feedStart = 0;
-        hold(records);
+        state.feedCount = 0;
         var ms = limits.rest[Math.min(state.trips - 1, limits.rest.length - 1)];
-        receipt({ kind: 'loop-paused', file: state.where, ok: true, got: 'trip ' + state.trips,
-                  why: 'its own callback kept re-triggering it for over ' + limits.loopMs + 'ms with no turn for the page; resting ' + ms + 'ms, then it listens again and gets the records held meanwhile' });
+        // before (Celeste 2026-11-16, c8c6d4d0): receipt({ kind: 'loop-paused', file: state.where, ok: true, got: 'trip ' + state.trips,
+        // before (Celeste 2026-11-16, c8c6d4d0):           why: 'its own callback kept re-triggering it for over ' + limits.loopMs + 'ms with no turn for the page; resting ' + ms + 'ms, then it listens again and gets the records held meanwhile' });
+        receipt({ kind: 'loop-paused', file: state.where, ok: true, got: 'trip ' + state.trips, ms: chainMs,
+                  why: 'its own callback re-triggered it ' + chainCalls + ' times in a row (' + Math.round(chainMs) + 'ms) with no turn for the page; resting ' + ms + 'ms, then it listens again and gets the records held meanwhile' });
         state.timer = setTimeout(wake, ms);
       }
       function wake() {
@@ -399,23 +446,37 @@
         state.resting = false;
         var give = state.held; state.held = [];
         var lost = state.dropped; state.dropped = 0;
-        if (lost) receipt({ kind: 'loop-records-dropped', file: state.where, ok: false, why: lost + ' records past the ' + limits.held + ' held while resting were dropped (oldest first)' });
-        if (give.length) run(me, give);
+        status.resting = Math.max(0, status.resting - 1);
+        if (lost) {
+          status.dropped += lost;
+          receipt({ kind: 'loop-records-dropped', file: state.where, ok: false, why: lost + ' records past the ' + limits.held + ' held while resting were dropped (oldest first)' });
+          showReloadNotice('Part of this page got stuck and skipped ' + lost + ' updates while it rested. Reload to catch up. ');
+        }
+        // before (Celeste 2026-11-16, c8c6d4d0): if (give.length) run(me, give);
+        if (give.length) inner(give);
       }
       function run(ctx, records) {
-        var t0 = now(), fed = [];
+        // before (Celeste 2026-11-16, c8c6d4d0): var t0 = now(), fed = [];
+        var t0 = now(), fed = 0;
+        if (state.twin) { try { nativeTake.call(state.twin); } catch (e) {} }     // empty the twin: count only this call
         try { return callback.call(ctx, records, me); }
         finally {
-          try { fed = nativeTake.call(me) || []; } catch (e) { fed = []; }
-          if (!fed.length) state.feedStart = 0;                 // it did not feed itself: no chain
+          // before (Celeste 2026-11-16, c8c6d4d0): try { fed = nativeTake.call(me) || []; } catch (e) { fed = []; }
+          if (state.twin) { try { fed = (nativeTake.call(state.twin) || []).length; } catch (e) { fed = 0; } }
+          // before (Celeste 2026-11-16, c8c6d4d0): if (!fed.length) state.feedStart = 0;                 // it did not feed itself: no chain
+          if (!fed) { state.feedStart = 0; state.feedCount = 0; }   // it did not feed itself: no chain
           else {
             if (!state.feedStart) state.feedStart = t0;
-            if (now() - state.feedStart > limits.loopMs) rest(fed);
-            else soon(function () { inner(fed); });              // the browser would deliver these next anyway
+            state.feedCount++;
+            // before (Celeste 2026-11-16, c8c6d4d0): if (now() - state.feedStart > limits.loopMs) rest(fed);
+            // before (Celeste 2026-11-16, c8c6d4d0): else soon(function () { inner(fed); });              // the browser would deliver these next anyway
+            // Its own records stay where the browser put them; the browser delivers them next.
+            if (now() - state.feedStart > limits.loopMs || state.feedCount > limits.loopCalls) rest();
           }
         }
       }
       var inner = function (records) {
+        // before (Celeste 2026-11-16, c8c6d4d0): if (state.resting) { hold(records); return undefined; }
         if (state.resting) { hold(records); return undefined; }
         return run(me, records);
       };
@@ -425,9 +486,17 @@
     }
     Guarded.prototype = Object.create(Native.prototype);
     Guarded.prototype.constructor = Guarded;
+    Guarded.prototype.observe = function (target, options) {
+      var r = nativeObserve.call(this, target, options);            // throws exactly as the browser would
+      var s = this.__sporeState;
+      if (s && s.twin) { try { nativeObserve.call(s.twin, target, options); } catch (e) {} }   // the twin watches the same; no list is kept
+      return r;
+    };
     Guarded.prototype.disconnect = function () {
       var s = this.__sporeState;
-      if (s) { if (s.timer) clearTimeout(s.timer); s.timer = 0; s.resting = false; s.held = []; s.dropped = 0; }
+      // before (Celeste 2026-11-16, c8c6d4d0): if (s) { if (s.timer) clearTimeout(s.timer); s.timer = 0; s.resting = false; s.held = []; s.dropped = 0; }
+      if (s) { if (s.timer) { clearTimeout(s.timer); status.resting = Math.max(0, status.resting - 1); } s.timer = 0; s.resting = false; s.held = []; s.dropped = 0; }
+      if (s && s.twin) { try { nativeDisconnect.call(s.twin); } catch (e) {} }
       return nativeDisconnect.call(this);
     };
     Guarded.prototype.takeRecords = function () {
@@ -469,6 +538,7 @@
     receipts: function () { return readReceipts().concat(memReceipts.filter(function (r) { return r._unsaved; })); },
     exportReceipts: exportReceipts,
     unsaved: function () { return unsaved ? HONEST_LINE : ''; },
+    status: function () { return { trips: status.trips, resting: status.resting, dropped: status.dropped, notice: status.notice }; },
     check: check,
     restore: restore,
     setOff: function (yes) { try { root.localStorage.setItem(OFF_KEY, yes ? 'off' : 'on'); } catch (e) {} return !!yes; },

@@ -30,6 +30,7 @@ ok(/RECEIPT_KEY = 'fl_sporeReceipts'/.test(code) && /OFF_KEY = 'fl_spores'/.test
 ok(!/fetch\(\s*['"]https?:/.test(code), 'spores.js never fetches a fixed outside address');
 ok(code.indexOf('caches.match(url)') === -1, 'no cached-manifest fallback: the manifest only comes fresh from the same origin');
 ok(!/\.targets\b/.test(code), 'the watchdog keeps no list of observed targets (no retained nodes)');
+ok(!/nativeTake\.call\(me\)/.test(code.replace(/\/\/ before \(.*$/gm, '')), 'the watchdog never takes an observer\'s own records (the browser delivers them in its own order)');
 ok(/ev\.lineno !== 1/.test(code) && /\/JSON\/i\.test\(msg\)/.test(code), 'only a line-1 parse failure counts, and a JSON.parse error never does');
 var api = require(modPath);
 ok(api.version === 'v-spores-v0.1', 'version marker v-spores-v0.1');
@@ -86,6 +87,8 @@ fs.writeFileSync(path.join(tmp, 'modules', 'c.js'), 'window.C_RAN = (window.C_RA
 fs.writeFileSync(path.join(tmp, 'modules', 'd.js'), 'window.D_RAN = (window.D_RAN || 0) + 1;\n');
 // e.js really has a line-1 syntax error, and that is exactly what its fingerprint says: served copy matches, so not cracked.
 fs.writeFileSync(path.join(tmp, 'modules', 'e.js'), 'window.E_RAN = 1; )\n');
+// f.js is healthy but its one line calls JSON.parse on bad text before it finishes loading. Not a crack.
+fs.writeFileSync(path.join(tmp, 'modules', 'f.js'), 'window.F_RAN = 1; JSON.parse("{bad json");\n');
 var page = [
   '<!DOCTYPE html><html><head><meta charset="utf-8">',
   '<script src="modules/spores.js"></script>',
@@ -94,8 +97,9 @@ var page = [
   '<script src="modules/c.js" defer></script>',
   '<script src="modules/d.js" defer></script>',
   '<script src="modules/e.js" defer></script>',
+  '<script src="modules/f.js" defer></script>',
   '</head><body><pre id="out">waiting</pre><div id="chat"></div><div id="chat2"></div><div id="chat3"></div><script>',
-  'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), SHORT = CAP || /swap/.test(Q);',
+  'var Q = location.search, OFF = /spores=off/.test(Q), CAP = /captest/.test(Q), DROP = /droptest/.test(Q), SHORT = CAP || DROP || /swap/.test(Q);',
   'var R = { calls: 0, pageNodes: 0, chatRecords: 0, chat2Records: 0, chat3Records: 0, marksSeen: 0, boundedCalls: 0, hotCalls: [], streamMs: [] };',
   'var calm = document.createElement("i"); document.body.appendChild(calm);',
   'new MutationObserver(function () { R.calls++; }).observe(calm, { attributes: true });',
@@ -112,6 +116,27 @@ var page = [
   '  return (async function () { while (true) { var x = await reader.read(); if (x.done) break; if (busy) { var b = performance.now() + busy; while (performance.now() < b) {} } el.appendChild(document.createTextNode(x.value)); } R.streamMs.push(Math.round(performance.now() - t0)); })(); }',
   'var chat = document.getElementById("chat"), chat2 = document.getElementById("chat2");',
   'setTimeout(function () { if (window.throwLater) throwLater(); setTimeout(function () { JSON.parse("{bad json"); }, 0); }, 400);',
+  // Order (Hypha re-walk): records must arrive in the same order and batches as with no spores at all.
+  'var o1 = document.createElement("s"); document.body.appendChild(o1); var log1 = [], n1 = 1, aFed = false, bFed = false;',
+  'function vals(rs) { return rs.map(function (r) { return r.target.getAttribute("data-v-" + r.attributeName.slice(7)) || r.attributeName; }).join(","); }',
+  'new MutationObserver(function (rs) { log1.push("A[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (!aFed) { aFed = true; o1.setAttribute("v", String(++n1)); } }).observe(o1, { attributes: true, attributeOldValue: true });',
+  'new MutationObserver(function (rs) { log1.push("B[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (!bFed) { bFed = true; o1.setAttribute("v", String(++n1)); } }).observe(o1, { attributes: true, attributeOldValue: true });',
+  'var o4 = document.createElement("q"); document.body.appendChild(o4); var log4 = [], n4 = 0;',
+  // O4: on its first call, another part of the page queues an outside change, then the observer feeds itself.
+  'new MutationObserver(function (rs) { log4.push("O[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (n4 === 0) queueMicrotask(function () { o4.setAttribute("v", "x"); }); if (n4 < 5) o4.setAttribute("v", "s" + (++n4)); }).observe(o4, { attributes: true, attributeOldValue: true });',
+  // O5: the same, but the outside change is queued after the observer feeds itself.
+  'var o5 = document.createElement("kbd"); document.body.appendChild(o5); var log5 = [], n5 = 0;',
+  'new MutationObserver(function (rs) { log5.push("P[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (n5 < 5) o5.setAttribute("v", "s" + (++n5)); if (n5 === 1 && !o5.x) { o5.x = 1; queueMicrotask(function () { o5.setAttribute("v", "x"); }); } }).observe(o5, { attributes: true, attributeOldValue: true });',
+  'setTimeout(function () { o1.setAttribute("v", "0"); o1.setAttribute("v", "1"); }, 200);',
+  'setTimeout(function () { o4.setAttribute("v", "s0"); }, 250);',
+  'setTimeout(function () { o5.setAttribute("v", "s0"); }, 300);',
+  // O6: feeds itself, then calls takeRecords inside its callback. O7: disconnects and observes again inside its callback.
+  'var o6 = document.createElement("var"); document.body.appendChild(o6); var log6 = [], n6 = 0;',
+  'new MutationObserver(function (rs, ob) { log6.push("T[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (n6 < 3) { o6.setAttribute("v", "s" + (++n6)); o6.setAttribute("w", "w" + n6); log6.push("t" + ob.takeRecords().length); } }).observe(o6, { attributes: true, attributeOldValue: true });',
+  'var o7 = document.createElement("samp"); document.body.appendChild(o7); var log7 = [], n7 = 0;',
+  'new MutationObserver(function (rs, ob) { log7.push("D[" + rs.map(function (r) { return r.oldValue; }).join(",") + "]"); if (n7 < 3) { o7.setAttribute("v", "s" + (++n7)); ob.disconnect(); ob.observe(o7, { attributes: true, attributeOldValue: true }); o7.setAttribute("v", "r" + n7); } }).observe(o7, { attributes: true, attributeOldValue: true });',
+  'setTimeout(function () { o6.setAttribute("v", "s0"); o7.setAttribute("v", "s0"); }, 350);',
+  'setTimeout(function () { R.order1 = log1.join(" "); R.order4 = log4.join(" "); R.order5 = log5.join(" "); R.order6 = log6.join(" "); R.order7 = log7.join(" "); }, 600);',
   'setTimeout(function () { stream(chat, 2000); }, 800);',
   'setTimeout(function () { stream(chat, 2000); }, 911);',
   'setTimeout(function () { stream(chat, 2000); }, 1022);',
@@ -133,9 +158,13 @@ var page = [
   'async function capTest() { var S = window.FLSpores; S._limits.cap = 10; S._limits.fold = 5; for (var i = 0; i < 23; i++) await S._receipt({ kind: "test", file: "x" + i, ok: true });',
   '  var rows = S.receipts(); var ex = JSON.parse(S.exportReceipts()); R.cap = { len: rows.length, first: rows[0], last: rows[rows.length - 1], exported: ex.receipts.length }; }',
   'if (CAP) setTimeout(capTest, 1500);',
+  'function dropTest() { var L = window.FLSpores._limits; L.held = 10; L.rest = [600, 600]; var d = document.createElement("p"); document.body.appendChild(d); var dc = 0;',
+  '  var dmo = new MutationObserver(function () { dc++; d.setAttribute("n", String(dc)); }); dmo.observe(d, { attributes: true }); d.setAttribute("n", "go");',
+  '  setTimeout(function () { for (var i = 0; i < 30; i++) d.setAttribute("o" + i, "1"); }, 200); setTimeout(function () { dmo.disconnect(); R.dropStatus = window.FLSpores.status(); }, 1500); }',
+  'if (DROP) setTimeout(dropTest, 300);',
   'setTimeout(function () {',
   '  var S = window.FLSpores || {};',
-  '  R.off = S.off; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
+  '  R.off = S.off; R.F = window.F_RAN || 0; R.notice = (document.querySelector("#fl-spore-notice span") || {}).textContent || ""; R.A = window.A_RAN || 0; R.B = window.B_RAN || 0; R.C = window.C_RAN || 0; R.D = window.D_RAN || 0; R.E = window.E_RAN || 0;',
   '  R.isGuarded = !!MutationObserver.__spores; R.alive = true; R.notices = document.querySelectorAll("#fl-spore-notice").length;',
   '  R.receipts = S.receipts ? S.receipts() : []; R.unsaved = S.unsaved ? S.unsaved() : "";',
   '  document.getElementById("out").textContent = JSON.stringify(R);',
@@ -179,9 +208,10 @@ function runChrome(url) {
       var f = path.join(prof, 'DevToolsActivePort');
       if (!fs.existsSync(f)) { if (tries > 100) return finish(null); return setTimeout(function () { waitPort(tries + 1); }, 100); }
       var port = fs.readFileSync(f, 'utf8').split('\n')[0];
-      http.get('http://127.0.0.1:' + port + '/json/list', function (r) {
+      (function list(tries) { http.get('http://127.0.0.1:' + port + '/json/list', function (r) {
         var body = ''; r.on('data', function (d) { body += d; }); r.on('end', function () {
-          var pg = JSON.parse(body).filter(function (t) { return t.type === 'page'; })[0];
+          var pg = null; try { pg = JSON.parse(body).filter(function (t) { return t.type === 'page'; })[0]; } catch (e) {}
+          if (!pg) { if (tries > 100) return finish(null); return setTimeout(function () { list(tries + 1); }, 100); }   // Chrome still opening its first tab
           ws = new WebSocket(pg.webSocketDebuggerUrl);
           ws.onmessage = function (ev) { var m = JSON.parse(ev.data); if (m.id && waiters[m.id]) { waiters[m.id](m.result); delete waiters[m.id]; } };
           ws.onopen = function () {
@@ -194,13 +224,14 @@ function runChrome(url) {
             });
           };
         });
-      }).on('error', function () { finish(null); });
+      }).on('error', function () { if (tries > 100) return finish(null); setTimeout(function () { list(tries + 1); }, 100); }); })(0);
     })(0);
   });
 }
 
 server.listen(0, '127.0.0.1', async function () {
   var base = 'http://127.0.0.1:' + server.address().port + '/fixture.html';
+  var off = await runChrome(base + '?spores=off');
   var on = await runChrome(base);
   ok(on && on.alive, 'the page did not freeze (a self-feeding observer would hang it without the watchdog)');
   var kinds = on.receipts.map(function (r) { return r.kind + ':' + (r.file || '').replace(/^.*\//, '') + (r.got && /^trip/.test(r.got) ? '(' + r.got + ')' : ''); });
@@ -210,9 +241,14 @@ server.listen(0, '127.0.0.1', async function () {
   ok(on.B === 0 && rec('modules/b.js').length === 1 && rec('modules/b.js')[0].kind === 'still-broken', 'b.js copy had the wrong sha256: refused, never ran, one still-broken receipt');
   ok(on.C === 1 && rec('modules/c.js').length === 0, 'HOLD 1: a healthy c.js that throws a SyntaxError at run time is not touched (ran once, no receipt)');
   ok(on.D === 1 && rec('modules/d.js').length === 1 && rec('modules/d.js')[0].kind === 'restored', 'd.js was served as an HTML page: line-1 parse failure, served copy did not match, verified copy ran once');
-  ok(on.E === 0 && rec('modules/e.js').length === 1 && rec('modules/e.js')[0].kind === 'not-cracked', 'HOLD 1: e.js failed to parse but the copy served matches its fingerprint: not-cracked receipt, nothing run');
+  ok(on.E === 0 && rec('modules/e.js').length === 1 && rec('modules/e.js')[0].kind === 'reload-needed' && rec('modules/e.js')[0].ok === false, 'soft 1: e.js failed to parse but the server now sends the matching copy: nothing run, receipt says reload-needed (ok false)');
+  ok(on.F === 1 && rec('modules/f.js').length === 0, 'soft 2: a JSON.parse error on line 1 of a listed file, before its load, is not a crack (decided by the error object and stack)');
   ok(rec('fixture.html').length === 0 && on.receipts.every(function (r) { return !/\.html$/.test(r.file) || /^loop/.test(r.kind); }), 'soft 2: a JSON.parse error writes no receipt');
-  ok(on.notices === 1, 'one "Reload to finish the repair" notice after the restores (not one per file)');
+  ok(on.notices === 1 && /Reload to finish the repair/.test(on.notice), 'one "Reload to finish the repair" notice after the restores (not one per file)');
+  ok(on.order1 === off.order1 && on.order1.split(' ').length === 4, 'HOLD (order): two observers that each feed themselves once get the same records, order and batches as with no spores (' + on.order1 + ')');
+  ok(on.order4 === off.order4 && /^O\[\] O\[s0,s1\] /.test(on.order4), 'HOLD (order): an observer feeding itself plus an outside change gets its own record first, in the same call, as with no spores (' + on.order4 + '; labels are old values: [s0,s1] = its own change, then the outside one)');
+  ok(on.order6 === off.order6 && on.order7 === off.order7, 'order: takeRecords and disconnect/observe inside a callback behave as with no spores (' + on.order6 + ' | ' + on.order7 + ')');
+  ok(on.order5 === off.order5, 'HOLD (order): the same with the outside change queued after it feeds itself (' + on.order5 + ' / off ' + off.order5 + ')');
   ok(on.calls === 1, 'a calm observer still works as before (1 call)');
   ok(on.streamMs.length === 5 && on.streamMs[4] > 1500, 'five buffered streams ran, the last one longer than the 1500 ms trip time (' + on.streamMs.join(', ') + ' ms)');
   ok(on.chatRecords === 6000 && on.chat2Records === 1500 && on.chat3Records === 1500, 'HOLD 2: streaming 3 x 2000, 1 x 1500 and a slow 1 x 1500 buffered chunks lost no records (' + on.chatRecords + ' + ' + on.chat2Records + ' + ' + on.chat3Records + ')');
@@ -222,7 +258,8 @@ server.listen(0, '127.0.0.1', async function () {
   ok(Object.keys(where).length === 2, 'HOLD 2: only the two self-feeding observers ever rested; streaming and page-wide observers had 0 trips (' + JSON.stringify(where) + ')');
   ok(on.marksSeen === 5, 'HOLD 2: records that arrived while an observer rested were handed to it when it listened again (' + on.marksSeen + ' of 5 marks)');
   var bounded = loops.filter(function (r) { return r.file === loops[0].file; });
-  ok(bounded.length === 1 && bounded[0].kind === 'loop-paused', 'the bounded loop rested once, then listened again and stopped on its own');
+  ok(bounded.length >= 1 && bounded.every(function (r) { return r.kind === 'loop-paused'; }), 'the bounded loop rested (' + bounded.length + 'x), then listened again and stopped on its own');
+  ok(bounded[0].ms < 1500, 'soft 3: with the call-count backstop a real loop rests after ' + Math.round(bounded[0].ms) + ' ms, not 1.5 s');
   var hot = loops.filter(function (r) { return r.file !== loops[0].file; }).map(function (r) { return r.kind + ' ' + r.got; });
   ok(hot.length >= 3 && hot.slice(0, 3).join(',') === 'loop-paused trip 1,loop-paused trip 2,loop-paused trip 3', 'a real self-feeding loop is still stopped, rest after rest (' + hot.join(', ') + ')');
   var hc = on.hotCalls;
@@ -245,7 +282,11 @@ server.listen(0, '127.0.0.1', async function () {
   fs.writeFileSync(path.join(tmp, 'spores-manifest.json'), forged);
   ok(swapped && swapped.A === 0 && swapped.receipts.some(function (r) { return r.kind === 'refused' && r.file === 'modules/a.js'; }), 'soft 1 / (f): a manifest that does not match the pinned sha256 is refused; nothing is run');
 
-  var off = await runChrome(base + '?spores=off');
+  var drop = await runChrome(base + '?droptest=1');
+  ok(drop && drop.dropStatus && drop.dropStatus.dropped >= 20 && drop.dropStatus.trips >= 1, 'soft 6: records dropped while resting show in FLSpores.status() (' + JSON.stringify(drop && drop.dropStatus) + ')');
+  ok(/skipped \d+ updates/.test(drop.notice), 'soft 6: and in the one notice ("' + drop.notice.trim() + '")');
+
+
   ok(off && off.off === true, '?spores=off turns spores off');
   ok(off.A === 0 && off.receipts.length === 0 && !off.isGuarded && off.notices === 0, 'with spores off nothing is restored, wrapped, shown or written');
   ok(off.alive && off.calls === 1 && off.chatRecords === 6000 && off.chat3Records === 1500 && off.pageNodes === 9000, 'with spores off the observers see the same records (the loops are not kicked there: unguarded they would hang the page)');
