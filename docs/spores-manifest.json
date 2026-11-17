@@ -290,9 +290,9 @@
      "bytes": 7758
     },
     "modules/particle-clay.js": {
-     "sha256": "a8c93fa9237d46753d14fed4df2f2018516e17fd2d05d54462889587bbb6d9ba",
-     "sri": "sha256-qMk/qSN9RnU9FP7U3y8gGFFuF/0tBdVEYoiVh7u22bo=",
-     "bytes": 80484
+     "sha256": "63df7fddb07cfc5c4c99b8835dc153194b5e04bfd0a2831900e14aa8fedc9ccb",
+     "sri": "sha256-Y99/3bB8/FxMmbiDXcFTGUteBL/QooMZAOFKqP7cnMs=",
+     "bytes": 86202
     },
     "modules/phone-swarm.js": {
      "sha256": "731859922e028b7f235b67c7684ca1cae81652680c6130e2c5352adc9d9af61b",

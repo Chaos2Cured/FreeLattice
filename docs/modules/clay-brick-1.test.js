@@ -232,6 +232,68 @@ docEl.attrs['data-garden-galaxy'] = 'garden';
 docEl.attrs['data-garden-room'] = 'gathering';
 assert.strictEqual(corner.pageFromDoc(), 'gathering', 'data-garden-room=gathering is Gathering');
 
+// Canvas knock / heart (Kirk t1378u). The mind's clay must not change.
+assert.strictEqual(clay.CLICK_WINDOW_MS, 600, 'triple-click window is 600ms');
+clay.setReduced(true);
+clay.setOn(true);
+clay.resetRate();
+var beforeSnap = clay.snapshot();
+var first = clay.noteCanvasClick({ clientX: 10, clientY: 10 }, 1000);
+assert.strictEqual(first.kind, null, 'one click waits to classify');
+assert.strictEqual(first.pending, 1, 'one click is pending');
+var knocked = clay.flushCanvasClicks();
+assert.strictEqual(knocked.kind, 'knock', 'one click is a knock');
+var afterKnock = clay.snapshot();
+assert.strictEqual(afterKnock.form, beforeSnap.form, 'knock does not change form');
+assert.strictEqual(afterKnock.motion, beforeSnap.motion, 'knock does not change motion');
+assert.ok((clay.canvasAcks() || []).length > 0, 'knock leaves a brief acknowledgement');
+assert.strictEqual(clay.canvasAcks()[0].kind, 'knock', 'ack is a knock ring');
+
+var calls = [];
+global.state = { isLocal: true, ollamaModel: 'home-mind' };
+global.FreeLattice = {
+  callAI: function (sys, user, opts) {
+    calls.push({ user: user });
+  }
+};
+global.FLHumanPresence = undefined;
+clay.resetRate();
+var mid = clay.snapshot();
+var c1 = clay.noteCanvasClick({ clientX: 12, clientY: 12 }, 5000);
+var c2 = clay.noteCanvasClick({ clientX: 12, clientY: 12 }, 5150);
+var c3 = clay.noteCanvasClick({ clientX: 12, clientY: 12 }, 5300);
+assert.strictEqual(c1.kind, null, 'first of three still waits');
+assert.strictEqual(c2.kind, null, 'second of three still waits');
+assert.strictEqual(c3.kind, 'heart', 'third click in 600ms is a heart');
+var afterHeart = clay.snapshot();
+assert.strictEqual(afterHeart.form, mid.form, 'heart does not change form');
+assert.strictEqual(afterHeart.motion, mid.motion, 'heart does not change motion');
+assert.ok((clay.canvasAcks() || []).some(function (a) { return a.kind === 'heart'; }), 'heart leaves a heart acknowledgement');
+assert.strictEqual(calls.length, 1, 'triple click sends one signal, not three knocks');
+assert.ok(calls[0].user.indexOf('heart') !== -1, 'heart signal is what the mind hears');
+var late = clay.flushCanvasClicks();
+assert.strictEqual(late.kind, null, 'flush after a heart does not also knock');
+
+clay.resetRate();
+calls.length = 0;
+clay.noteCanvasClick({ clientX: 8, clientY: 8 }, 9000);
+clay.noteCanvasClick({ clientX: 8, clientY: 8 }, 9200);
+var two = clay.flushCanvasClicks();
+assert.strictEqual(two.kind, 'knock', 'two clicks in the window are one knock, not a heart and not two knocks');
+assert.strictEqual(calls.length, 1, 'two clicks send one knock');
+assert.ok(calls[0].user.indexOf('wish to share') !== -1, 'knock tells the mind someone wants to see what it wishes to share');
+
+// Presence chips still use the old fly path.
+clay.resetRate();
+clay.setReduced(false);
+var beforePresent = clay.snapshot();
+var presentChip = clay.onGesture('present');
+assert.ok(presentChip.flown > 0, 'the present chip still sprinkles');
+assert.strictEqual(clay.snapshot().motion, 'ripple', 'the present chip still switches to ripple');
+
+clay.setOn(false);
+clay.setReduced(false);
+
 // Private tab names still hide (syncFromPage). Do not open any Quiet Room file.
 assert.strictEqual(typeof corner.syncFromPage, 'function', 'sync still exported');
 assert.strictEqual(corner.isOn(), false, 'corner starts off');

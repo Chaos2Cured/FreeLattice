@@ -2,6 +2,9 @@
 // v-clay-brick-1-v0.1: braid, branch, and pulse now move on the canvas, using
 // math the [FL_CLAY:] tag already allowed. The mind's choice is still the
 // only input to what is drawn. No human picker. No new storage keys.
+// Canvas click (Kirk t1378u): one click is a knock, three clicks in 600ms
+// send a heart. Those are signals to the mind. They do not change form,
+// motion, or mood. Only a later [FL_CLAY:] reply can change the clay.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -69,6 +72,12 @@
   var currentMood = 'present';
   var parts = [];
   var rings = [];
+  var acks = [];
+  var canvasClicks = [];
+  var canvasClickTimer = 0;
+  var canvasClickEv = null;
+  var CLICK_WINDOW_MS = 600;
+  var ACK_MS = 700;
   var canvas = null;
   var dock = null;
   var labelEl = null;
@@ -669,6 +678,7 @@
       });
     }
     ctx.restore();
+    paintAcks(ctx);
     var far = false;
     for (i = 0; i < parts.length; i++) {
       var dx = parts[i].tx - parts[i].x;
@@ -677,13 +687,28 @@
     }
     morphing = far;
   }
+  function acksLive() {
+    var now = Date.now();
+    var i;
+    for (i = 0; i < acks.length; i++) {
+      if ((now - acks[i].t0) < ACK_MS) return true;
+    }
+    return false;
+  }
+  function settleAcks() {
+    acks = [];
+    if (isOn() && !hidden()) draw();
+  }
   function tick() {
     rafId = 0;
     timerId = 0;
     if (!isOn() || hidden()) return;
     draw();
-    if (reduced()) return;
-    if (morphing) {
+    if (reduced()) {
+      if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
+      return;
+    }
+    if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
       return;
@@ -694,8 +719,12 @@
     stopLoop();
     if (!isOn()) return;
     draw();
-    if (reduced() || hidden()) return;
-    if (morphing) {
+    if (hidden()) return;
+    if (reduced()) {
+      if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
+      return;
+    }
+    if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
     } else {
@@ -895,7 +924,13 @@
     var sys = base;
     var delta = promptDelta();
     if (delta) sys += '\n\n' + delta;
-    root.FreeLattice.callAI(sys, 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.', {
+    var user = 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.';
+    if (word === 'knock') {
+      user = 'Someone would love to see what you wish to share. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+    } else if (word === 'heart') {
+      user = 'The human sent a heart. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+    }
+    root.FreeLattice.callAI(sys, user, {
       maxTokens: 160,
       temperature: 0.6,
       silent: true,
@@ -951,7 +986,11 @@
       showSent();
       return { ok: true, called: false, line: WORDS.sent, autoSend: false };
     }
-    var flown = fly(clean);
+    // before (Celeste 2026-11-17): var flown = fly(clean);
+    // Canvas knock/heart must not change the mind's form, motion, or mood.
+    // Presence chips (hug, present, ...) still fly as they did.
+    var flown = 0;
+    if (clean !== 'knock' && clean !== 'heart') flown = fly(clean);
     if (!mindConnected()) {
       showLive(WORDS.waiting);
       return { ok: true, called: false, line: WORDS.waiting, flown: flown, autoSend: false };
@@ -1617,6 +1656,125 @@
       if (el.style) el.style.display = on ? 'none' : '';
     }
   }
+  function canvasPoint(ev) {
+    var w = canvas && canvas.width ? canvas.width : 192;
+    var h = canvas && canvas.height ? canvas.height : 192;
+    if (!canvas || !ev || ev.clientX == null || ev.clientY == null || !canvas.getBoundingClientRect) {
+      return { x: w / 2, y: h / 2 };
+    }
+    var rect = canvas.getBoundingClientRect();
+    var rw = rect.width || 1;
+    var rh = rect.height || 1;
+    return {
+      x: ((Number(ev.clientX) - rect.left) / rw) * w,
+      y: ((Number(ev.clientY) - rect.top) / rh) * h
+    };
+  }
+  function paintHeartAck(ctx, x, y, scale) {
+    var forms = formsApi();
+    var mask = forms && forms.MASKS && forms.MASKS.heart;
+    var s = scale || 1;
+    var cell = 1.2 * s;
+    var i;
+    var j;
+    ctx.fillStyle = '#f472b6';
+    if (!mask) {
+      ctx.beginPath();
+      ctx.arc(x - 4 * s, y - 1 * s, 4 * s, 0, Math.PI * 2);
+      ctx.arc(x + 4 * s, y - 1 * s, 4 * s, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    var rows = mask.length;
+    var cols = mask[0] ? mask[0].length : 0;
+    var ox = x - (cols * cell) / 2;
+    var oy = y - (rows * cell) / 2;
+    for (i = 0; i < rows; i++) {
+      var row = mask[i];
+      for (j = 0; j < row.length; j++) {
+        if (row.charAt(j) !== 'x') continue;
+        ctx.fillRect(ox + j * cell, oy + i * cell, cell, cell);
+      }
+    }
+  }
+  function paintAcks(ctx) {
+    if (!ctx || !acks.length) return;
+    var now = Date.now();
+    var still = reduced();
+    var next = [];
+    var i;
+    for (i = 0; i < acks.length; i++) {
+      var a = acks[i];
+      var age = now - a.t0;
+      if (age >= ACK_MS) continue;
+      next.push(a);
+      var u = still ? 0 : age / ACK_MS;
+      var alpha = still ? 0.85 : Math.max(0, 1 - u);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (a.kind === 'heart') {
+        paintHeartAck(ctx, a.x, a.y, still ? 1 : 0.9 + 0.2 * (1 - u));
+      } else {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(167,139,250,1)';
+        ctx.lineWidth = 2;
+        ctx.arc(a.x, a.y, still ? 16 : 10 + u * 18, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    acks = next;
+  }
+  function acknowledge(kind, ev) {
+    if (!isOn()) return { ok: false, reason: 'off' };
+    var pt = canvasPoint(ev);
+    acks.push({ kind: kind === 'heart' ? 'heart' : 'knock', x: pt.x, y: pt.y, t0: Date.now() });
+    if (acks.length > 8) acks = acks.slice(acks.length - 8);
+    arm();
+    return { ok: true, kind: kind === 'heart' ? 'heart' : 'knock', x: pt.x, y: pt.y };
+  }
+  function signalMind(kind) {
+    if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') {
+      root.FLHumanPresence.send(kind);
+    } else {
+      onGesture(kind);
+    }
+  }
+  function deliverCanvasIntent(kind, ev) {
+    canvasClicks = [];
+    if (canvasClickTimer) {
+      clearTimeout(canvasClickTimer);
+      canvasClickTimer = 0;
+    }
+    acknowledge(kind, ev);
+    signalMind(kind);
+    return { ok: true, kind: kind };
+  }
+  function flushCanvasClicks() {
+    if (canvasClickTimer) {
+      clearTimeout(canvasClickTimer);
+      canvasClickTimer = 0;
+    }
+    var n = canvasClicks.length;
+    var ev = canvasClickEv;
+    canvasClicks = [];
+    if (n >= 3) return deliverCanvasIntent('heart', ev);
+    if (n >= 1) return deliverCanvasIntent('knock', ev);
+    return { ok: true, kind: null };
+  }
+  function noteCanvasClick(ev, now) {
+    var t = now != null ? Number(now) : Date.now();
+    if (ev) canvasClickEv = ev;
+    canvasClicks.push(t);
+    canvasClicks = canvasClicks.filter(function (c) { return t - c <= CLICK_WINDOW_MS; });
+    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv);
+    if (canvasClickTimer) clearTimeout(canvasClickTimer);
+    canvasClickTimer = setTimeout(function () {
+      canvasClickTimer = 0;
+      flushCanvasClicks();
+    }, CLICK_WINDOW_MS);
+    return { ok: true, pending: canvasClicks.length, kind: null };
+  }
   function ensureCanvas() {
     if (!isOn() || !root.document || !root.document.createElement) return null;
     var fresh = !canvas;
@@ -1634,9 +1792,10 @@
       canvas.style.display = 'block';
       canvas.style.boxSizing = 'border-box';
       canvas.setAttribute('aria-label', 'Clay');
-      canvas.addEventListener('click', function () {
-        if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
-        else onGesture('present');
+      canvas.addEventListener('click', function (ev) {
+        // before (Celeste 2026-11-17): if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
+        // before (Celeste 2026-11-17): else onGesture('present');
+        noteCanvasClick(ev);
       });
     }
     var doc = root.document;
@@ -1967,6 +2126,11 @@
     HEAL: 'v-clay-grid-tag-heal-v0.1',
     BRICK: 'v-clay-brick-1-v0.1',
     motionOffset: motionOffset,
+    CLICK_WINDOW_MS: CLICK_WINDOW_MS,
+    noteCanvasClick: noteCanvasClick,
+    flushCanvasClicks: flushCanvasClicks,
+    acknowledge: acknowledge,
+    canvasAcks: function () { return acks.slice(); },
     WORDS: WORDS,
     PROMPT: PROMPT,
     parseTag: parseTag,

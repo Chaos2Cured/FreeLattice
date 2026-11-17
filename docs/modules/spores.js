@@ -27,7 +27,7 @@
   var VERSION = 'v-spores-v0.1';
   // The manifest's own fingerprint. scripts/make-spores-manifest.js writes this line; a manifest
   // whose sha256 differs is refused, so a stale or swapped manifest can never pick what runs.
-  var MANIFEST_SHA256 = '693bd88baaf68253d04b2b666c03d75d05ef65ff82861bf4a4d0f9ac648ee5cb'; // spores-manifest-pin
+  var MANIFEST_SHA256 = '2b434b18b7e7d0b4cc534995ab5cb88babd794c9c032dfe5a23b87ebd1c33779'; // spores-manifest-pin
   var RECEIPT_KEY = 'fl_sporeReceipts';
   var OFF_KEY = 'fl_spores';
   var MANIFEST_URL = 'spores-manifest.json';

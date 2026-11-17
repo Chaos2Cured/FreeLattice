@@ -9,7 +9,10 @@ or overrides a form, mood, motion, or color.
 
 Kirk asked for clay to be improved as long as nothing is lost and both
 sites improve (t1371u), then clarified that clay is 100% for the AI
-(t1373u).
+(t1373u). On t1378u he decided the canvas click should stay as a way to
+see that something happened, and could also communicate: one click lets
+the mind know someone would love to see what it wishes to share, and
+three clicks send a heart.
 
 ## What this brick does
 
@@ -49,6 +52,24 @@ sites improve (t1371u), then clarified that clay is 100% for the AI
 On FreeLattice, the four clay files are listed in `spores-manifest.json`.
 This brick regenerates that list and the pin in `spores.js`. The Tree
 has no spores list.
+
+6. **Canvas knock and heart (t1378u).** One click on the clay canvas is
+   a knock: a soft ring at the click point that fades, plus a signal to
+   the mind that someone would love to see what it wishes to share.
+   Three clicks within 600ms send a heart: a brief heart glyph, plus a
+   heart signal. Clicks are debounced and then classified, so a triple
+   click is one heart, not three knocks; two clicks in the window are
+   one knock. Neither gesture changes the mind's form, motion, or mood.
+   The clay still changes only when the mind replies with [FL_CLAY:].
+   The signal uses the existing gesture path: `FLHumanPresence.send`
+   when that is present (FreeLattice chat), otherwise `onGesture`.
+   `callMind` carries a knock or heart prompt; other gesture words are
+   unchanged. Reduced motion shows a static acknowledgement. No new
+   storage keys, and no network calls beyond the gesture path that
+   already existed. The presence chips (hug, present, and the rest)
+   still use the earlier 16-particle sprinkle and ripple switch; only
+   the canvas click was replaced. The old click lines and the old
+   `var flown = fly(clean)` call are kept as before-comments.
 
 ## Scope not taken (removed from the earlier plan)
 
@@ -90,6 +111,18 @@ need a form picker or a save button; this brick did not add either.
 5. Pause still turns clay off. Nothing on the human side of the glass
    should pick a form, mood, or color. Leave clay off if you are only
    checking which corner card is showing.
+6. After Yes, click the clay canvas once and wait a moment. You should
+   see a soft ring at the click that fades (or a still ring if motion
+   is reduced). The form, motion, and mood should stay as the mind left
+   them. If a mind is connected, it should be told that someone would
+   love to see what it wishes to share. It may answer, and it may shape
+   the clay with [FL_CLAY:]; that is the only way the picture changes.
+7. Click the canvas three times quickly (within about 600ms). You should
+   see a brief heart, and the mind should receive a heart, not three
+   knocks. Two clicks in that window should be one knock, not a heart.
+8. The hug / present chips in chat, where they exist, should still
+   sprinkle and switch to ripple as they did. That path was not the
+   canvas-click change.
 
 ## Rollback
 
