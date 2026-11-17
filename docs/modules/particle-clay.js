@@ -575,8 +575,13 @@
     } else if (motion === 'branch' && math && typeof math.branch === 'function') {
       var br = math.branch(index % 5, 8 + energy * 10);
       var len = br && br.length ? br.length : 0;
-      dx += Math.cos(index * 0.7) * len * 0.02;
-      dy += Math.sin(index * 0.7) * len * 0.02;
+      // before (Celeste 2026-11-17): dx += Math.cos(index * 0.7) * len * 0.02;
+      // before (Celeste 2026-11-17): dy += Math.sin(index * 0.7) * len * 0.02;
+      // Soft: a gentle time term so the branch sways. Distinct from breath
+      // (breath still scales the whole form). Reduced motion still settles
+      // in draw() and never calls this.
+      dx += Math.cos(index * 0.7 + t * 0.6) * len * 0.02;
+      dy += Math.sin(index * 0.7 + t * 0.6) * len * 0.02;
     } else if (motion === 'pulse' && math && typeof math.pulse === 'function') {
       var pu = math.pulse(t + index * 0.01);
       dx += (part.tx || 0) * (pu - 0.5) * 0.04;
@@ -633,6 +638,16 @@
         } else {
           p.x += (p.tx - p.x) * 0.18;
           p.y += (p.ty - p.y) * 0.18;
+          // before (Celeste 2026-11-17): if (currentMotion === 'wave' && math) {
+          // before (Celeste 2026-11-17):   p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+          // before (Celeste 2026-11-17): } else if (currentMotion === 'drift' && math) {
+          // before (Celeste 2026-11-17):   p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+          // before (Celeste 2026-11-17):   p.y += math.wave(p.ty, p.tx, t, knob.amplitude) * 0.08;
+          // before (Celeste 2026-11-17): } else if (currentMotion === 'scatter' && math) {
+          // before (Celeste 2026-11-17):   var g = math.gather(i + 1, parts.length, 6 + energyNow * 10);
+          // before (Celeste 2026-11-17):   p.x += (g.x) * 0.002;
+          // before (Celeste 2026-11-17):   p.y += (g.y) * 0.002;
+          // before (Celeste 2026-11-17): }
           var shift = motionOffset(currentMotion, p, i, t, energyNow, parts.length, math, knob);
           p.x += shift.x;
           p.y += shift.y;

@@ -320,6 +320,7 @@
     if (doc && doc.body && typeof root.MutationObserver === 'function') {
       try {
         var obs = new root.MutationObserver(function () { syncFromPage(); });
+        // before (Celeste 2026-11-17): obs.observe(doc.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
         obs.observe(doc.body, { attributes: true, subtree: true, attributeFilter: ['class', 'hidden'] });
       } catch (e) {}
     }

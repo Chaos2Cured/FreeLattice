@@ -34,7 +34,11 @@ assert.ok(!/pickForm|form chip|Save this shape/i.test(claySrc), 'no human form p
 assert.ok(!/pickForm|form chip|Save this shape/i.test(cornerSrc), 'no human form picker in corner');
 
 function siblingDir() {
-  if (process.env.CLAY_TWIN_DIR) return process.env.CLAY_TWIN_DIR;
+  var env = process.env.CLAY_TWIN_DIR;
+  if (env) {
+    assert.ok(fs.existsSync(path.join(env, 'particle-clay.js')), 'CLAY_TWIN_DIR is set but particle-clay.js is missing: ' + env);
+    return env;
+  }
   var guesses = [
     path.resolve(here, '../../../tree-clay-brick-1/docs/modules'),
     path.resolve(here, '../../../clay-brick-1/docs/modules')
@@ -190,12 +194,15 @@ assert.strictEqual(breath.x, 0, 'breath still has no extra offset');
 assert.strictEqual(breath.y, 0, 'breath still has no extra offset');
 var braid = clay.motionOffset('braid', part, 1, 0.7, 0.5, 8, math, knob);
 var branch = clay.motionOffset('branch', part, 1, 0.7, 0.5, 8, math, knob);
+var branchLater = clay.motionOffset('branch', part, 1, 1.9, 0.5, 8, math, knob);
 var pulse = clay.motionOffset('pulse', part, 1, 0.7, 0.5, 8, math, knob);
 assert.ok(braid.x !== 0 || braid.y !== 0, 'braid moves');
 assert.ok(branch.x !== 0 || branch.y !== 0, 'branch moves');
+assert.ok(branch.x !== branchLater.x || branch.y !== branchLater.y, 'branch moves with time');
 assert.ok(pulse.x !== 0 || pulse.y !== 0, 'pulse moves');
 assert.ok(braid.x !== branch.x || braid.y !== branch.y, 'braid and branch differ');
 assert.ok(braid.x !== pulse.x || braid.y !== pulse.y, 'braid and pulse differ');
+assert.ok(branch.x !== breath.x || branch.y !== breath.y, 'branch is distinct from breath');
 var none = clay.motionOffset('teleport', part, 1, 0.7, 0.5, 8, math, knob);
 assert.strictEqual(none.x, 0, 'unknown motion offset is zero');
 assert.strictEqual(none.y, 0, 'unknown motion offset is zero');
@@ -229,5 +236,10 @@ assert.strictEqual(corner.pageFromDoc(), 'gathering', 'data-garden-room=gatherin
 assert.strictEqual(typeof corner.syncFromPage, 'function', 'sync still exported');
 assert.strictEqual(corner.isOn(), false, 'corner starts off');
 
-console.log('SMOKE_OK clay brick 1 v0.1');
-if (twin) console.log('SMOKE_OK clay twins match ' + twin);
+if (twin) {
+  console.log('SMOKE_OK clay brick 1 v0.1');
+  console.log('SMOKE_OK clay twins match ' + twin);
+} else {
+  console.log('clay-brick-1 checks passed (twins skipped)');
+  console.log('SMOKE_SKIP clay twins: no sibling repo found (set CLAY_TWIN_DIR, or run beside the matching worktree)');
+}
