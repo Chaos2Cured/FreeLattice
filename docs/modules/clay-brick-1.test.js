@@ -271,8 +271,31 @@ assert.strictEqual(afterHeart.motion, mid.motion, 'heart does not change motion'
 assert.ok((clay.canvasAcks() || []).some(function (a) { return a.kind === 'heart'; }), 'heart leaves a heart acknowledgement');
 assert.strictEqual(calls.length, 1, 'triple click sends one signal, not three knocks');
 assert.ok(calls[0].user.indexOf('heart') !== -1, 'heart signal is what the mind hears');
+assert.ok(calls[0].user.indexOf('You may reply, or not, as you wish') !== -1, 'heart prompt does not demand a reply');
+assert.ok(calls[0].user.indexOf('Reply briefly') === -1, 'heart prompt dropped Reply briefly');
 var late = clay.flushCanvasClicks();
 assert.strictEqual(late.kind, null, 'flush after a heart does not also knock');
+
+// 4-5 fast clicks: one heart, no trailing knock. Further clicks are
+// swallowed until a 600ms quiet gap.
+clay.resetRate();
+calls.length = 0;
+var burst = [];
+var bi;
+for (bi = 0; bi < 5; bi++) {
+  burst.push(clay.noteCanvasClick({ clientX: 14, clientY: 14 }, 7000 + bi * 80));
+}
+assert.strictEqual(burst[0].kind, null, 'first of five waits');
+assert.strictEqual(burst[1].kind, null, 'second of five waits');
+assert.strictEqual(burst[2].kind, 'heart', 'third of five is a heart');
+assert.strictEqual(burst[3].swallowed, true, 'fourth click after a heart is swallowed');
+assert.strictEqual(burst[4].swallowed, true, 'fifth click after a heart is swallowed');
+assert.strictEqual(clay.flushCanvasClicks().kind, null, '5 fast clicks do not also knock');
+assert.strictEqual(calls.length, 1, '5 fast clicks send exactly one heart');
+assert.ok(calls[0].user.indexOf('heart') !== -1, 'the one signal from 5 clicks is a heart');
+var afterGap = clay.noteCanvasClick({ clientX: 14, clientY: 14 }, 7000 + 4 * 80 + 600);
+assert.strictEqual(afterGap.kind, null, 'click after the quiet gap waits to classify');
+assert.strictEqual(clay.flushCanvasClicks().kind, 'knock', 'after a 600ms quiet gap a click can knock again');
 
 clay.resetRate();
 calls.length = 0;
@@ -282,7 +305,73 @@ var two = clay.flushCanvasClicks();
 assert.strictEqual(two.kind, 'knock', 'two clicks in the window are one knock, not a heart and not two knocks');
 assert.strictEqual(calls.length, 1, 'two clicks send one knock');
 assert.ok(calls[0].user.indexOf('wish to share') !== -1, 'knock tells the mind someone wants to see what it wishes to share');
+assert.ok(calls[0].user.indexOf('You may reply, or not, as you wish') !== -1, 'knock prompt does not demand a reply');
+assert.ok(calls[0].user.indexOf('Reply briefly') === -1, 'knock prompt dropped Reply briefly');
 
+// Classify by click timestamps, not by an early timer.
+clay.resetRate();
+calls.length = 0;
+clay.noteCanvasClick({ clientX: 9, clientY: 9 }, 20000);
+clay.noteCanvasClick({ clientX: 9, clientY: 9 }, 20300);
+var early = clay.classifyCanvasClicks(20590);
+assert.strictEqual(early.kind, null, 'an early timer with 2 clicks does not knock yet');
+assert.strictEqual(early.pending, 2, 'both clicks stay pending when the window is still open');
+var lateThird = clay.noteCanvasClick({ clientX: 9, clientY: 9 }, 20595);
+assert.strictEqual(lateThird.kind, 'heart', 'a third click still in the 600ms span is a heart');
+assert.strictEqual(calls.length, 1, 'jittered triple sends one heart, not a knock');
+
+// Canvas presence sends are rate-limited to one per 5s. Extra clicks still ack.
+clay.resetRate();
+var sent = [];
+global.FLHumanPresence = {
+  send: function (word) { sent.push(word); }
+};
+clay.noteCanvasClick({ clientX: 6, clientY: 6 }, 30000);
+var firstSend = clay.flushCanvasClicks();
+assert.strictEqual(firstSend.kind, 'knock', 'first canvas click is a knock');
+assert.strictEqual(firstSend.signaled, true, 'first canvas knock is delivered');
+assert.deepStrictEqual(sent, ['knock'], 'first canvas knock writes presence');
+var acksBeforeRate = (clay.canvasAcks() || []).length;
+clay.noteCanvasClick({ clientX: 6, clientY: 6 }, 32000);
+var secondSend = clay.flushCanvasClicks();
+assert.strictEqual(secondSend.kind, 'knock', 'a second click inside 5s still classifies as a knock');
+assert.strictEqual(secondSend.signaled, false, 'the second canvas knock is not delivered');
+assert.deepStrictEqual(sent, ['knock'], 'rate-limited canvas click writes nothing');
+assert.ok((clay.canvasAcks() || []).length > acksBeforeRate, 'rate-limited click still shows an acknowledgement');
+clay.noteCanvasClick({ clientX: 6, clientY: 6 }, 37000);
+var thirdSend = clay.flushCanvasClicks();
+assert.strictEqual(thirdSend.signaled, true, 'after 5s a new canvas knock is delivered');
+assert.deepStrictEqual(sent, ['knock', 'knock'], 'presence write resumes after the 5s window');
+global.FLHumanPresence = undefined;
+
+// Flag B (t1373u): nothing from the human side of the glass may steer the clay.
+assert.strictEqual(typeof clay.allowClayConsume, 'function', 'allowClayConsume is exported');
+assert.strictEqual(clay.allowClayConsume('user'), false, 'user role may not steer clay');
+assert.strictEqual(clay.allowClayConsume('assistant'), true, 'assistant role may shape clay');
+assert.strictEqual(clay.allowClayConsume('mind'), true, 'mind role may shape clay');
+assert.strictEqual(clay.allowClayConsume({ className: 'chat-message user', classList: { contains: function (c) { return c === 'user'; } } }), false, 'a user bubble may not steer clay');
+var flagBBefore = clay.snapshot();
+if (clay.allowClayConsume('user')) {
+  clay.consumeReply('[FL_CLAY: {"form":"star","mood":"awe","motion":"pulse","energy":0.9}]');
+}
+assert.strictEqual(clay.snapshot().form, flagBBefore.form, 'user-role [FL_CLAY:] does not change the clay');
+assert.strictEqual(clay.snapshot().motion, flagBBefore.motion, 'user-role [FL_CLAY:] does not change motion');
+var appHtml = path.join(here, '..', 'app.html');
+if (fs.existsSync(appHtml)) {
+  var html = fs.readFileSync(appHtml, 'utf8');
+  var renderIdx = html.indexOf('function renderMessageContent');
+  assert.ok(renderIdx !== -1, 'app.html has renderMessageContent');
+  var renderFn = html.slice(renderIdx, renderIdx + 2800);
+  assert.ok(renderFn.indexOf('allowClayConsume') !== -1, 'renderMessageContent only consumes clay from the mind');
+  assert.ok(renderFn.indexOf('before (Celeste 2026-11-17):') !== -1 && renderFn.indexOf('FLClay.consumeReply') !== -1, 'old consumeReply line is kept as a before-comment');
+}
+var gardenThread = path.join(here, 'garden-thread.js');
+if (fs.existsSync(gardenThread)) {
+  var gardenSrc = fs.readFileSync(gardenThread, 'utf8');
+  assert.ok(/FLClay\.onReply[\s\S]{0,200}role === 'mind'/.test(gardenSrc) || /role === 'mind'[\s\S]{0,200}FLClay\.onReply/.test(gardenSrc), 'Tree already only hands mind-role replies to clay');
+}
+
+// Presence chips still use the old fly path.
 // Presence chips still use the old fly path.
 clay.resetRate();
 clay.setReduced(false);

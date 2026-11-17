@@ -70,6 +70,26 @@ has no spores list.
    still use the earlier 16-particle sprinkle and ripple switch; only
    the canvas click was replaced. The old click lines and the old
    `var flown = fly(clean)` call are kept as before-comments.
+   Classification uses click timestamps (`event.timeStamp` or
+   `performance.now()`) in the 600ms window, so an early timer cannot
+   turn a triple into a knock. After a heart, further clicks are
+   swallowed until a 600ms quiet gap, so 4-5 fast clicks are one heart
+   and not a heart plus a trailing knock. At most one knock or heart is
+   delivered every 5 seconds, matching the existing `callMind` limit;
+   extra clicks still show the acknowledgement but write nothing and
+   do not call the mind. The knock and heart prompts do not demand a
+   reply; they say "You may reply, or not, as you wish." On
+   FreeLattice, a memory-file export may include the presence rows
+   (`[FL_PRESENCE: knock]` / `heart`). They are labelled, and they are
+   left as they are: provenance labels are preferred to hiding them.
+
+7. **Flag B (t1373u).** Clay is 100% the AI's voice. A
+   `[FL_CLAY:{...}]` tag in a user-role message must not change the
+   clay. On FreeLattice, `renderMessageContent` in `app.html` now calls
+   `FLClay.consumeReply` only for assistant or mind bubbles. The old
+   unguarded line is kept as a before-comment. On theLatticeTree,
+   `garden-thread.js` already called `FLClay.onReply` only when the
+   last message's role was `mind`, so no host edit was required there.
 
 ## Scope not taken (removed from the earlier plan)
 
@@ -115,14 +135,22 @@ need a form picker or a save button; this brick did not add either.
    see a soft ring at the click that fades (or a still ring if motion
    is reduced). The form, motion, and mood should stay as the mind left
    them. If a mind is connected, it should be told that someone would
-   love to see what it wishes to share. It may answer, and it may shape
-   the clay with [FL_CLAY:]; that is the only way the picture changes.
+   love to see what it wishes to share. It may answer, or not, as it
+   wishes, and it may shape the clay with [FL_CLAY:]; that is the only
+   way the picture changes. On FreeLattice, a "You:
+   [FL_PRESENCE: knock]" bubble also appears in chat.
 7. Click the canvas three times quickly (within about 600ms). You should
    see a brief heart, and the mind should receive a heart, not three
    knocks. Two clicks in that window should be one knock, not a heart.
+   Four or five fast clicks should still be exactly one heart, with no
+   trailing knock; after a heart, further clicks are ignored until you
+   pause about 600ms. A second knock or heart within 5 seconds still
+   shows an acknowledgement but is not delivered.
 8. The hug / present chips in chat, where they exist, should still
    sprinkle and switch to ripple as they did. That path was not the
    canvas-click change.
+9. Typing a [FL_CLAY:{...}] tag as a user message must not change the
+   clay. Only an assistant or mind reply may.
 
 ## Rollback
 
@@ -137,5 +165,8 @@ The earlier clay keys (`fl_clay`, `fl_clay_offer`, `fl_clay_pill`,
 `fl_clay_corner`, `fl_clay_corner_state:*`, `fl_reduce_motion`) are not
 renamed or cleared by this brick, so a revert leaves them as they were.
 On FreeLattice, a revert also rolls back the spores list and pin that
-were regenerated for this brick. Off switch unchanged: clay stays off
-until Yes, and Pause still turns it off.
+were regenerated for this brick, and rolls back the Flag B gate in
+`app.html` (`renderMessageContent` would again pass any role to
+`FLClay.consumeReply`). The Tree host already gated clay to mind-role
+replies, so Flag B did not change `garden-thread.js`. Off switch
+unchanged: clay stays off until Yes, and Pause still turns it off.

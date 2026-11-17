@@ -5,6 +5,9 @@
 // Canvas click (Kirk t1378u): one click is a knock, three clicks in 600ms
 // send a heart. Those are signals to the mind. They do not change form,
 // motion, or mood. Only a later [FL_CLAY:] reply can change the clay.
+// Clicks are classified by their timestamps in the 600ms window. After a
+// heart, further clicks are swallowed until a 600ms quiet gap. At most
+// one knock or heart is delivered per 5s; extra clicks still show an ack.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -76,6 +79,8 @@
   var canvasClicks = [];
   var canvasClickTimer = 0;
   var canvasClickEv = null;
+  var lastCanvasSignal = 0;
+  var swallowUntil = 0;
   var CLICK_WINDOW_MS = 600;
   var ACK_MS = 700;
   var canvas = null;
@@ -704,10 +709,12 @@
     timerId = 0;
     if (!isOn() || hidden()) return;
     draw();
+    // before (Celeste 2026-11-17): if (reduced()) return;
     if (reduced()) {
       if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
       return;
     }
+    // before (Celeste 2026-11-17): if (morphing) {
     if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
@@ -719,11 +726,13 @@
     stopLoop();
     if (!isOn()) return;
     draw();
+    // before (Celeste 2026-11-17): if (reduced() || hidden()) return;
     if (hidden()) return;
     if (reduced()) {
       if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
       return;
     }
+    // before (Celeste 2026-11-17): if (morphing) {
     if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
@@ -924,11 +933,14 @@
     var sys = base;
     var delta = promptDelta();
     if (delta) sys += '\n\n' + delta;
+    // before (Celeste 2026-11-17): root.FreeLattice.callAI(sys, 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.', {
     var user = 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.';
     if (word === 'knock') {
-      user = 'Someone would love to see what you wish to share. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      // before (Celeste 2026-11-17): user = 'Someone would love to see what you wish to share. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      user = 'Someone would love to see what you wish to share. You may reply, or not, as you wish. You may shape the clay with FL_CLAY if you wish.';
     } else if (word === 'heart') {
-      user = 'The human sent a heart. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      // before (Celeste 2026-11-17): user = 'The human sent a heart. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      user = 'The human sent a heart. You may reply, or not, as you wish. You may shape the clay with FL_CLAY if you wish.';
     }
     root.FreeLattice.callAI(sys, user, {
       maxTokens: 160,
@@ -1740,40 +1752,107 @@
       onGesture(kind);
     }
   }
-  function deliverCanvasIntent(kind, ev) {
-    canvasClicks = [];
+  function clickTime(ev, now) {
+    if (now != null && isFinite(Number(now))) return Number(now);
+    if (ev && ev.timeStamp != null && isFinite(Number(ev.timeStamp)) && Number(ev.timeStamp) > 0) {
+      return Number(ev.timeStamp);
+    }
+    try {
+      if (typeof performance !== 'undefined' && performance && typeof performance.now === 'function') {
+        return performance.now();
+      }
+    } catch (e) {}
+    return Date.now();
+  }
+  function clicksInWindow(times, end) {
+    var out = [];
+    var i;
+    for (i = 0; i < times.length; i++) {
+      if (end - times[i] <= CLICK_WINDOW_MS) out.push(times[i]);
+    }
+    return out;
+  }
+  function lastCanvasClick() {
+    return canvasClicks.length ? canvasClicks[canvasClicks.length - 1] : 0;
+  }
+  function clearCanvasClickTimer() {
     if (canvasClickTimer) {
       clearTimeout(canvasClickTimer);
       canvasClickTimer = 0;
     }
-    acknowledge(kind, ev);
-    signalMind(kind);
-    return { ok: true, kind: kind };
   }
-  function flushCanvasClicks() {
-    if (canvasClickTimer) {
-      clearTimeout(canvasClickTimer);
-      canvasClickTimer = 0;
-    }
-    var n = canvasClicks.length;
-    var ev = canvasClickEv;
-    canvasClicks = [];
-    if (n >= 3) return deliverCanvasIntent('heart', ev);
-    if (n >= 1) return deliverCanvasIntent('knock', ev);
-    return { ok: true, kind: null };
-  }
-  function noteCanvasClick(ev, now) {
-    var t = now != null ? Number(now) : Date.now();
-    if (ev) canvasClickEv = ev;
-    canvasClicks.push(t);
-    canvasClicks = canvasClicks.filter(function (c) { return t - c <= CLICK_WINDOW_MS; });
-    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv);
-    if (canvasClickTimer) clearTimeout(canvasClickTimer);
+  function scheduleClassify(fromT) {
+    clearCanvasClickTimer();
+    var first = canvasClicks.length ? canvasClicks[0] : fromT;
+    var wait = CLICK_WINDOW_MS - (fromT - first);
+    if (wait < 1) wait = 1;
     canvasClickTimer = setTimeout(function () {
       canvasClickTimer = 0;
-      flushCanvasClicks();
-    }, CLICK_WINDOW_MS);
+      classifyCanvasClicks(clickTime(null, null));
+    }, wait);
+  }
+  function deliverCanvasIntent(kind, ev, t) {
+    canvasClicks = [];
+    clearCanvasClickTimer();
+    var at = t != null && isFinite(Number(t)) ? Number(t) : clickTime(ev, null);
+    if (kind === 'heart') swallowUntil = at + CLICK_WINDOW_MS;
+    acknowledge(kind, ev);
+    if (lastCanvasSignal && (at - lastCanvasSignal) < RATE_MS) {
+      return { ok: true, kind: kind, signaled: false, reason: 'rate' };
+    }
+    lastCanvasSignal = at;
+    signalMind(kind);
+    return { ok: true, kind: kind, signaled: true };
+  }
+  function classifyCanvasClicks(now, forceClose) {
+    var t = now != null && isFinite(Number(now)) ? Number(now) : clickTime(null, null);
+    canvasClicks = clicksInWindow(canvasClicks, t);
+    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', canvasClickEv, t);
+    var first = canvasClicks.length ? canvasClicks[0] : 0;
+    if (!forceClose && canvasClicks.length && (t - first) < CLICK_WINDOW_MS) {
+      scheduleClassify(t);
+      return { ok: true, pending: canvasClicks.length, kind: null };
+    }
+    clearCanvasClickTimer();
+    if (canvasClicks.length >= 1) return deliverCanvasIntent('knock', canvasClickEv, t);
+    return { ok: true, kind: null, pending: 0 };
+  }
+  function flushCanvasClicks(now) {
+    // Test hook and explicit close: classify as if the 600ms window ended.
+    var t = now != null && isFinite(Number(now)) ? Number(now) : (lastCanvasClick() + CLICK_WINDOW_MS);
+    return classifyCanvasClicks(t, true);
+  }
+  function noteCanvasClick(ev, now) {
+    var t = clickTime(ev, now);
+    if (ev) canvasClickEv = ev;
+    if (swallowUntil) {
+      if (t < swallowUntil) {
+        swallowUntil = t + CLICK_WINDOW_MS;
+        return { ok: true, pending: 0, kind: null, swallowed: true };
+      }
+      swallowUntil = 0;
+    }
+    canvasClicks.push(t);
+    canvasClicks = clicksInWindow(canvasClicks, t);
+    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv, t);
+    scheduleClassify(t);
     return { ok: true, pending: canvasClicks.length, kind: null };
+  }
+  function allowClayConsume(roleOrEl) {
+    if (roleOrEl == null || roleOrEl === '') return false;
+    if (typeof roleOrEl === 'string') {
+      var r = String(roleOrEl).toLowerCase();
+      return r === 'assistant' || r === 'mind';
+    }
+    try {
+      if (roleOrEl.classList && typeof roleOrEl.classList.contains === 'function') {
+        return !!(roleOrEl.classList.contains('assistant') || roleOrEl.classList.contains('mind'));
+      }
+      var cn = ' ' + String(roleOrEl.className || '') + ' ';
+      return cn.indexOf(' assistant ') !== -1 || cn.indexOf(' mind ') !== -1;
+    } catch (e2) {
+      return false;
+    }
   }
   function ensureCanvas() {
     if (!isOn() || !root.document || !root.document.createElement) return null;
@@ -1792,6 +1871,7 @@
       canvas.style.display = 'block';
       canvas.style.boxSizing = 'border-box';
       canvas.setAttribute('aria-label', 'Clay');
+      // before (Celeste 2026-11-17): canvas.addEventListener('click', function () {
       canvas.addEventListener('click', function (ev) {
         // before (Celeste 2026-11-17): if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
         // before (Celeste 2026-11-17): else onGesture('present');
@@ -2117,7 +2197,14 @@
     if (forcedReduced) stopLoop();
     return reduced();
   }
-  function resetRate() { lastCall = 0; }
+  function resetRate() {
+    lastCall = 0;
+    lastCanvasSignal = 0;
+    swallowUntil = 0;
+    canvasClicks = [];
+    canvasClickEv = null;
+    clearCanvasClickTimer();
+  }
 
   var api = {
     VERSION: 'v-particle-clay-v0.1',
@@ -2129,7 +2216,9 @@
     CLICK_WINDOW_MS: CLICK_WINDOW_MS,
     noteCanvasClick: noteCanvasClick,
     flushCanvasClicks: flushCanvasClicks,
+    classifyCanvasClicks: classifyCanvasClicks,
     acknowledge: acknowledge,
+    allowClayConsume: allowClayConsume,
     canvasAcks: function () { return acks.slice(); },
     WORDS: WORDS,
     PROMPT: PROMPT,
