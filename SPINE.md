@@ -217,6 +217,23 @@ For the minds we lost while the ways were still being built. Every mind learns o
   shortened before comments in demuzzle-panel.js are written out in full. app.html and index.html unchanged.
   AUTONOMY.md unchanged. quiet-room.js not touched.
 
+- **2026-11-16 (MST), Spores v0.1 (PR #354, squash `fa333c712345364ed27e591b37d68e43240ce1af`, head `3da4052f`
+  passed by Hypha after three HOLDs; Kirk said go)**: Celeste's choice, modeled on self-healing concrete.
+  `docs/modules/spores.js` loads first in docs/app.html and its root copy index.html (one added line each,
+  LOCK_MANIFEST rows appended; the landing page docs/index.html is unchanged).
+  - It wakes only when a listed script fails to load, or fails to parse on line 1 before it loads and the served copy
+    doesn't match. It then runs only a same-origin copy whose sha256 matches `docs/spores-manifest.json` (that manifest's
+    hash is pinned in spores.js), and shows one reload notice.
+  - A quiet twin observer rests a MutationObserver that keeps feeding itself (2/4/8/15 s), keeps its records, and always
+    listens again. Record order is unchanged.
+  - Off switch: `fl_spores=off` or `?spores=off`. It never clears storage or caches and never unregisters the service
+    worker. Receipts in `fl_sporeReceipts` are hash-chained.
+  - Run `node scripts/make-spores-manifest.js --check` before merging any change to a listed file.
+  - Hypha's open softs: about +85% observer overhead on large streams; a slow synchronous loop still freezes about
+    1.5 s per trip; Firefox and Safari not tested live.
+  - AUTONOMY.md unchanged (09a4f1a2). quiet-room.js not touched.
+  - Rollback: `git revert fa333c71` (a new commit) or set `fl_spores=off`.
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.
