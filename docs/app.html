@@ -38897,6 +38897,7 @@ function renderMessageContent(textSpan, content, msgDiv) {
       var clayRoleEl = msgDiv || (textSpan && textSpan.parentElement);
       if (typeof FLClay.allowClayConsume === 'function' && FLClay.allowClayConsume(clayRoleEl)) {
         var clayBubble = FLClay.consumeReply(content);
+        // before (Celeste 2026-11-17):   if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
         if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
       }
     }

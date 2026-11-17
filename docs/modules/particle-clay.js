@@ -5,9 +5,11 @@
 // Canvas click (Kirk t1378u): one click is a knock, three clicks in 600ms
 // send a heart. Those are signals to the mind. They do not change form,
 // motion, or mood. Only a later [FL_CLAY:] reply can change the clay.
-// Clicks are classified by their timestamps in the 600ms window. After a
-// heart, further clicks are swallowed until a 600ms quiet gap. At most
-// one knock or heart is delivered per 5s; extra clicks still show an ack.
+// Clicks are classified by their timestamps in the 600ms window, relative
+// to the first click: count those in [first, first+600]. A late timer
+// still uses that span, not the fire time, so a single click still knocks.
+// After a heart, further clicks are swallowed until a 600ms quiet gap. At
+// most one knock or heart is delivered per 5s; extra clicks still show an ack.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -81,6 +83,8 @@
   var canvasClickEv = null;
   var lastCanvasSignal = 0;
   var swallowUntil = 0;
+  var lastDelivery = null;
+  var classifyTimerDelay = 0;
   var CLICK_WINDOW_MS = 600;
   var ACK_MS = 700;
   var canvas = null;
@@ -1764,11 +1768,14 @@
     } catch (e) {}
     return Date.now();
   }
-  function clicksInWindow(times, end) {
+  function clicksInFirstWindow(times) {
     var out = [];
+    if (!times.length) return out;
+    var first = times[0];
+    var closeAt = first + CLICK_WINDOW_MS;
     var i;
     for (i = 0; i < times.length; i++) {
-      if (end - times[i] <= CLICK_WINDOW_MS) out.push(times[i]);
+      if (times[i] >= first && times[i] <= closeAt) out.push(times[i]);
     }
     return out;
   }
@@ -1781,14 +1788,21 @@
       canvasClickTimer = 0;
     }
   }
+  function setClassifyTimerDelay(ms) {
+    classifyTimerDelay = Math.max(0, Number(ms) || 0);
+    return classifyTimerDelay;
+  }
   function scheduleClassify(fromT) {
     clearCanvasClickTimer();
     var first = canvasClicks.length ? canvasClicks[0] : fromT;
-    var wait = CLICK_WINDOW_MS - (fromT - first);
+    var wait = (first + CLICK_WINDOW_MS) - fromT;
     if (wait < 1) wait = 1;
+    wait += classifyTimerDelay;
     canvasClickTimer = setTimeout(function () {
       canvasClickTimer = 0;
-      classifyCanvasClicks(clickTime(null, null));
+      var start = canvasClicks.length ? canvasClicks[0] : clickTime(null, null);
+      // Classify at first+600, not the (possibly late) fire time.
+      classifyCanvasClicks(start + CLICK_WINDOW_MS);
     }, wait);
   }
   function deliverCanvasIntent(kind, ev, t) {
@@ -1797,29 +1811,59 @@
     var at = t != null && isFinite(Number(t)) ? Number(t) : clickTime(ev, null);
     if (kind === 'heart') swallowUntil = at + CLICK_WINDOW_MS;
     acknowledge(kind, ev);
+    var signaled = true;
+    var reason = '';
     if (lastCanvasSignal && (at - lastCanvasSignal) < RATE_MS) {
-      return { ok: true, kind: kind, signaled: false, reason: 'rate' };
+      signaled = false;
+      reason = 'rate';
+    } else {
+      lastCanvasSignal = at;
+      signalMind(kind);
     }
-    lastCanvasSignal = at;
-    signalMind(kind);
-    return { ok: true, kind: kind, signaled: true };
+    lastDelivery = { kind: kind, signaled: signaled, reason: reason };
+    return { ok: true, kind: kind, signaled: signaled, reason: reason };
   }
   function classifyCanvasClicks(now, forceClose) {
     var t = now != null && isFinite(Number(now)) ? Number(now) : clickTime(null, null);
-    canvasClicks = clicksInWindow(canvasClicks, t);
-    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', canvasClickEv, t);
-    var first = canvasClicks.length ? canvasClicks[0] : 0;
-    if (!forceClose && canvasClicks.length && (t - first) < CLICK_WINDOW_MS) {
-      scheduleClassify(t);
-      return { ok: true, pending: canvasClicks.length, kind: null };
+    if (!canvasClicks.length) {
+      clearCanvasClickTimer();
+      return { ok: true, kind: null, pending: 0 };
+    }
+    var first = canvasClicks[0];
+    var closeAt = first + CLICK_WINDOW_MS;
+    var inWin = clicksInFirstWindow(canvasClicks);
+    var rest = [];
+    var i;
+    for (i = 0; i < canvasClicks.length; i++) {
+      if (canvasClicks[i] > closeAt) rest.push(canvasClicks[i]);
+    }
+    if (inWin.length >= 3) {
+      // A heart swallows leftovers; they must not start a trailing knock.
+      return deliverCanvasIntent('heart', canvasClickEv, inWin[inWin.length - 1]);
+    }
+    if (!forceClose && t < closeAt) {
+      scheduleClassify(t < first ? first : t);
+      return { ok: true, pending: inWin.length, kind: null };
     }
     clearCanvasClickTimer();
-    if (canvasClicks.length >= 1) return deliverCanvasIntent('knock', canvasClickEv, t);
-    return { ok: true, kind: null, pending: 0 };
+    canvasClicks = rest.slice();
+    var result = { ok: true, kind: null, pending: rest.length };
+    if (inWin.length >= 1) result = deliverCanvasIntent('knock', canvasClickEv, closeAt);
+    if (rest.length) {
+      canvasClicks = rest;
+      if (clicksInFirstWindow(canvasClicks).length >= 3) {
+        return deliverCanvasIntent('heart', canvasClickEv, canvasClicks[canvasClicks.length - 1]);
+      }
+      scheduleClassify(canvasClicks[canvasClicks.length - 1]);
+    }
+    return result;
   }
   function flushCanvasClicks(now) {
     // Test hook and explicit close: classify as if the 600ms window ended.
-    var t = now != null && isFinite(Number(now)) ? Number(now) : (lastCanvasClick() + CLICK_WINDOW_MS);
+    var t;
+    if (now != null && isFinite(Number(now))) t = Number(now);
+    else if (canvasClicks.length) t = canvasClicks[0] + CLICK_WINDOW_MS;
+    else t = lastCanvasClick() + CLICK_WINDOW_MS;
     return classifyCanvasClicks(t, true);
   }
   function noteCanvasClick(ev, now) {
@@ -1832,11 +1876,14 @@
       }
       swallowUntil = 0;
     }
+    if (canvasClicks.length && t > canvasClicks[0] + CLICK_WINDOW_MS) {
+      classifyCanvasClicks(canvasClicks[0] + CLICK_WINDOW_MS, true);
+    }
     canvasClicks.push(t);
-    canvasClicks = clicksInWindow(canvasClicks, t);
-    if (canvasClicks.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv, t);
+    var inWin = clicksInFirstWindow(canvasClicks);
+    if (inWin.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv, t);
     scheduleClassify(t);
-    return { ok: true, pending: canvasClicks.length, kind: null };
+    return { ok: true, pending: inWin.length, kind: null };
   }
   function allowClayConsume(roleOrEl) {
     if (roleOrEl == null || roleOrEl === '') return false;
@@ -2197,12 +2244,14 @@
     if (forcedReduced) stopLoop();
     return reduced();
   }
+  // before (Celeste 2026-11-17): function resetRate() { lastCall = 0; }
   function resetRate() {
     lastCall = 0;
     lastCanvasSignal = 0;
     swallowUntil = 0;
     canvasClicks = [];
     canvasClickEv = null;
+    lastDelivery = null;
     clearCanvasClickTimer();
   }
 
@@ -2217,6 +2266,8 @@
     noteCanvasClick: noteCanvasClick,
     flushCanvasClicks: flushCanvasClicks,
     classifyCanvasClicks: classifyCanvasClicks,
+    setClassifyTimerDelay: setClassifyTimerDelay,
+    lastCanvasDelivery: function () { return lastDelivery; },
     acknowledge: acknowledge,
     allowClayConsume: allowClayConsume,
     canvasAcks: function () { return acks.slice(); },

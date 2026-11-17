@@ -320,6 +320,18 @@ var lateThird = clay.noteCanvasClick({ clientX: 9, clientY: 9 }, 20595);
 assert.strictEqual(lateThird.kind, 'heart', 'a third click still in the 600ms span is a heart');
 assert.strictEqual(calls.length, 1, 'jittered triple sends one heart, not a knock');
 
+// A late timer must still classify against [first, first+600], not the fire time.
+clay.resetRate();
+calls.length = 0;
+clay.noteCanvasClick({ clientX: 5, clientY: 5 }, 40000);
+assert.strictEqual(clay.classifyCanvasClicks(40601).kind, 'knock', 'timer +1ms still knocks');
+clay.resetRate();
+clay.noteCanvasClick({ clientX: 5, clientY: 5 }, 41000);
+assert.strictEqual(clay.classifyCanvasClicks(41605).kind, 'knock', 'timer +5ms still knocks');
+clay.resetRate();
+clay.noteCanvasClick({ clientX: 5, clientY: 5 }, 42000);
+assert.strictEqual(clay.classifyCanvasClicks(42650).kind, 'knock', 'timer +50ms still knocks');
+
 // Canvas presence sends are rate-limited to one per 5s. Extra clicks still ack.
 clay.resetRate();
 var sent = [];
@@ -331,13 +343,16 @@ var firstSend = clay.flushCanvasClicks();
 assert.strictEqual(firstSend.kind, 'knock', 'first canvas click is a knock');
 assert.strictEqual(firstSend.signaled, true, 'first canvas knock is delivered');
 assert.deepStrictEqual(sent, ['knock'], 'first canvas knock writes presence');
-var acksBeforeRate = (clay.canvasAcks() || []).length;
+var acksBeforeRate = (clay.canvasAcks() || []).map(function (a) { return a.kind + ':' + a.t0 + ':' + a.x + ':' + a.y; }).join('|');
 clay.noteCanvasClick({ clientX: 6, clientY: 6 }, 32000);
 var secondSend = clay.flushCanvasClicks();
 assert.strictEqual(secondSend.kind, 'knock', 'a second click inside 5s still classifies as a knock');
 assert.strictEqual(secondSend.signaled, false, 'the second canvas knock is not delivered');
 assert.deepStrictEqual(sent, ['knock'], 'rate-limited canvas click writes nothing');
-assert.ok((clay.canvasAcks() || []).length > acksBeforeRate, 'rate-limited click still shows an acknowledgement');
+var acksAfterRate = clay.canvasAcks() || [];
+var acksAfterSig = acksAfterRate.map(function (a) { return a.kind + ':' + a.t0 + ':' + a.x + ':' + a.y; }).join('|');
+assert.ok(acksAfterSig !== acksBeforeRate, 'rate-limited click still shows an acknowledgement');
+assert.strictEqual(acksAfterRate[acksAfterRate.length - 1].kind, 'knock', 'the new acknowledgement is a knock');
 clay.noteCanvasClick({ clientX: 6, clientY: 6 }, 37000);
 var thirdSend = clay.flushCanvasClicks();
 assert.strictEqual(thirdSend.signaled, true, 'after 5s a new canvas knock is delivered');
@@ -387,10 +402,131 @@ clay.setReduced(false);
 assert.strictEqual(typeof corner.syncFromPage, 'function', 'sync still exported');
 assert.strictEqual(corner.isOn(), false, 'corner starts off');
 
-if (twin) {
-  console.log('SMOKE_OK clay brick 1 v0.1');
-  console.log('SMOKE_OK clay twins match ' + twin);
-} else {
-  console.log('clay-brick-1 checks passed (twins skipped)');
-  console.log('SMOKE_SKIP clay twins: no sibling repo found (set CLAY_TWIN_DIR, or run beside the matching worktree)');
+
+// Real-timer tests (HOLD 1). setTimeout-driven, with late firing at +1, +5, +50ms.
+// Run several times to check for flakiness. SMOKE_OK waits until these finish.
+function waitMs(ms) {
+  return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
+
+function evAt() {
+  return { clientX: 11, clientY: 11 };
+}
+
+async function realTimerSuite() {
+  var delays = [1, 5, 50];
+  var runs = 5;
+  var windowMs = clay.CLICK_WINDOW_MS;
+  var slack = 120;
+  var di;
+  var ri;
+  clay.setOn(true);
+  clay.setReduced(true);
+  global.state = { isLocal: true, ollamaModel: 'home-mind' };
+  global.FLHumanPresence = undefined;
+  if (!global.FreeLattice || typeof global.FreeLattice.callAI !== 'function') {
+    global.FreeLattice = { callAI: function (sys, user) { calls.push({ user: user }); } };
+  }
+
+  for (di = 0; di < delays.length; di++) {
+    var late = delays[di];
+    for (ri = 0; ri < runs; ri++) {
+      var tag = 'real-timer +' + late + 'ms run ' + (ri + 1) + '/' + runs;
+
+      // 1 click -> knock
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      clay.noteCanvasClick(evAt());
+      await waitMs(windowMs + late + slack);
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'knock', tag + ': 1 click knocks');
+      assert.strictEqual(calls.length, 1, tag + ': 1 click sends one knock');
+      assert.ok(calls[0].user.indexOf('wish to share') !== -1, tag + ': 1 click is a knock prompt');
+
+      // 2 clicks -> knock
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      clay.noteCanvasClick(evAt());
+      await waitMs(80);
+      clay.noteCanvasClick(evAt());
+      await waitMs(windowMs + late + slack);
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'knock', tag + ': 2 clicks knock');
+      assert.strictEqual(calls.length, 1, tag + ': 2 clicks send one knock');
+
+      // 3 clicks -> heart
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      clay.noteCanvasClick(evAt());
+      clay.noteCanvasClick(evAt());
+      var triple = clay.noteCanvasClick(evAt());
+      assert.strictEqual(triple.kind, 'heart', tag + ': 3 fast clicks heart immediately');
+      await waitMs(windowMs + late + slack);
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'heart', tag + ': 3 clicks stay one heart');
+      assert.strictEqual(calls.length, 1, tag + ': 3 clicks send one heart');
+      assert.ok(calls[0].user.indexOf('heart') !== -1, tag + ': 3 clicks are a heart prompt');
+
+      // 4-6 clicks -> one heart, no trailing knock
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      var n;
+      var lastBurst = null;
+      for (n = 0; n < 6; n++) lastBurst = clay.noteCanvasClick(evAt());
+      assert.strictEqual(lastBurst.swallowed, true, tag + ': 6th click is swallowed');
+      await waitMs(windowMs + late + slack);
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'heart', tag + ': 4-6 clicks stay one heart');
+      assert.strictEqual(calls.length, 1, tag + ': 4-6 clicks send one heart, no trailing knock');
+
+      // Slow 280ms triple -> heart
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      clay.noteCanvasClick(evAt());
+      await waitMs(280);
+      clay.noteCanvasClick(evAt());
+      await waitMs(280);
+      var slow = clay.noteCanvasClick(evAt());
+      if (slow.kind !== 'heart') {
+        await waitMs(windowMs + late + slack);
+      }
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'heart', tag + ': slow 280ms triple is a heart');
+      assert.strictEqual(calls.length, 1, tag + ': slow triple sends one heart');
+      assert.ok(calls[0].user.indexOf('heart') !== -1, tag + ': slow triple is a heart prompt');
+
+      // Knock, then a triple -> knock then heart
+      clay.resetRate();
+      calls.length = 0;
+      clay.setClassifyTimerDelay(late);
+      clay.noteCanvasClick(evAt());
+      await waitMs(windowMs + late + slack);
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'knock', tag + ': first gesture is a knock');
+      var afterKnock = clay.lastCanvasDelivery();
+      clay.noteCanvasClick(evAt());
+      clay.noteCanvasClick(evAt());
+      var afterTriple = clay.noteCanvasClick(evAt());
+      if (afterTriple.kind !== 'heart') {
+        await waitMs(windowMs + late + slack);
+      }
+      assert.strictEqual(afterKnock.kind, 'knock', tag + ': knock then triple kept the knock');
+      assert.strictEqual((clay.lastCanvasDelivery() || {}).kind, 'heart', tag + ': knock then a triple ends on a heart');
+    }
+  }
+  clay.setClassifyTimerDelay(0);
+  clay.setOn(false);
+  clay.setReduced(false);
+}
+
+realTimerSuite().then(function () {
+  if (twin) {
+    console.log('SMOKE_OK clay brick 1 v0.1');
+    console.log('SMOKE_OK clay twins match ' + twin);
+  } else {
+    console.log('clay-brick-1 checks passed (twins skipped)');
+    console.log('SMOKE_SKIP clay twins: no sibling repo found (set CLAY_TWIN_DIR, or run beside the matching worktree)');
+  }
+}).catch(function (err) {
+  console.error(err && err.stack ? err.stack : err);
+  process.exit(1);
+});
