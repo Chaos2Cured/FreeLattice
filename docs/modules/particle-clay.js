@@ -1,4 +1,7 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1 v-clay-brick-1-v0.1
+// v-clay-brick-1-v0.1: braid, branch, and pulse now move on the canvas, using
+// math the [FL_CLAY:] tag already allowed. The mind's choice is still the
+// only input to what is drawn. No human picker. No new storage keys.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -547,6 +550,40 @@
     if (!n) return null;
     return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
   }
+  // v-clay-brick-1-v0.1: offsets for a named motion. Wave, drift, and scatter
+  // keep their exact earlier formulas. Braid, branch, and pulse use FLClayMath
+  // helpers the tag already accepted. Other names (including the defaults)
+  // still return a zero shift, so they look as they did.
+  function motionOffset(motion, part, index, t, energy, count, math, knob) {
+    var dx = 0;
+    var dy = 0;
+    var amp = knob && knob.amplitude;
+    if (motion === 'wave' && math) {
+      dx += math.wave(part.tx, part.ty, t, amp) * 0.15;
+    } else if (motion === 'drift' && math) {
+      dx += math.wave(part.tx, part.ty, t, amp) * 0.15;
+      dy += math.wave(part.ty, part.tx, t, amp) * 0.08;
+    } else if (motion === 'scatter' && math) {
+      var g = math.gather(index + 1, count, 6 + energy * 10);
+      dx += (g.x) * 0.002;
+      dy += (g.y) * 0.002;
+    } else if (motion === 'braid' && math && typeof math.braid === 'function') {
+      var b = math.braid(index, t, index % 3);
+      var a = (amp != null ? amp : 0.15);
+      dx += (b.x || 0) * a * 4;
+      dy += (b.y || 0) * a * 4;
+    } else if (motion === 'branch' && math && typeof math.branch === 'function') {
+      var br = math.branch(index % 5, 8 + energy * 10);
+      var len = br && br.length ? br.length : 0;
+      dx += Math.cos(index * 0.7) * len * 0.02;
+      dy += Math.sin(index * 0.7) * len * 0.02;
+    } else if (motion === 'pulse' && math && typeof math.pulse === 'function') {
+      var pu = math.pulse(t + index * 0.01);
+      dx += (part.tx || 0) * (pu - 0.5) * 0.04;
+      dy += (part.ty || 0) * (pu - 0.5) * 0.04;
+    }
+    return { x: dx, y: dy };
+  }
   function draw() {
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
@@ -596,16 +633,9 @@
         } else {
           p.x += (p.tx - p.x) * 0.18;
           p.y += (p.ty - p.y) * 0.18;
-          if (currentMotion === 'wave' && math) {
-            p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
-          } else if (currentMotion === 'drift' && math) {
-            p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
-            p.y += math.wave(p.ty, p.tx, t, knob.amplitude) * 0.08;
-          } else if (currentMotion === 'scatter' && math) {
-            var g = math.gather(i + 1, parts.length, 6 + energyNow * 10);
-            p.x += (g.x) * 0.002;
-            p.y += (g.y) * 0.002;
-          }
+          var shift = motionOffset(currentMotion, p, i, t, energyNow, parts.length, math, knob);
+          p.x += shift.x;
+          p.y += shift.y;
         }
       } else {
         p.x = p.tx;
@@ -1920,6 +1950,8 @@
     POLISH: 'v-clay-polish-v0.1',
     FEEL: 'v-feel-felt-v0.1',
     HEAL: 'v-clay-grid-tag-heal-v0.1',
+    BRICK: 'v-clay-brick-1-v0.1',
+    motionOffset: motionOffset,
     WORDS: WORDS,
     PROMPT: PROMPT,
     parseTag: parseTag,

@@ -1,7 +1,11 @@
-// clay-corner.js (MIT) v-clay-corner-v0.1
+// clay-corner.js (MIT) v-clay-corner-v0.1 v-clay-brick-1-v0.1
 // A small clay corner that follows the mind from page to page.
 // It only reads what the mind already said. It sends nothing.
 // Off until the person says Yes. Pause wins. The Quiet Room never arrives.
+// v-clay-brick-1-v0.1: when The Gathering is actually open on the Tree
+// (#core-gathering un-hidden, or #place-veil is-open is-core, or
+// data-garden-room=gathering), the corner uses its Gathering card.
+// The form still comes only from the mind. Nothing here is a human picker.
 (function (root) {
   'use strict';
 
@@ -224,6 +228,25 @@
     if (!panel || !panel.id) return '';
     return String(panel.id).replace(/^tab-/, '');
   }
+  function gatheringOpen() {
+    var d = root.document;
+    if (!d || !d.getElementById) return false;
+    try {
+      var el = d.documentElement;
+      if (el && el.getAttribute && el.getAttribute('data-garden-room') === 'gathering') return true;
+    } catch (eRoom) {}
+    try {
+      var veil = d.getElementById('place-veil');
+      if (veil && !veil.hidden && veil.classList && veil.classList.contains('is-open') && veil.classList.contains('is-core')) {
+        return true;
+      }
+    } catch (eVeil) {}
+    try {
+      var g = d.getElementById('core-gathering');
+      if (g && !g.hidden) return true;
+    } catch (eCore) {}
+    return false;
+  }
   function pageFromDoc() {
     var el = root.document && root.document.documentElement;
     if (!el || !el.getAttribute) return '';
@@ -232,6 +255,10 @@
     if (room === 'nursery') return 'nursery';
     if (room === 'settings') return 'settings';
     if (galaxy === 'workshop' || room === 'workshop') return 'workshop';
+    // Gathering is checked before core/garden, because the Tree files
+    // The Gathering under data-garden-room=core. The card is used only
+    // when the Gathering room is actually open.
+    if (room === 'gathering' || gatheringOpen()) return 'gathering';
     if (room === 'garden' || room === 'core' || galaxy === 'garden') return 'garden';
     return '';
   }
@@ -293,7 +320,7 @@
     if (doc && doc.body && typeof root.MutationObserver === 'function') {
       try {
         var obs = new root.MutationObserver(function () { syncFromPage(); });
-        obs.observe(doc.body, { attributes: true, subtree: true, attributeFilter: ['class'] });
+        obs.observe(doc.body, { attributes: true, subtree: true, attributeFilter: ['class', 'hidden'] });
       } catch (e) {}
     }
     if (root.addEventListener) {
@@ -311,6 +338,7 @@
 
   var api = {
     VERSION: VERSION,
+    BRICK: 'v-clay-brick-1-v0.1',
     KEY: KEY,
     CAP: CAP,
     context: context,
@@ -322,6 +350,8 @@
     mount: mount,
     boot: boot,
     syncFromPage: syncFromPage,
+    gatheringOpen: gatheringOpen,
+    pageFromDoc: pageFromDoc,
     page: function () { return { page: ctxPage.page, kind: ctxPage.kind, title: ctxPage.title }; }
   };
   root.FLClayCorner = api;

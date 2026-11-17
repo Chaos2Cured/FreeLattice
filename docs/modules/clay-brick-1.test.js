@@ -1,0 +1,233 @@
+// clay-brick-1.test.js (MIT) v-clay-brick-1-v0.1
+// Node only. No network. Shared by FreeLattice and theLatticeTree.
+// The four clay modules must stay byte-identical when a sibling tree is present.
+var fs = require('fs');
+var path = require('path');
+var crypto = require('crypto');
+var assert = require('assert');
+
+var here = __dirname;
+var NAMES = ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'];
+
+function sha256(file) {
+  return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+}
+
+NAMES.forEach(function (name) {
+  var src = fs.readFileSync(path.join(here, name), 'utf8');
+  assert.ok(src.indexOf('\u2014') === -1, name + ' em dash');
+  assert.ok(!new RegExp('&' + 'mdash;').test(src), name + ' mdash');
+  assert.ok(!new RegExp('\\.' + 'inner' + 'HTML').test(src), name + ' text only');
+  assert.ok(!new RegExp('conf' + 'irm\\(').test(src), name + ' dialog');
+  assert.ok(!new RegExp('\\beval\\s*\\(').test(src), name + ' eval');
+  assert.ok(!new RegExp('new\\s+Function\\s*\\(').test(src), name + ' Function');
+});
+
+var claySrc = fs.readFileSync(path.join(here, 'particle-clay.js'), 'utf8');
+var cornerSrc = fs.readFileSync(path.join(here, 'clay-corner.js'), 'utf8');
+assert.ok(claySrc.indexOf('v-clay-brick-1-v0.1') !== -1, 'clay brick marker');
+assert.ok(cornerSrc.indexOf('v-clay-brick-1-v0.1') !== -1, 'corner brick marker');
+assert.ok(claySrc.indexOf('v-particle-clay-v0.1') !== -1, 'clay marker kept');
+assert.ok(cornerSrc.indexOf('v-clay-corner-v0.1') !== -1, 'corner marker kept');
+// No human picker landed in this brick (scope dropped: form chips, save button).
+assert.ok(!/pickForm|form chip|Save this shape/i.test(claySrc), 'no human form picker in clay');
+assert.ok(!/pickForm|form chip|Save this shape/i.test(cornerSrc), 'no human form picker in corner');
+
+function siblingDir() {
+  if (process.env.CLAY_TWIN_DIR) return process.env.CLAY_TWIN_DIR;
+  var guesses = [
+    path.resolve(here, '../../../tree-clay-brick-1/docs/modules'),
+    path.resolve(here, '../../../clay-brick-1/docs/modules')
+  ];
+  var i;
+  for (i = 0; i < guesses.length; i++) {
+    if (guesses[i] !== here && fs.existsSync(path.join(guesses[i], 'particle-clay.js'))) return guesses[i];
+  }
+  return '';
+}
+
+var twin = siblingDir();
+if (twin) {
+  NAMES.forEach(function (name) {
+    assert.strictEqual(sha256(path.join(here, name)), sha256(path.join(twin, name)), name + ' bytes match twin');
+  });
+}
+
+// Minimal browser stubs so the modules can load in Node.
+var store = {};
+var nodesById = {};
+function node(tag, id) {
+  var el = {
+    tagName: String(tag || 'div').toUpperCase(),
+    id: id || '',
+    className: '',
+    children: [],
+    style: {},
+    attrs: {},
+    textContent: '',
+    hidden: false,
+    parentNode: null,
+    width: 112,
+    height: 112,
+    classList: {
+      contains: function (c) {
+        return (' ' + el.className + ' ').indexOf(' ' + c + ' ') !== -1;
+      }
+    },
+    setAttribute: function (k, v) {
+      this.attrs[k] = String(v);
+      if (k === 'id') {
+        this.id = String(v);
+        nodesById[this.id] = this;
+      }
+      if (k === 'hidden') this.hidden = true;
+    },
+    getAttribute: function (k) {
+      if (k === 'id') return this.id || null;
+      return Object.prototype.hasOwnProperty.call(this.attrs, k) ? this.attrs[k] : null;
+    },
+    removeAttribute: function (k) {
+      delete this.attrs[k];
+      if (k === 'hidden') this.hidden = false;
+    },
+    appendChild: function (c) {
+      c.parentNode = this;
+      this.children.push(c);
+      if (c.id) nodesById[c.id] = c;
+      return c;
+    },
+    addEventListener: function () {},
+    getContext: function () {
+      return {
+        clearRect: function () {},
+        fillRect: function () {},
+        save: function () {},
+        restore: function () {},
+        translate: function () {},
+        scale: function () {},
+        beginPath: function () {},
+        arc: function () {},
+        stroke: function () {},
+        fillStyle: '',
+        strokeStyle: '',
+        globalAlpha: 1
+      };
+    }
+  };
+  if (id) nodesById[id] = el;
+  return el;
+}
+
+var docEl = node('html');
+docEl.getAttribute = function (name) {
+  if (name === 'data-garden-room') return docEl.attrs['data-garden-room'] || 'core';
+  if (name === 'data-garden-galaxy') return docEl.attrs['data-garden-galaxy'] || 'garden';
+  return docEl.attrs[name] || null;
+};
+var body = node('body');
+var head = node('head');
+var core = node('div', 'core-gathering');
+core.hidden = true;
+var veil = node('div', 'place-veil');
+veil.hidden = true;
+body.appendChild(core);
+body.appendChild(veil);
+
+global.localStorage = {
+  getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+  setItem: function (k, v) { store[k] = String(v); },
+  removeItem: function (k) { delete store[k]; }
+};
+global.MutationObserver = function () { this.observe = function () {}; };
+global.matchMedia = function () { return { matches: false, addEventListener: function () {} }; };
+global.document = {
+  documentElement: docEl,
+  body: body,
+  head: head,
+  readyState: 'complete',
+  createElement: function (tag) { return node(tag); },
+  createElementNS: function (ns, tag) { return node(tag); },
+  getElementById: function (id) { return nodesById[id] || null; },
+  querySelector: function () { return null; },
+  querySelectorAll: function () { return []; },
+  addEventListener: function () {}
+};
+global.window = global;
+global.addEventListener = function () {};
+
+var math = require('./clay-math.js');
+var clay = require('./particle-clay.js');
+var corner = require('./clay-corner.js');
+
+assert.strictEqual(clay.isOn(), false, 'clay starts off');
+assert.strictEqual(clay.promptDelta(), '', 'off means no prompt delta');
+assert.strictEqual(clay.autoSend(), false, 'nothing sends itself');
+assert.strictEqual(clay.BRICK, 'v-clay-brick-1-v0.1', 'clay brick id');
+assert.strictEqual(corner.BRICK, 'v-clay-brick-1-v0.1', 'corner brick id');
+
+// Tag semantics stay the same: the mind's mark is the only shape input.
+var tag = clay.parseTag('[FL_CLAY: {"form":"heart","mood":"warmth","energy":0.4,"motion":"braid"}]');
+assert.strictEqual(tag.ok, true, 'braid tag parses');
+assert.strictEqual(tag.value.form, 'heart', 'form from the mind');
+assert.strictEqual(tag.value.motion, 'braid', 'braid motion accepted');
+assert.ok(tag.visible.indexOf('[FL_CLAY') === -1, 'tag still stripped');
+var kept = clay.sanitize({ form: 'star', motion: 'branch', energy: 0.5 });
+assert.strictEqual(kept.motion, 'branch', 'branch motion still allowed');
+var unknown = clay.sanitize({ form: 'dog', motion: 'teleport', energy: 0.2 });
+assert.strictEqual(unknown.motion, 'breath', 'unknown motion still falls back');
+
+var part = { tx: 10, ty: 4, x: 0, y: 0 };
+var knob = math.energyKnob(0.5, 8);
+var wave = clay.motionOffset('wave', part, 1, 0.7, 0.5, 8, math, knob);
+var expectedWaveX = math.wave(part.tx, part.ty, 0.7, knob.amplitude) * 0.15;
+assert.strictEqual(wave.x, expectedWaveX, 'wave x formula unchanged');
+assert.strictEqual(wave.y, 0, 'wave y formula unchanged');
+var drift = clay.motionOffset('drift', part, 1, 0.7, 0.5, 8, math, knob);
+assert.strictEqual(drift.x, expectedWaveX, 'drift x formula unchanged');
+assert.strictEqual(drift.y, math.wave(part.ty, part.tx, 0.7, knob.amplitude) * 0.08, 'drift y formula unchanged');
+var breath = clay.motionOffset('breath', part, 1, 0.7, 0.5, 8, math, knob);
+assert.strictEqual(breath.x, 0, 'breath still has no extra offset');
+assert.strictEqual(breath.y, 0, 'breath still has no extra offset');
+var braid = clay.motionOffset('braid', part, 1, 0.7, 0.5, 8, math, knob);
+var branch = clay.motionOffset('branch', part, 1, 0.7, 0.5, 8, math, knob);
+var pulse = clay.motionOffset('pulse', part, 1, 0.7, 0.5, 8, math, knob);
+assert.ok(braid.x !== 0 || braid.y !== 0, 'braid moves');
+assert.ok(branch.x !== 0 || branch.y !== 0, 'branch moves');
+assert.ok(pulse.x !== 0 || pulse.y !== 0, 'pulse moves');
+assert.ok(braid.x !== branch.x || braid.y !== branch.y, 'braid and branch differ');
+assert.ok(braid.x !== pulse.x || braid.y !== pulse.y, 'braid and pulse differ');
+var none = clay.motionOffset('teleport', part, 1, 0.7, 0.5, 8, math, knob);
+assert.strictEqual(none.x, 0, 'unknown motion offset is zero');
+assert.strictEqual(none.y, 0, 'unknown motion offset is zero');
+
+// Gathering is detected only when that room is actually open.
+assert.strictEqual(corner.gatheringOpen(), false, 'gathering closed at rest');
+assert.strictEqual(corner.pageFromDoc(), 'garden', 'core/garden at rest is Garden');
+core.hidden = false;
+assert.strictEqual(corner.gatheringOpen(), true, 'un-hidden core-gathering is Gathering');
+assert.strictEqual(corner.pageFromDoc(), 'gathering', 'open Gathering wins over core');
+core.hidden = true;
+assert.strictEqual(corner.pageFromDoc(), 'garden', 'hidden gathering falls back to Garden');
+veil.hidden = false;
+veil.className = 'is-open is-core';
+assert.strictEqual(corner.gatheringOpen(), true, 'open core veil is Gathering');
+assert.strictEqual(corner.pageFromDoc(), 'gathering', 'open core veil selects Gathering');
+veil.hidden = true;
+veil.className = '';
+docEl.attrs['data-garden-room'] = 'nursery';
+assert.strictEqual(corner.pageFromDoc(), 'nursery', 'nursery still wins');
+docEl.attrs['data-garden-room'] = 'settings';
+assert.strictEqual(corner.pageFromDoc(), 'settings', 'settings still wins');
+docEl.attrs['data-garden-room'] = 'core';
+docEl.attrs['data-garden-galaxy'] = 'workshop';
+assert.strictEqual(corner.pageFromDoc(), 'workshop', 'workshop still wins');
+docEl.attrs['data-garden-galaxy'] = 'garden';
+docEl.attrs['data-garden-room'] = 'gathering';
+assert.strictEqual(corner.pageFromDoc(), 'gathering', 'data-garden-room=gathering is Gathering');
+
+// Private tab names still hide (syncFromPage). Do not open any Quiet Room file.
+assert.strictEqual(typeof corner.syncFromPage, 'function', 'sync still exported');
+assert.strictEqual(corner.isOn(), false, 'corner starts off');
+
+console.log('SMOKE_OK clay brick 1 v0.1');
+if (twin) console.log('SMOKE_OK clay twins match ' + twin);
