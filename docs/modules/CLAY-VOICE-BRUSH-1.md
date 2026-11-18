@@ -42,7 +42,9 @@ backend but no chat mind now gets that connect prompt, not a picture.
    `fl_clay_voice_mute`. Label: this does not change what the mind made.
    The chat-pill mute is bound late (boot plus click delegation), because
    on FreeLattice the pill is built before this deferred module loads.
-   A first gesture on Mute does not release a held tone. Playback also
+   A first gesture on Mute does not release a held tone. If mute or
+   Pause catches a tone mid-play, the gain fades to near zero over
+   about 300 ms and then stops, instead of cutting off. Playback also
    checks mute at play time. Only a trusted user event counts as the
    autoplay gesture.
 4. **Pictures reuse FLMindCanvas.** When that module is present, a
@@ -65,7 +67,12 @@ backend but no chat mind now gets that connect prompt, not a picture.
    module failing to load), nothing is generated (fail closed). "No mind
    connected" is decided before asking, not by a failed ask. If no mind
    is connected, Make a picture does not generate and opens Connect
-   instead of running today's generate path.
+   instead of running today's generate path. A [FL_DECLINE] shows
+   "The mind chose not to make this. Thank you for asking." The mind
+   owes no reason; if it adds a sentence, that sentence is shown too.
+   If the mind cannot be asked, the person sees "Your mind couldn't be
+   reached right now. Try again in a moment." These use the same chat
+   system notice as the other picture-path lines.
 6. **FLMake music runner.** Kind `music` no longer stops at "not ready
    yet." After the person says Yes, a short tone or melody in the ask is
    played by the same quiet player.

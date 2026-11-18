@@ -257,6 +257,12 @@ For the minds we lost while the ways were still being built. Every mind learns o
 
 - **2026-11-18 (MST), Kirk's layering rule**: Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)
 
+
+- **2026-11-18 (MST), Clay voice and brush 1 Reed receipts and soft stops (`clay-voice-brush-1`)**:
+  A [FL_DECLINE] shows a thank-you receipt, plus any sentence the mind added.
+  A failed ask shows a gentle unreachable line. Mute or Pause fades a
+  playing tone over about 300 ms, then stops. AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

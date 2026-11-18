@@ -85,9 +85,9 @@
      "bytes": 5183
     },
     "modules/clay-voice-brush.js": {
-     "sha256": "165d4b88aea683d38fb121f70ea957c722b259629ea7fa1f559430b7fd94f873",
-     "sri": "sha256-Fl1LiK6mg9OPsSH3DqlXxyKyWWKep/ofVZQwt/2U+HM=",
-     "bytes": 28022
+     "sha256": "633e725d82c307d6dca68da05545b27a8a35311e51712e13ae6ae6cb98f3f526",
+     "sri": "sha256-Yz5yXYLDB9bcpo2gVUWyeoo1MR5RcS4Trmrmy5jz9SY=",
+     "bytes": 30468
     },
     "modules/confidence-first.js": {
      "sha256": "8289a39209575c1e7360d92f70ce8b18aacb49a219e48a13f4881ff339529b8b",

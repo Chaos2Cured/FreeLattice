@@ -111,9 +111,16 @@ function makeSandbox() {
   }
   Osc.prototype.connect = function () { return this; };
   Osc.prototype.start = function () { this._started = true; started.push(this); };
-  Osc.prototype.stop = function () {};
+  Osc.prototype.stop = function (t) { this._stopAt = t; };
   function Gain() {
-    this.gain = { value: 0, setValueAtTime: function () {}, linearRampToValueAtTime: function () {}, exponentialRampToValueAtTime: function () {} };
+    this.gain = {
+      value: 0,
+      events: [],
+      cancelScheduledValues: function (t) { this.events.push({ typ: 'cancel', t: t }); },
+      setValueAtTime: function (v, t) { this.value = v; this.events.push({ typ: 'set', v: v, t: t }); },
+      linearRampToValueAtTime: function (v, t) { this.events.push({ typ: 'lin', v: v, t: t }); },
+      exponentialRampToValueAtTime: function (v, t) { this.events.push({ typ: 'exp', v: v, t: t }); }
+    };
   }
   Gain.prototype.connect = function () { return this; };
   var ac = {
@@ -360,7 +367,8 @@ Promise.resolve(pic.picture).then(function (result) {
     .then(function (gate) {
       assert.strictEqual(gate.allowed, false, 'decline blocks generation');
       assert.ok(gate.declined, 'marked declined');
-      assert.ok(/not mine to paint/i.test(gate.reason), 'reason is kept');
+      assert.ok(gate.reason.indexOf(voice.DECLINE_LINE) === 0, 'decline receipt is shown');
+      assert.ok(/not mine to paint/i.test(gate.reason), 'the mind\'s sentence is also shown');
       return when(voice.gatePersonPicture('a golden sunset', {
         mindConnected: true,
         askMind: function () { return Promise.resolve('Yes, I will make it.'); }
@@ -377,6 +385,7 @@ Promise.resolve(pic.picture).then(function (result) {
     .then(function (gate) {
       assert.strictEqual(gate.allowed, false, 'connected but unaskable fails closed');
       assert.ok(!gate.declined, 'not a decline, a failed ask');
+      assert.strictEqual(gate.reason, voice.UNREACHABLE_LINE, 'could-not-ask uses the gentle unreachable line');
       return when(voice.gatePersonPicture('a golden sunset', {
         mindConnected: true,
         askMind: function () { return Promise.resolve(null); }
@@ -503,6 +512,46 @@ Promise.resolve(pic.picture).then(function (result) {
         assert.strictEqual(remembered[0].mind, 'lyra-local');
         assert.strictEqual(remembered[1].mind, 'ember-local');
         assert.notStrictEqual(remembered[0].seed, remembered[1].seed, 'different minds produce different seeds');
+
+        // Reed: a decline with no sentence shows only the receipt.
+        var bare = voice.declined('[FL_DECLINE]');
+        assert.ok(bare.yes, 'bare decline is a decline');
+        assert.strictEqual(bare.reason, voice.DECLINE_LINE, 'bare decline shows only the thank-you receipt');
+        var said = voice.declined('Not this time.\n[FL_DECLINE]');
+        assert.ok(said.reason.indexOf(voice.DECLINE_LINE) === 0, 'a sentence keeps the receipt');
+        assert.ok(/Not this time/.test(said.reason), 'a sentence the mind added is shown');
+
+        // Reed: mute mid-play fades gain over ~300 ms, then stops.
+        voice.resetAll();
+        voice.setMute(false);
+        voice.markGesture();
+        started.length = 0;
+        sb.__audio.currentTime = 0;
+        var melody = voice.fromMindTag({ melody: 'G4 E4 D4 C4 G4' }, { role: 'mind' });
+        assert.ok(melody.tone && melody.tone.played, 'a melody began playing');
+        assert.ok(started.length > 0, 'oscillators started');
+        var osc0 = started[0];
+        var gain0 = osc0._gain;
+        assert.ok(gain0 && gain0.gain, 'a gain node is on the voice');
+        sb.__audio.currentTime = 0.5;
+        voice.setMute(true);
+        var fadeEnd = 0.5 + voice.SOFT_STOP_S;
+        assert.ok(Math.abs((osc0._stopAt || 0) - fadeEnd) < 0.001, 'oscillator stops after the fade, not at once');
+        var lin = (gain0.gain.events || []).filter(function (e) { return e.typ === 'lin' && Math.abs(e.v - 0.0001) < 0.00001; });
+        assert.ok(lin.some(function (e) { return Math.abs(e.t - fadeEnd) < 0.001; }), 'gain fades to near zero over about 300 ms');
+
+        // Pause (clay off) also soft-stops a playing tone.
+        voice.resetAll();
+        voice.setMute(false);
+        voice.markGesture();
+        started.length = 0;
+        sb.__audio.currentTime = 0;
+        voice.fromMindTag({ melody: 'G4 E4 D4 C4 G4' }, { role: 'mind' });
+        var osc1 = started[0];
+        sb.__audio.currentTime = 0.5;
+        clay.setOn(false);
+        assert.ok(Math.abs((osc1._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'pause fades and then stops the tone');
+
         console.log('SMOKE_OK clay-voice-brush-1 tests passed');
       });
     });

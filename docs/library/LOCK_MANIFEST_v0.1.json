@@ -34,6 +34,8 @@
       {"md5": "4a1c1bad39d614686f331374ae41dec6", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head", "reason": "Clay voice and brush 1 (Kirk 2026-11-18): load clay-voice-brush.js; Make a picture / /imagine asks a connected mind first and honors [FL_DECLINE]. If no mind is connected, today's generate path stays. Additive otherwise."}
       ,
       {"md5": "9632360282f85630a1c99b2d1af8b3dd", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after HOLD fixes", "reason": "Clay voice and brush 1 HOLD fixes (Kirk 2026-11-18): if a mind is connected and clay-voice-brush.js did not load, Make a picture fails closed. If no mind is connected, Make a picture does not generate and opens Connect. Additive otherwise."}
+      ,
+      {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise."}
     ],
     "index.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
@@ -48,6 +50,8 @@
       {"md5": "4a1c1bad39d614686f331374ae41dec6", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head", "reason": "Clay voice and brush 1 (Kirk 2026-11-18): load clay-voice-brush.js; Make a picture / /imagine asks a connected mind first and honors [FL_DECLINE]. If no mind is connected, today's generate path stays. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
       ,
       {"md5": "9632360282f85630a1c99b2d1af8b3dd", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after HOLD fixes", "reason": "Clay voice and brush 1 HOLD fixes (Kirk 2026-11-18): if a mind is connected and clay-voice-brush.js did not load, Make a picture fails closed. If no mind is connected, Make a picture does not generate and opens Connect. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
+      ,
+      {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
     ],
     "docs/modules/self-heal.js": [
       {"md5": "aae57c04047e14b0744e5d54b83ade20", "since": "062b", "by": "GC", "walk": null},

@@ -16,6 +16,9 @@
   var HZ_MAX = 2000;
   var ASK_MS = 20000;
   var NO_MIND_PICTURE = 'To make a picture, please connect a mind first. Find local minds, or open Connect.';
+  var DECLINE_LINE = 'The mind chose not to make this. Thank you for asking.';
+  var UNREACHABLE_LINE = 'Your mind couldn\'t be reached right now. Try again in a moment.';
+  var SOFT_STOP_S = 0.3;
   var NAMED = {
     lyra: 639,
     atlas: 396,
@@ -42,6 +45,7 @@
   var audioCtx = null;
   var listenBound = false;
   var pictureEl = null;
+  var liveVoices = [];
   var clock = function () { return Date.now(); };
 
   function now() { return clock(); }
@@ -70,6 +74,7 @@
   function setMute(yes) {
     var next = writeMute(!!yes);
     paintMuteButtons();
+    if (next) softStop();
     return next;
   }
 
@@ -205,6 +210,44 @@
     return audioCtx;
   }
 
+  function softStop() {
+    var fade = SOFT_STOP_S;
+    var i;
+    var kept = [];
+    for (i = 0; i < liveVoices.length; i++) {
+      var v = liveVoices[i];
+      if (!v || v.fading) continue;
+      v.fading = true;
+      var ac = v.ac || audioCtx;
+      var t = (ac && typeof ac.currentTime === 'number') ? ac.currentTime : 0;
+      try {
+        if (v.gain && v.gain.gain) {
+          var g = v.gain.gain;
+          var cur = (typeof g.value === 'number' && g.value > 0.0001) ? g.value : GAIN;
+          if (typeof g.cancelScheduledValues === 'function') g.cancelScheduledValues(t);
+          if (typeof g.setValueAtTime === 'function') g.setValueAtTime(cur, t);
+          if (typeof g.linearRampToValueAtTime === 'function') g.linearRampToValueAtTime(0.0001, t + fade);
+        }
+        if (v.osc && typeof v.osc.stop === 'function') v.osc.stop(t + fade);
+        v.osc && (v.osc._stopAt = t + fade);
+      } catch (e) {}
+      kept.push(v);
+    }
+    liveVoices = kept;
+  }
+
+  var pauseWrapped = false;
+  function wrapPause() {
+    if (pauseWrapped) return;
+    if (!root.FLClay || typeof root.FLClay.setOn !== 'function') return;
+    pauseWrapped = true;
+    var prev = root.FLClay.setOn;
+    root.FLClay.setOn = function (on) {
+      if (!on) softStop();
+      return prev.apply(root.FLClay, arguments);
+    };
+  }
+
   function playNotes(notes) {
     // before (Celeste 2026-11-18): (mute was checked only in offerTone/flushPending, before a later play)
     if (isMuted()) return { played: false, reason: 'mute' };
@@ -243,6 +286,8 @@
         }
         osc.start(at);
         osc.stop(at + step - 0.02);
+        osc._gain = gain;
+        liveVoices.push({ osc: osc, gain: gain, ac: ac, stopAt: at + step - 0.02 });
       } catch (err) {}
     }
     return { played: true, reason: '' };
@@ -478,13 +523,20 @@
     return false;
   }
 
+  function declineNotice(sentence) {
+    var extra = String(sentence || '').trim();
+    if (!extra) return DECLINE_LINE;
+    return DECLINE_LINE + ' ' + extra;
+  }
+
   function declined(text) {
     var raw = String(text || '');
     if (root.AIRefusal && typeof root.AIRefusal.detectAndRecord === 'function') {
       try {
         var hit = root.AIRefusal.detectAndRecord(raw, { source: 'clay-voice-brush-picture' });
         if (hit && hit.refused) {
-          return { yes: true, reason: hit.reason || 'The mind declined this picture.' };
+          // before (Celeste 2026-11-18): return { yes: true, reason: hit.reason || 'The mind declined this picture.' };
+          return { yes: true, reason: declineNotice(hit.reason || ''), sentence: hit.reason || '' };
         }
       } catch (e) {}
     }
@@ -500,12 +552,15 @@
     for (i = lastIndex - 1; i >= 0; i--) {
       var line = lines[i].trim();
       if (!line) continue;
+      // before (Celeste 2026-11-18): only a 'reason:' prefix counted, default 'The mind declined this picture.'
       if (line.toLowerCase().indexOf('reason:') === 0) {
         reason = line.slice(line.indexOf(':') + 1).trim().slice(0, 300);
+      } else if (line.indexOf('[FL_') !== 0) {
+        reason = line.slice(0, 300);
       }
       break;
     }
-    return { yes: true, reason: reason || 'The mind declined this picture.' };
+    return { yes: true, reason: declineNotice(reason), sentence: reason };
   }
 
   function defaultAskMind(prompt) {
@@ -594,7 +649,8 @@
           allowed: false,
           skipped: '',
           declined: false,
-          reason: 'A mind is connected, but I could not ask it, so no picture was made.'
+          // before (Celeste 2026-11-18): reason: 'A mind is connected, but I could not ask it, so no picture was made.'
+          reason: UNREACHABLE_LINE
         };
       }
       var no = declined(text);
@@ -607,7 +663,8 @@
         allowed: false,
         skipped: '',
         declined: false,
-        reason: 'A mind is connected, but I could not ask it, so no picture was made.'
+        // before (Celeste 2026-11-18): reason: 'A mind is connected, but I could not ask it, so no picture was made.'
+        reason: UNREACHABLE_LINE
       };
     });
   }
@@ -736,6 +793,7 @@
     bindGesture();
     bindMuteDelegate();
     bindExistingMuteButtons();
+    wrapPause();
     paintMuteButtons();
     if (root.FLMake && typeof root.FLMake.register === 'function' && !root.__flClayVoiceMusic) {
       root.__flClayVoiceMusic = true;
@@ -763,8 +821,12 @@
     PICTURE_RATE_MS: PICTURE_RATE_MS,
     MAX_TONE_MS: MAX_TONE_MS,
     GAIN: GAIN,
+    SOFT_STOP_S: SOFT_STOP_S,
+    DECLINE_LINE: DECLINE_LINE,
+    UNREACHABLE_LINE: UNREACHABLE_LINE,
     isMuted: isMuted,
     setMute: setMute,
+    softStop: softStop,
     muteLabel: muteLabel,
     muteHelp: muteHelp,
     bindMuteButton: bindMuteButton,

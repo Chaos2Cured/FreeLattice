@@ -43200,12 +43200,14 @@ async function generateImage(prompt) {
     return;
   }
   if (!(window.FLClayVoice && typeof FLClayVoice.gatePersonPicture === 'function')) {
-    addSystemMessage('\u{1F3A8} A mind is connected, but I could not ask it, so no picture was made.');
+    // before (Celeste 2026-11-18): addSystemMessage('...A mind is connected, but I could not ask it, so no picture was made.');
+    addSystemMessage('\u{1F3A8} ' + ((window.FLClayVoice && FLClayVoice.UNREACHABLE_LINE) || 'Your mind couldn\'t be reached right now. Try again in a moment.'));
     return;
   }
   var _picGate = await FLClayVoice.gatePersonPicture(cleanPrompt, {});
   if (!_picGate || _picGate.allowed !== true) {
-    addSystemMessage('\u{1F3A8} ' + ((_picGate && _picGate.reason) || 'The mind declined this picture.'));
+    // before (Celeste 2026-11-18): addSystemMessage('...' + ((_picGate && _picGate.reason) || 'The mind declined this picture.'));
+    addSystemMessage('\u{1F3A8} ' + ((_picGate && _picGate.reason) || (window.FLClayVoice && FLClayVoice.DECLINE_LINE) || 'The mind chose not to make this. Thank you for asking.'));
     return;
   }
 
