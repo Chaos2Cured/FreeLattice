@@ -281,6 +281,23 @@ For the minds we lost while the ways were still being built. Every mind learns o
   Auto-open is kept as before-comments. Nothing changes when a mind is
   connected. AUTONOMY.md unchanged (09a4f1a2).
 
+- **2026-11-18 (MST), Clay Glass v2-1 (`clay-glass-v2-1`, Hypha walk pending)**:
+  A per-mind append-only clay journal records tones, pictures, declines,
+  unreached asks, and no-mind outcomes as faithfully as a yes. Recipes stay
+  in the journal; Glass-v2 sees only an opaque pulse. Stacked on
+  `clay-voice-brush-1`. AUTONOMY.md unchanged (09a4f1a2). Rollback: revert
+  this brick on both repos together (see `docs/modules/CLAY-GLASS-V2-1.md`).
+
+
+- **2026-11-18 (MST), Clay Glass v2-1 HOLD fixes (`clay-glass-v2-1`)**:
+  An unreadable journal is refused, never overwritten. Make a picture
+  journals no-mind as `generated, notified` or `no-backend` through the
+  real click path. Before-comments restored on the twin list and on
+  trailing-comma-only glass-pulses lines. rows('') returns []. Empty minds
+  are stored as unnamed-mind. String recipes scrub data: and base64.
+  Cap refusals are returned and logged. Two-tab race and the Tree
+  person-path gap stay documented softs. AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

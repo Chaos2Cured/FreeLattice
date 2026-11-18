@@ -16,7 +16,14 @@
     'pair.rotated': 'pair rotated',
     'manifest.signed': 'manifest signed',
     'tier.advanced': 'trust tier advanced',
-    'tier.reset': 'trust tier reset'
+    // before (Celeste 2026-11-18): 'tier.reset': 'trust tier reset'
+    'tier.reset': 'trust tier reset',
+    // v-clay-glass-v2-1-v0.1: opaque clay voice/brush journal pulses (additive)
+    'clay.tone': 'clay tone recorded',
+    'clay.picture': 'clay picture recorded',
+    'clay.declined': 'clay decline recorded',
+    'clay.unreached': 'clay mind not reached',
+    'clay.nomind': 'clay mind not connected'
   };
 
   var RESERVED_KINDS = {
@@ -32,7 +39,9 @@
     import: true,
     swarm: true,
     identity: true,
-    glass: true
+    // before (Celeste 2026-11-18): glass: true
+    glass: true,
+    clay: true
   };
 
   function opaqueSummaryFor(kind) {

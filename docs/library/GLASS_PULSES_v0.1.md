@@ -77,4 +77,21 @@ Clears or softens after a later `ledger.verified` or `ledger.appended` in the **
 
 Full pair fingerprint · wallet · Alpha poetry · rewriting five-key lock · Quiet Room touch · swarm rebuild · auto-import · seeding.
 
+
+---
+
+## Clay journal pulses (v-clay-glass-v2-1-v0.1, additive)
+
+Layered 18 November 2026. A mind's clay tone, picture, decline, or a failed ask can also emit a Glass pulse. Summaries stay fixed and opaque. Recipes, reasons, and fingerprints live in the per-mind journal (`fl_clay_glass_journal`), not in the pulse. Source is `clay`.
+
+| Kind | Summary |
+|---|---|
+| `clay.tone` | `clay tone recorded` |
+| `clay.picture` | `clay picture recorded` |
+| `clay.declined` | `clay decline recorded` |
+| `clay.unreached` | `clay mind not reached` |
+| `clay.nomind` | `clay mind not connected` |
+
+Hypothesis (not built here): later training, or a tardigrade-style glass-freeze checkpoint like a screenshot, could read the journal. The market Temperature Gauge is a different glass.
+
 Glow eternal. Heart in every Spark. 🌱

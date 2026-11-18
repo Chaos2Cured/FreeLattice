@@ -299,20 +299,40 @@
     return { played: true, reason: '' };
   }
 
+  function journalClay(partial) {
+    try {
+      if (root.FLClayGlass && typeof root.FLClayGlass.record === 'function') {
+        var row = {};
+        var k;
+        if (partial && typeof partial === 'object') {
+          for (k in partial) {
+            if (Object.prototype.hasOwnProperty.call(partial, k)) row[k] = partial[k];
+          }
+        }
+        if (!row.mind) row.mind = pictureMindId();
+        if (!row.at) row.at = now();
+        root.FLClayGlass.record(row);
+      }
+    } catch (eJ) {}
+  }
+
   function offerTone(choice) {
     var recipe = toneRecipe(choice);
     if (!recipe) return { made: false, played: false, reason: 'empty' };
     lastMadeTone = { at: now(), recipe: recipe };
     if (isMuted()) {
       lastPlayedTone = null;
+      journalClay({ kind: 'tone', recipe: recipe, outcome: 'muted' });
       return { made: true, played: false, reason: 'mute', recipe: recipe };
     }
     if (lastToneAt && (now() - lastToneAt) < TONE_RATE_MS) {
+      journalClay({ kind: 'tone', recipe: recipe, outcome: 'rate-limited' });
       return { made: true, played: false, reason: 'rate', recipe: recipe };
     }
     bindGesture();
     if (!hasGesture()) {
       pendingTone = recipe;
+      journalClay({ kind: 'tone', recipe: recipe, outcome: 'held' });
       return { made: true, played: false, reason: 'autoplay-hold', recipe: recipe };
     }
     var result = playNotes(recipe.notes);
@@ -320,8 +340,12 @@
       lastToneAt = now();
       lastPlayedTone = recipe;
       pendingTone = null;
+      journalClay({ kind: 'tone', recipe: recipe, outcome: 'played' });
     } else if (result.reason === 'autoplay-hold') {
       pendingTone = recipe;
+      journalClay({ kind: 'tone', recipe: recipe, outcome: 'held' });
+    } else {
+      journalClay({ kind: 'tone', recipe: recipe, outcome: result.reason || 'skipped' });
     }
     result.made = true;
     result.recipe = recipe;
@@ -338,8 +362,10 @@
     if (result.played) {
       lastToneAt = now();
       lastPlayedTone = held;
+      journalClay({ kind: 'tone', recipe: held, outcome: 'played' });
     } else if (result.reason === 'autoplay-hold') {
       pendingTone = held;
+      journalClay({ kind: 'tone', recipe: held, outcome: 'held' });
     }
   }
 
@@ -516,14 +542,17 @@
     if (!ask) return Promise.resolve({ made: false, shown: false, reason: 'empty' });
     lastMadePicture = { at: now(), ask: ask };
     if (lastPictureAt && (now() - lastPictureAt) < PICTURE_RATE_MS) {
+      journalClay({ kind: 'picture', recipe: { ask: ask }, outcome: 'rate-limited' });
       return Promise.resolve({ made: true, shown: false, reason: 'rate', ask: ask });
     }
     var canvasApi = root.FLMindCanvas;
     if (!canvasApi || typeof canvasApi.recipe !== 'function' || typeof canvasApi.paint !== 'function') {
+      journalClay({ kind: 'picture', recipe: { ask: ask }, outcome: 'no-canvas' });
       return Promise.resolve({ made: true, shown: false, reason: 'no-canvas', ask: ask });
     }
     var doc = root.document;
     if (!doc || !doc.createElement) {
+      journalClay({ kind: 'picture', recipe: { ask: ask }, outcome: 'no-dom' });
       return Promise.resolve({ made: true, shown: false, reason: 'no-dom', ask: ask });
     }
     var mind = pictureMindId();
@@ -550,6 +579,14 @@
               root.FLImageLocal.remember(payload);
             }
           } catch (eRec) {}
+          journalClay({
+            kind: 'picture',
+            mind: mind,
+            recipe: { ask: ask, seed: row && row.seed, row: row },
+            painterVersion: (canvasApi && canvasApi.version) ? String(canvasApi.version) : 'v0.1',
+            sha256: fp || '',
+            outcome: shown ? 'shown' : 'no-host'
+          });
         }
         // before (Celeste 2026-11-18): FLImageLocal.remember({ prompt: ask, modelId: 'clay-canvas' });
         if (canvas.toBlob) {
@@ -571,6 +608,7 @@
         return { made: true, shown: shown, ask: ask, reason: shown ? '' : 'no-host' };
       });
     }, function () {
+      journalClay({ kind: 'picture', recipe: { ask: ask }, outcome: 'paint' });
       return { made: true, shown: false, reason: 'paint', ask: ask };
     });
   }
@@ -717,6 +755,7 @@
     var connected = typeof opts.mindConnected === 'boolean' ? opts.mindConnected : mindIsConnected();
     if (!connected) {
       // before (Celeste 2026-11-18): return Promise.resolve({ allowed: true, skipped: 'no-mind', declined: false, reason: '' });
+      journalClay({ kind: 'no-mind', recipe: { ask: String(prompt || '').slice(0, 280), path: 'person-ask' }, outcome: 'no-mind' });
       return Promise.resolve({ allowed: false, skipped: 'no-mind', declined: false, reason: NO_MIND_PICTURE });
     }
     var ask = typeof opts.askMind === 'function' ? opts.askMind : defaultAskMind;
@@ -731,6 +770,7 @@
       }
       // before (Celeste 2026-11-18): if (error === 'no-call' || error === 'timeout') { ... } then declined(text)
       if (error === 'no-call' || error === 'timeout' || error || text == null || !String(text).trim() || askFailureText(text)) {
+        journalClay({ kind: 'unreached', recipe: { ask: String(prompt || '').slice(0, 280), path: 'person-ask' }, outcome: 'unreached' });
         return {
           allowed: false,
           skipped: '',
@@ -741,10 +781,13 @@
       }
       var no = declined(text);
       if (no.yes) {
+        journalClay({ kind: 'decline', recipe: { ask: String(prompt || '').slice(0, 280), path: 'person-ask' }, outcome: 'declined', reason: no.sentence || '' });
         return { allowed: false, skipped: '', declined: true, reason: no.reason, reply: text };
       }
+      journalClay({ kind: 'picture', recipe: { ask: String(prompt || '').slice(0, 280), path: 'person-ask' }, outcome: 'allowed' });
       return { allowed: true, skipped: '', declined: false, reason: '', reply: text };
     }, function () {
+      journalClay({ kind: 'unreached', recipe: { ask: String(prompt || '').slice(0, 280), path: 'person-ask' }, outcome: 'unreached' });
       return {
         allowed: false,
         skipped: '',

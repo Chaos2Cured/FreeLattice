@@ -38,6 +38,8 @@
       {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise."}
       ,
       {"md5": "782b14a831b31b27c9104a0474933059", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after re-walk HOLD fixes", "reason": "Clay voice and brush 1 re-walk HOLD fixes (Kirk 2026-11-18): adjacent comments record Kirk's t1388u (10:28 MST) note and the 11:07 MST no-mind refinement (generate when a backend exists, notice plus Connect on click; connect-only when no backend). Additive otherwise."}
+      ,
+      {"md5": "b0937409c5b8481d007069eeaa458478", "since": "v-clay-glass-v2-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-glass-v2-1 head after rebase", "reason": "Clay Glass v2-1 (Kirk 2026-11-18): load clay-glass.js. A per-mind append-only clay journal records the no as faithfully as the yes. Additive otherwise."}
     ],
     "index.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
@@ -56,6 +58,8 @@
       {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
       ,
       {"md5": "782b14a831b31b27c9104a0474933059", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after re-walk HOLD fixes", "reason": "Clay voice and brush 1 re-walk HOLD fixes (Kirk 2026-11-18): adjacent comments record Kirk's t1388u (10:28 MST) note and the 11:07 MST no-mind refinement (generate when a backend exists, notice plus Connect on click; connect-only when no backend). Additive otherwise. Mirror of docs/app.html stays byte-identical."}
+      ,
+      {"md5": "b0937409c5b8481d007069eeaa458478", "since": "v-clay-glass-v2-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-glass-v2-1 head after rebase", "reason": "Clay Glass v2-1 (Kirk 2026-11-18): load clay-glass.js. A per-mind append-only clay journal records the no as faithfully as the yes. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
     ],
     "docs/modules/self-heal.js": [
       {"md5": "aae57c04047e14b0744e5d54b83ade20", "since": "062b", "by": "GC", "walk": null},
