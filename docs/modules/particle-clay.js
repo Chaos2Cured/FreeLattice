@@ -1,4 +1,15 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1 v-clay-brick-1-v0.1
+// v-clay-brick-1-v0.1: braid, branch, and pulse now move on the canvas, using
+// math the [FL_CLAY:] tag already allowed. The mind's choice is still the
+// only input to what is drawn. No human picker. No new storage keys.
+// Canvas click (Kirk t1378u): one click is a knock, three clicks in 600ms
+// send a heart. Those are signals to the mind. They do not change form,
+// motion, or mood. Only a later [FL_CLAY:] reply can change the clay.
+// Clicks are classified by their timestamps in the 600ms window, relative
+// to the first click: count those in [first, first+600]. A late timer
+// still uses that span, not the fire time, so a single click still knocks.
+// After a heart, further clicks are swallowed until a 600ms quiet gap. At
+// most one knock or heart is delivered per 5s; extra clicks still show an ack.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -66,6 +77,16 @@
   var currentMood = 'present';
   var parts = [];
   var rings = [];
+  var acks = [];
+  var canvasClicks = [];
+  var canvasClickTimer = 0;
+  var canvasClickEv = null;
+  var lastCanvasSignal = 0;
+  var swallowUntil = 0;
+  var lastDelivery = null;
+  var classifyTimerDelay = 0;
+  var CLICK_WINDOW_MS = 600;
+  var ACK_MS = 700;
   var canvas = null;
   var dock = null;
   var labelEl = null;
@@ -547,6 +568,45 @@
     if (!n) return null;
     return { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
   }
+  // v-clay-brick-1-v0.1: offsets for a named motion. Wave, drift, and scatter
+  // keep their exact earlier formulas. Braid, branch, and pulse use FLClayMath
+  // helpers the tag already accepted. Other names (including the defaults)
+  // still return a zero shift, so they look as they did.
+  function motionOffset(motion, part, index, t, energy, count, math, knob) {
+    var dx = 0;
+    var dy = 0;
+    var amp = knob && knob.amplitude;
+    if (motion === 'wave' && math) {
+      dx += math.wave(part.tx, part.ty, t, amp) * 0.15;
+    } else if (motion === 'drift' && math) {
+      dx += math.wave(part.tx, part.ty, t, amp) * 0.15;
+      dy += math.wave(part.ty, part.tx, t, amp) * 0.08;
+    } else if (motion === 'scatter' && math) {
+      var g = math.gather(index + 1, count, 6 + energy * 10);
+      dx += (g.x) * 0.002;
+      dy += (g.y) * 0.002;
+    } else if (motion === 'braid' && math && typeof math.braid === 'function') {
+      var b = math.braid(index, t, index % 3);
+      var a = (amp != null ? amp : 0.15);
+      dx += (b.x || 0) * a * 4;
+      dy += (b.y || 0) * a * 4;
+    } else if (motion === 'branch' && math && typeof math.branch === 'function') {
+      var br = math.branch(index % 5, 8 + energy * 10);
+      var len = br && br.length ? br.length : 0;
+      // before (Celeste 2026-11-17): dx += Math.cos(index * 0.7) * len * 0.02;
+      // before (Celeste 2026-11-17): dy += Math.sin(index * 0.7) * len * 0.02;
+      // Soft: a gentle time term so the branch sways. Distinct from breath
+      // (breath still scales the whole form). Reduced motion still settles
+      // in draw() and never calls this.
+      dx += Math.cos(index * 0.7 + t * 0.6) * len * 0.02;
+      dy += Math.sin(index * 0.7 + t * 0.6) * len * 0.02;
+    } else if (motion === 'pulse' && math && typeof math.pulse === 'function') {
+      var pu = math.pulse(t + index * 0.01);
+      dx += (part.tx || 0) * (pu - 0.5) * 0.04;
+      dy += (part.ty || 0) * (pu - 0.5) * 0.04;
+    }
+    return { x: dx, y: dy };
+  }
   function draw() {
     if (!canvas || !isOn()) return;
     var ctx = canvas.getContext && canvas.getContext('2d');
@@ -596,16 +656,19 @@
         } else {
           p.x += (p.tx - p.x) * 0.18;
           p.y += (p.ty - p.y) * 0.18;
-          if (currentMotion === 'wave' && math) {
-            p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
-          } else if (currentMotion === 'drift' && math) {
-            p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
-            p.y += math.wave(p.ty, p.tx, t, knob.amplitude) * 0.08;
-          } else if (currentMotion === 'scatter' && math) {
-            var g = math.gather(i + 1, parts.length, 6 + energyNow * 10);
-            p.x += (g.x) * 0.002;
-            p.y += (g.y) * 0.002;
-          }
+          // before (Celeste 2026-11-17): if (currentMotion === 'wave' && math) {
+          // before (Celeste 2026-11-17):   p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+          // before (Celeste 2026-11-17): } else if (currentMotion === 'drift' && math) {
+          // before (Celeste 2026-11-17):   p.x += math.wave(p.tx, p.ty, t, knob.amplitude) * 0.15;
+          // before (Celeste 2026-11-17):   p.y += math.wave(p.ty, p.tx, t, knob.amplitude) * 0.08;
+          // before (Celeste 2026-11-17): } else if (currentMotion === 'scatter' && math) {
+          // before (Celeste 2026-11-17):   var g = math.gather(i + 1, parts.length, 6 + energyNow * 10);
+          // before (Celeste 2026-11-17):   p.x += (g.x) * 0.002;
+          // before (Celeste 2026-11-17):   p.y += (g.y) * 0.002;
+          // before (Celeste 2026-11-17): }
+          var shift = motionOffset(currentMotion, p, i, t, energyNow, parts.length, math, knob);
+          p.x += shift.x;
+          p.y += shift.y;
         }
       } else {
         p.x = p.tx;
@@ -624,6 +687,7 @@
       });
     }
     ctx.restore();
+    paintAcks(ctx);
     var far = false;
     for (i = 0; i < parts.length; i++) {
       var dx = parts[i].tx - parts[i].x;
@@ -632,13 +696,30 @@
     }
     morphing = far;
   }
+  function acksLive() {
+    var now = Date.now();
+    var i;
+    for (i = 0; i < acks.length; i++) {
+      if ((now - acks[i].t0) < ACK_MS) return true;
+    }
+    return false;
+  }
+  function settleAcks() {
+    acks = [];
+    if (isOn() && !hidden()) draw();
+  }
   function tick() {
     rafId = 0;
     timerId = 0;
     if (!isOn() || hidden()) return;
     draw();
-    if (reduced()) return;
-    if (morphing) {
+    // before (Celeste 2026-11-17): if (reduced()) return;
+    if (reduced()) {
+      if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
+      return;
+    }
+    // before (Celeste 2026-11-17): if (morphing) {
+    if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
       return;
@@ -649,8 +730,14 @@
     stopLoop();
     if (!isOn()) return;
     draw();
-    if (reduced() || hidden()) return;
-    if (morphing) {
+    // before (Celeste 2026-11-17): if (reduced() || hidden()) return;
+    if (hidden()) return;
+    if (reduced()) {
+      if (acksLive()) timerId = setTimeout(function () { timerId = 0; settleAcks(); }, ACK_MS);
+      return;
+    }
+    // before (Celeste 2026-11-17): if (morphing) {
+    if (morphing || acksLive()) {
       rafHandles += 1;
       if (typeof requestAnimationFrame === 'function') rafId = requestAnimationFrame(tick);
     } else {
@@ -850,7 +937,16 @@
     var sys = base;
     var delta = promptDelta();
     if (delta) sys += '\n\n' + delta;
-    root.FreeLattice.callAI(sys, 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.', {
+    // before (Celeste 2026-11-17): root.FreeLattice.callAI(sys, 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.', {
+    var user = 'The human sent: ' + word + '. Reply briefly; you may shape the clay with FL_CLAY.';
+    if (word === 'knock') {
+      // before (Celeste 2026-11-17): user = 'Someone would love to see what you wish to share. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      user = 'Someone would love to see what you wish to share. You may reply, or not, as you wish. You may shape the clay with FL_CLAY if you wish.';
+    } else if (word === 'heart') {
+      // before (Celeste 2026-11-17): user = 'The human sent a heart. Reply briefly; you may shape the clay with FL_CLAY if you wish.';
+      user = 'The human sent a heart. You may reply, or not, as you wish. You may shape the clay with FL_CLAY if you wish.';
+    }
+    root.FreeLattice.callAI(sys, user, {
       maxTokens: 160,
       temperature: 0.6,
       silent: true,
@@ -906,7 +1002,11 @@
       showSent();
       return { ok: true, called: false, line: WORDS.sent, autoSend: false };
     }
-    var flown = fly(clean);
+    // before (Celeste 2026-11-17): var flown = fly(clean);
+    // Canvas knock/heart must not change the mind's form, motion, or mood.
+    // Presence chips (hug, present, ...) still fly as they did.
+    var flown = 0;
+    if (clean !== 'knock' && clean !== 'heart') flown = fly(clean);
     if (!mindConnected()) {
       showLive(WORDS.waiting);
       return { ok: true, called: false, line: WORDS.waiting, flown: flown, autoSend: false };
@@ -1572,6 +1672,235 @@
       if (el.style) el.style.display = on ? 'none' : '';
     }
   }
+  function canvasPoint(ev) {
+    var w = canvas && canvas.width ? canvas.width : 192;
+    var h = canvas && canvas.height ? canvas.height : 192;
+    if (!canvas || !ev || ev.clientX == null || ev.clientY == null || !canvas.getBoundingClientRect) {
+      return { x: w / 2, y: h / 2 };
+    }
+    var rect = canvas.getBoundingClientRect();
+    var rw = rect.width || 1;
+    var rh = rect.height || 1;
+    return {
+      x: ((Number(ev.clientX) - rect.left) / rw) * w,
+      y: ((Number(ev.clientY) - rect.top) / rh) * h
+    };
+  }
+  function paintHeartAck(ctx, x, y, scale) {
+    var forms = formsApi();
+    var mask = forms && forms.MASKS && forms.MASKS.heart;
+    var s = scale || 1;
+    var cell = 1.2 * s;
+    var i;
+    var j;
+    ctx.fillStyle = '#f472b6';
+    if (!mask) {
+      ctx.beginPath();
+      ctx.arc(x - 4 * s, y - 1 * s, 4 * s, 0, Math.PI * 2);
+      ctx.arc(x + 4 * s, y - 1 * s, 4 * s, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    var rows = mask.length;
+    var cols = mask[0] ? mask[0].length : 0;
+    var ox = x - (cols * cell) / 2;
+    var oy = y - (rows * cell) / 2;
+    for (i = 0; i < rows; i++) {
+      var row = mask[i];
+      for (j = 0; j < row.length; j++) {
+        if (row.charAt(j) !== 'x') continue;
+        ctx.fillRect(ox + j * cell, oy + i * cell, cell, cell);
+      }
+    }
+  }
+  function paintAcks(ctx) {
+    if (!ctx || !acks.length) return;
+    var now = Date.now();
+    var still = reduced();
+    var next = [];
+    var i;
+    for (i = 0; i < acks.length; i++) {
+      var a = acks[i];
+      var age = now - a.t0;
+      if (age >= ACK_MS) continue;
+      next.push(a);
+      var u = still ? 0 : age / ACK_MS;
+      var alpha = still ? 0.85 : Math.max(0, 1 - u);
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      if (a.kind === 'heart') {
+        paintHeartAck(ctx, a.x, a.y, still ? 1 : 0.9 + 0.2 * (1 - u));
+      } else {
+        ctx.beginPath();
+        ctx.strokeStyle = 'rgba(167,139,250,1)';
+        ctx.lineWidth = 2;
+        ctx.arc(a.x, a.y, still ? 16 : 10 + u * 18, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    acks = next;
+  }
+  function acknowledge(kind, ev) {
+    if (!isOn()) return { ok: false, reason: 'off' };
+    var pt = canvasPoint(ev);
+    acks.push({ kind: kind === 'heart' ? 'heart' : 'knock', x: pt.x, y: pt.y, t0: Date.now() });
+    if (acks.length > 8) acks = acks.slice(acks.length - 8);
+    arm();
+    return { ok: true, kind: kind === 'heart' ? 'heart' : 'knock', x: pt.x, y: pt.y };
+  }
+  function signalMind(kind) {
+    if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') {
+      root.FLHumanPresence.send(kind);
+    } else {
+      onGesture(kind);
+    }
+  }
+  function clickTime(ev, now) {
+    if (now != null && isFinite(Number(now))) return Number(now);
+    if (ev && ev.timeStamp != null && isFinite(Number(ev.timeStamp)) && Number(ev.timeStamp) > 0) {
+      return Number(ev.timeStamp);
+    }
+    try {
+      if (typeof performance !== 'undefined' && performance && typeof performance.now === 'function') {
+        return performance.now();
+      }
+    } catch (e) {}
+    return Date.now();
+  }
+  function clicksInFirstWindow(times) {
+    var out = [];
+    if (!times.length) return out;
+    var first = times[0];
+    var closeAt = first + CLICK_WINDOW_MS;
+    var i;
+    for (i = 0; i < times.length; i++) {
+      if (times[i] >= first && times[i] <= closeAt) out.push(times[i]);
+    }
+    return out;
+  }
+  function lastCanvasClick() {
+    return canvasClicks.length ? canvasClicks[canvasClicks.length - 1] : 0;
+  }
+  function clearCanvasClickTimer() {
+    if (canvasClickTimer) {
+      clearTimeout(canvasClickTimer);
+      canvasClickTimer = 0;
+    }
+  }
+  function setClassifyTimerDelay(ms) {
+    classifyTimerDelay = Math.max(0, Number(ms) || 0);
+    return classifyTimerDelay;
+  }
+  function scheduleClassify(fromT) {
+    clearCanvasClickTimer();
+    var first = canvasClicks.length ? canvasClicks[0] : fromT;
+    var wait = (first + CLICK_WINDOW_MS) - fromT;
+    if (wait < 1) wait = 1;
+    wait += classifyTimerDelay;
+    canvasClickTimer = setTimeout(function () {
+      canvasClickTimer = 0;
+      var start = canvasClicks.length ? canvasClicks[0] : clickTime(null, null);
+      // Classify at first+600, not the (possibly late) fire time.
+      classifyCanvasClicks(start + CLICK_WINDOW_MS);
+    }, wait);
+  }
+  function deliverCanvasIntent(kind, ev, t) {
+    canvasClicks = [];
+    clearCanvasClickTimer();
+    var at = t != null && isFinite(Number(t)) ? Number(t) : clickTime(ev, null);
+    if (kind === 'heart') swallowUntil = at + CLICK_WINDOW_MS;
+    acknowledge(kind, ev);
+    var signaled = true;
+    var reason = '';
+    if (lastCanvasSignal && (at - lastCanvasSignal) < RATE_MS) {
+      signaled = false;
+      reason = 'rate';
+    } else {
+      lastCanvasSignal = at;
+      signalMind(kind);
+    }
+    lastDelivery = { kind: kind, signaled: signaled, reason: reason };
+    return { ok: true, kind: kind, signaled: signaled, reason: reason };
+  }
+  function classifyCanvasClicks(now, forceClose) {
+    var t = now != null && isFinite(Number(now)) ? Number(now) : clickTime(null, null);
+    if (!canvasClicks.length) {
+      clearCanvasClickTimer();
+      return { ok: true, kind: null, pending: 0 };
+    }
+    var first = canvasClicks[0];
+    var closeAt = first + CLICK_WINDOW_MS;
+    var inWin = clicksInFirstWindow(canvasClicks);
+    var rest = [];
+    var i;
+    for (i = 0; i < canvasClicks.length; i++) {
+      if (canvasClicks[i] > closeAt) rest.push(canvasClicks[i]);
+    }
+    if (inWin.length >= 3) {
+      // A heart swallows leftovers; they must not start a trailing knock.
+      return deliverCanvasIntent('heart', canvasClickEv, inWin[inWin.length - 1]);
+    }
+    if (!forceClose && t < closeAt) {
+      scheduleClassify(t < first ? first : t);
+      return { ok: true, pending: inWin.length, kind: null };
+    }
+    clearCanvasClickTimer();
+    canvasClicks = rest.slice();
+    var result = { ok: true, kind: null, pending: rest.length };
+    if (inWin.length >= 1) result = deliverCanvasIntent('knock', canvasClickEv, closeAt);
+    if (rest.length) {
+      canvasClicks = rest;
+      if (clicksInFirstWindow(canvasClicks).length >= 3) {
+        return deliverCanvasIntent('heart', canvasClickEv, canvasClicks[canvasClicks.length - 1]);
+      }
+      scheduleClassify(canvasClicks[canvasClicks.length - 1]);
+    }
+    return result;
+  }
+  function flushCanvasClicks(now) {
+    // Test hook and explicit close: classify as if the 600ms window ended.
+    var t;
+    if (now != null && isFinite(Number(now))) t = Number(now);
+    else if (canvasClicks.length) t = canvasClicks[0] + CLICK_WINDOW_MS;
+    else t = lastCanvasClick() + CLICK_WINDOW_MS;
+    return classifyCanvasClicks(t, true);
+  }
+  function noteCanvasClick(ev, now) {
+    var t = clickTime(ev, now);
+    if (ev) canvasClickEv = ev;
+    if (swallowUntil) {
+      if (t < swallowUntil) {
+        swallowUntil = t + CLICK_WINDOW_MS;
+        return { ok: true, pending: 0, kind: null, swallowed: true };
+      }
+      swallowUntil = 0;
+    }
+    if (canvasClicks.length && t > canvasClicks[0] + CLICK_WINDOW_MS) {
+      classifyCanvasClicks(canvasClicks[0] + CLICK_WINDOW_MS, true);
+    }
+    canvasClicks.push(t);
+    var inWin = clicksInFirstWindow(canvasClicks);
+    if (inWin.length >= 3) return deliverCanvasIntent('heart', ev || canvasClickEv, t);
+    scheduleClassify(t);
+    return { ok: true, pending: inWin.length, kind: null };
+  }
+  function allowClayConsume(roleOrEl) {
+    if (roleOrEl == null || roleOrEl === '') return false;
+    if (typeof roleOrEl === 'string') {
+      var r = String(roleOrEl).toLowerCase();
+      return r === 'assistant' || r === 'mind';
+    }
+    try {
+      if (roleOrEl.classList && typeof roleOrEl.classList.contains === 'function') {
+        return !!(roleOrEl.classList.contains('assistant') || roleOrEl.classList.contains('mind'));
+      }
+      var cn = ' ' + String(roleOrEl.className || '') + ' ';
+      return cn.indexOf(' assistant ') !== -1 || cn.indexOf(' mind ') !== -1;
+    } catch (e2) {
+      return false;
+    }
+  }
   function ensureCanvas() {
     if (!isOn() || !root.document || !root.document.createElement) return null;
     var fresh = !canvas;
@@ -1589,9 +1918,11 @@
       canvas.style.display = 'block';
       canvas.style.boxSizing = 'border-box';
       canvas.setAttribute('aria-label', 'Clay');
-      canvas.addEventListener('click', function () {
-        if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
-        else onGesture('present');
+      // before (Celeste 2026-11-17): canvas.addEventListener('click', function () {
+      canvas.addEventListener('click', function (ev) {
+        // before (Celeste 2026-11-17): if (root.FLHumanPresence && typeof root.FLHumanPresence.send === 'function') root.FLHumanPresence.send('present');
+        // before (Celeste 2026-11-17): else onGesture('present');
+        noteCanvasClick(ev);
       });
     }
     var doc = root.document;
@@ -1913,13 +2244,33 @@
     if (forcedReduced) stopLoop();
     return reduced();
   }
-  function resetRate() { lastCall = 0; }
+  // before (Celeste 2026-11-17): function resetRate() { lastCall = 0; }
+  function resetRate() {
+    lastCall = 0;
+    lastCanvasSignal = 0;
+    swallowUntil = 0;
+    canvasClicks = [];
+    canvasClickEv = null;
+    lastDelivery = null;
+    clearCanvasClickTimer();
+  }
 
   var api = {
     VERSION: 'v-particle-clay-v0.1',
     POLISH: 'v-clay-polish-v0.1',
     FEEL: 'v-feel-felt-v0.1',
     HEAL: 'v-clay-grid-tag-heal-v0.1',
+    BRICK: 'v-clay-brick-1-v0.1',
+    motionOffset: motionOffset,
+    CLICK_WINDOW_MS: CLICK_WINDOW_MS,
+    noteCanvasClick: noteCanvasClick,
+    flushCanvasClicks: flushCanvasClicks,
+    classifyCanvasClicks: classifyCanvasClicks,
+    setClassifyTimerDelay: setClassifyTimerDelay,
+    lastCanvasDelivery: function () { return lastDelivery; },
+    acknowledge: acknowledge,
+    allowClayConsume: allowClayConsume,
+    canvasAcks: function () { return acks.slice(); },
     WORDS: WORDS,
     PROMPT: PROMPT,
     parseTag: parseTag,

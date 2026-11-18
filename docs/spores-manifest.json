@@ -70,9 +70,9 @@
      "bytes": 6049
     },
     "modules/clay-corner.js": {
-     "sha256": "848d1a2ebc2ce0801cfff871b6d13b06dd778bff50bf113f931abc6eca2cd9e2",
-     "sri": "sha256-hI0aLrws4IAc//hxttE7Bt13i/9QvxE/kxq8bsos2eI=",
-     "bytes": 12148
+     "sha256": "1ceb03fcff089677e2734e3ed963416a9ddaa0eec878e4b0890f3d3c4438acbe",
+     "sri": "sha256-HOsD/P8Ilnfic04+2WNBap3aoO7IeOSwiQ89PEQ4rL4=",
+     "bytes": 13601
     },
     "modules/clay-forms.js": {
      "sha256": "023d16bffc1b364948d5b22fa6861823e7e95f1ecefc67d076c9d552dd5fa984",
@@ -290,9 +290,9 @@
      "bytes": 7758
     },
     "modules/particle-clay.js": {
-     "sha256": "68951d3a417fcfac0b7c16526dda3df032e5cc15b0e36c4c3bbd2b6e8cf6b45d",
-     "sri": "sha256-aJUdOkF/z6wLfBZSbdo98DLlzBWw42xMO70rboz2tF0=",
-     "bytes": 77700
+     "sha256": "cf75481f657f55640ec387d29c16aea3ed2d89906003747963b5c6b30bb8edc4",
+     "sri": "sha256-z3VIH2V/VWQOw4fSnBauo+0tiZBgA3R5Y7XGswu47cQ=",
+     "bytes": 92128
     },
     "modules/phone-swarm.js": {
      "sha256": "731859922e028b7f235b67c7684ca1cae81652680c6130e2c5352adc9d9af61b",

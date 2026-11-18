@@ -38891,9 +38891,15 @@ function renderMessageContent(textSpan, content, msgDiv) {
   // v-particle-clay-v0.1: a clay tag never stays in the bubble.
   try {
     if (window.FLClayCorner && typeof FLClayCorner.noteReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) FLClayCorner.noteReply(content);
+    // before (Celeste 2026-11-17): if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) {
+    // before (Celeste 2026-11-17):   var clayBubble = FLClay.consumeReply(content);
     if (window.FLClay && typeof FLClay.consumeReply === 'function' && typeof content === 'string' && flHasMindMark(content, 'clay')) {
-      var clayBubble = FLClay.consumeReply(content);
-      if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+      var clayRoleEl = msgDiv || (textSpan && textSpan.parentElement);
+      if (typeof FLClay.allowClayConsume === 'function' && FLClay.allowClayConsume(clayRoleEl)) {
+        var clayBubble = FLClay.consumeReply(content);
+        // before (Celeste 2026-11-17):   if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+        if (clayBubble && typeof clayBubble.visible === 'string') content = clayBubble.visible;
+      }
     }
     if (window.FLMake && typeof FLMake.onReply === 'function' && typeof content === 'string' && content.indexOf('[FL_MAKE:') !== -1) {
       var makeBubble = FLMake.onReply(content, textSpan);
