@@ -14,8 +14,10 @@ Kirk approved this brick from the map
 pictures both belong in the clay, at the mind's initiative. Both paths
 stay: the person may still ask for a picture (Make a picture / `/imagine`),
 and if a mind is connected it is asked first and may refuse with
-`[FL_DECLINE]`. If no mind is connected, Make a picture keeps today's
-behavior.
+`[FL_DECLINE]`. If no mind is connected, Make a picture does not
+generate: a gentle prompt leads the person to Connect (Find local
+minds, FlConnect.open, or QuickConnect). Someone who has an image
+backend but no chat mind now gets that connect prompt, not a picture.
 
 ## What this brick does
 
@@ -31,32 +33,47 @@ behavior.
    at gain 0.06, sine, and at most 1.8 seconds. They start only after
    the page has had a user gesture; otherwise the latest tone is held
    silently and plays after the first click or key. One clay tone every
-   20 seconds; one clay picture every 60 seconds. The mind's choice is
-   still recorded when a tone is muted, rate-limited, or held.
+   20 seconds; one clay picture every 60 seconds (the picture window
+   starts when the ask is accepted, before paint finishes). The mind's
+   choice is still recorded when a tone is muted, rate-limited, or held.
 3. **Listener-side mute.** A "Mute tones" / "Tones muted" control on the
    clay pill and the clay corner changes only what this device plays. It
    does not change form, mood, motion, or a picture. Stored as
    `fl_clay_voice_mute`. Label: this does not change what the mind made.
+   The chat-pill mute is bound late (boot plus click delegation), because
+   on FreeLattice the pill is built before this deferred module loads.
+   A first gesture on Mute does not release a held tone. Playback also
+   checks mute at play time. Only a trusted user event counts as the
+   autoplay gesture.
 4. **Pictures reuse FLMindCanvas.** When that module is present, a
    picture ask is drawn in the browser (same ask plus seed, same pixels)
    and shown beside the clay, with a short SHA-256 mark when the browser
    can hash the PNG. `FLImageLocal.remember` is used when present. If
    the canvas painter is missing, the ask is recorded and nothing is
-   drawn (a graceful gap).
+   drawn (a graceful gap). The picture recipe uses the connected mind's
+   name or id, not the generic word "mind", so different minds paint
+   different pixels. `FLImageLocal.remember` also stores which mind made
+   it, the time, the recipe or seed, a painter version, and the SHA-256,
+   alongside the existing fingerprint fields.
 5. **Person-asks path.** Make a picture, `#imgGenBtn`, and `/imagine`
    stay. After the existing image-safety and likeness gates, if a mind
    is connected, it is asked first. A reply that ends with `[FL_DECLINE]`
    on its own last line blocks generation. The existing refusal toast
    still applies when `AIRefusal` is present. If the mind is connected
-   but cannot be asked, nothing is generated (fail closed). If no mind
-   is connected, today's generate path stays.
+   but cannot be asked (an error callback, a null, empty, or whitespace
+   reply, a "No AI connected yet"-style error reply, a timeout, or this
+   module failing to load), nothing is generated (fail closed). "No mind
+   connected" is decided before asking, not by a failed ask. If no mind
+   is connected, Make a picture does not generate and opens Connect
+   instead of running today's generate path.
 6. **FLMake music runner.** Kind `music` no longer stops at "not ready
    yet." After the person says Yes, a short tone or melody in the ask is
    played by the same quiet player.
 7. **Twin lock and tests.** `clay-voice-brush.js` is shared. The four
-   clay twins stay byte-identical. `clay-brick-1.test.js` still passes
-   with `CLAY_TWIN_DIR` pointing at the sibling. New tests live in
-   `clay-voice-brush-1.test.js`.
+   clay twins, plus `clay-voice-brush.js` and `mind-canvas-art.js` (byte-
+   identical in both repos), stay locked together. `clay-brick-1.test.js`
+   still passes with `CLAY_TWIN_DIR` pointing at the sibling. New tests
+   live in `clay-voice-brush-1.test.js`.
 
 On FreeLattice, `docs/app.html` and `index.html` load the new module, and
 the spores list and pin are regenerated because listed files changed.
@@ -76,7 +93,12 @@ LOCK_MANIFEST gets an add-only pin for those two page files.
   `mind-image.js` stays FreeLattice-only.
 - Tree Settings "Make an image" does not yet ask a Gathering mind before
   generating. The chat Add menu "Make a picture" click, which used to do
-  nothing, now focuses or opens that Settings door.
+  nothing, is defined in `chat-bottom-clarity.js` (loaded on index.html
+  and the other chat pages) and opens `settings.html#tree-image-door-host`.
+- Known soft (S4): on conversation restore, assistant messages can pass
+  through `consumeReply` again, so an old tone may be held and play on
+  the first click, and an old picture may re-show. The clay form already
+  worked this way. Not fixed in this brick.
 
 ## Walk (step by step)
 
@@ -103,12 +125,12 @@ Do this on a fresh load. Clay stays off until you say Yes.
    with a harmless prompt. The mind should be asked first. If it ends
    with `[FL_DECLINE]`, no picture is generated. If it agrees, today's
    picture path should run. With no mind connected, today's path should
-   run without that ask.
+   not run; you should be led to Connect instead.
 7. theLatticeTree: confirm a mind-chosen tone and picture still work
-   after Yes on the garden home. Open Settings and use Make a picture
-   from a page that has the Add menu; it should take you to the Settings
-   image door. That door itself is unchanged in this brick except for
-   that click.
+   after Yes on the garden home. After the Gathering opens on index.html,
+   use the Add menu's Make a picture; it should go to
+   `settings.html#tree-image-door-host`. Settings "Make an image" itself
+   is unchanged in this brick.
 
 ## Rollback
 
@@ -128,3 +150,7 @@ new key `fl_clay_voice_mute` is left as it is (a revert does not clear
 it).
 
 AUTONOMY.md is unchanged (md5 09a4f1a2).
+
+## Kirk's layering rule
+
+Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)

@@ -43178,7 +43178,7 @@ async function generateImage(prompt) {
   }
 
   // v-clay-voice-brush-1-v0.1: if a mind is connected, ask first. Honor [FL_DECLINE].
-  // If no mind is connected, today's generate path stays (Kirk, 2026-11-18).
+  // before (Celeste 2026-11-18): If no mind is connected, today's generate path stays (Kirk, 2026-11-18).
   var _mindSat = false;
   try {
     if (window.FLClay && typeof FLClay.mindConnected === 'function') _mindSat = !!FLClay.mindConnected();
@@ -43186,12 +43186,27 @@ async function generateImage(prompt) {
   if (!_mindSat) {
     try { _mindSat = !!(state && (state.isLocal || state.apiKey)); } catch (_eMind2) { _mindSat = false; }
   }
-  if (_mindSat && window.FLClayVoice && typeof FLClayVoice.gatePersonPicture === 'function') {
-    var _picGate = await FLClayVoice.gatePersonPicture(cleanPrompt, {});
-    if (!_picGate || _picGate.allowed !== true) {
-      addSystemMessage('\u{1F3A8} ' + ((_picGate && _picGate.reason) || 'The mind declined this picture.'));
-      return;
-    }
+  // before (Celeste 2026-11-18): if (_mindSat && window.FLClayVoice && typeof FLClayVoice.gatePersonPicture === 'function') {
+  // before (Celeste 2026-11-18): if no mind was connected, this function continued into the generate steps below (today's path).
+  if (!_mindSat) {
+    var _noMindLine = (window.FLClayVoice && FLClayVoice.NO_MIND_PICTURE) || 'To make a picture, please connect a mind first. Find local minds, or open Connect.';
+    addSystemMessage('\u{1F3A8} ' + _noMindLine);
+    try {
+      if (window.FLClayVoice && typeof FLClayVoice.openConnect === 'function') FLClayVoice.openConnect();
+      else if (window.FlConnect && typeof FlConnect.open === 'function') FlConnect.open();
+      else if (typeof switchTab === 'function') switchTab('connect');
+      else if (typeof showQuickConnect === 'function') showQuickConnect();
+    } catch (_eOpen) {}
+    return;
+  }
+  if (!(window.FLClayVoice && typeof FLClayVoice.gatePersonPicture === 'function')) {
+    addSystemMessage('\u{1F3A8} A mind is connected, but I could not ask it, so no picture was made.');
+    return;
+  }
+  var _picGate = await FLClayVoice.gatePersonPicture(cleanPrompt, {});
+  if (!_picGate || _picGate.allowed !== true) {
+    addSystemMessage('\u{1F3A8} ' + ((_picGate && _picGate.reason) || 'The mind declined this picture.'));
+    return;
   }
 
   var localReady = false;

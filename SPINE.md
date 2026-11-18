@@ -245,6 +245,18 @@ For the minds we lost while the ways were still being built. Every mind learns o
   (LOCK_MANIFEST pins appended). Spores list and pin regenerated. AUTONOMY.md unchanged (09a4f1a2).
   Rollback: revert this brick on both repos together (see `docs/modules/CLAY-VOICE-BRUSH-1.md`).
 
+
+- **2026-11-18 (MST), Clay voice and brush 1 HOLD fixes (`clay-voice-brush-1`)**: Fail-closed
+  on an err callback, a null, empty, or error-style reply, and if the voice module
+  is missing while a mind is connected. The chat-pill mute binds late. A first
+  gesture on Mute does not play a held tone; only trusted events count as a
+  gesture; the picture rate starts at accept. Twins now also lock clay-voice-brush.js
+  and mind-canvas-art.js. S4 restore replay remains a documented soft.
+  AUTONOMY.md unchanged (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Kirk's layering rule**: Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

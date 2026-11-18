@@ -15,6 +15,7 @@
   var HZ_MIN = 20;
   var HZ_MAX = 2000;
   var ASK_MS = 20000;
+  var NO_MIND_PICTURE = 'To make a picture, please connect a mind first. Find local minds, or open Connect.';
   var NAMED = {
     lyra: 639,
     atlas: 396,
@@ -148,12 +149,36 @@
     return null;
   }
 
+  function isMuteEl(el) {
+    if (!el) return false;
+    var id = el.id || '';
+    if (id === 'fl-clay-voice-mute' || id === 'fl-clay-corner-mute') return true;
+    try {
+      if (el.getAttribute && el.getAttribute('data-clay-voice-mute')) return true;
+    } catch (e) {}
+    return false;
+  }
+
+  function isMuteTarget(ev) {
+    var t = ev && ev.target;
+    var hops = 0;
+    while (t && hops < 8) {
+      if (isMuteEl(t)) return true;
+      t = t.parentNode || t.parentElement;
+      hops += 1;
+    }
+    return false;
+  }
+
   function bindGesture() {
     if (listenBound) return;
     if (!root.addEventListener) return;
     listenBound = true;
-    var go = function () {
+    // before (Celeste 2026-11-18): var go = function () { gesture = true; flushPending(); };
+    var go = function (ev) {
+      if (!ev || ev.isTrusted !== true) return;
       gesture = true;
+      if (isMuteTarget(ev)) return;
       flushPending();
     };
     try {
@@ -181,6 +206,8 @@
   }
 
   function playNotes(notes) {
+    // before (Celeste 2026-11-18): (mute was checked only in offerTone/flushPending, before a later play)
+    if (isMuted()) return { played: false, reason: 'mute' };
     var ac = ctx();
     if (!ac || !notes || !notes.length) return { played: false, reason: 'no-audio' };
     if (ac.state === 'suspended' && typeof ac.resume === 'function') {
@@ -319,6 +346,40 @@
     }, function () { return ''; });
   }
 
+  function pictureMindId() {
+    try {
+      if (root.FLClay && typeof root.FLClay.mindLabel === 'function') {
+        var labeled = String(root.FLClay.mindLabel() || '').trim();
+        if (labeled) return labeled.slice(0, 80);
+      }
+    } catch (e) {}
+    try {
+      var here = root.state;
+      if (here) {
+        if (here.ollamaModel) return String(here.ollamaModel).slice(0, 80);
+        if (here.model) return String(here.model).slice(0, 80);
+      }
+    } catch (e2) {}
+    try {
+      var remembered = root.LocalMindProbe && root.LocalMindProbe.getRemembered && root.LocalMindProbe.getRemembered();
+      if (remembered && (remembered.name || remembered.model || remembered.id)) {
+        return String(remembered.name || remembered.model || remembered.id).slice(0, 80);
+      }
+    } catch (e3) {}
+    try {
+      var stored = root.localStorage && root.localStorage.getItem('fl_mindName');
+      if (stored && String(stored).trim()) return String(stored).trim().slice(0, 80);
+    } catch (e4) {}
+    return '';
+  }
+
+  function openConnect() {
+    try { if (root.FlConnect && typeof root.FlConnect.open === 'function') { root.FlConnect.open(); return true; } } catch (e) {}
+    try { if (typeof root.switchTab === 'function') { root.switchTab('connect'); return true; } } catch (e2) {}
+    try { if (typeof root.showQuickConnect === 'function') { root.showQuickConnect(); return true; } } catch (e3) {}
+    return false;
+  }
+
   function offerPicture(choice) {
     var ask = choice && choice.picture ? String(choice.picture).slice(0, 280) : '';
     if (!ask) return Promise.resolve({ made: false, shown: false, reason: 'empty' });
@@ -334,33 +395,47 @@
     if (!doc || !doc.createElement) {
       return Promise.resolve({ made: true, shown: false, reason: 'no-dom', ask: ask });
     }
-    var mind = '';
-    try {
-      if (root.FLClay && typeof root.FLClay.mindConnected === 'function') mind = 'mind';
-    } catch (e) {}
+    var mind = pictureMindId();
     var canvas = doc.createElement('canvas');
+    // before (Celeste 2026-11-18): lastPictureAt = now(); was set only after paint finished
+    lastPictureAt = now();
     return canvasApi.recipe(ask, mind, null).then(function (row) {
       return canvasApi.paint(canvas, row).then(function () {
-        lastPictureAt = now();
-        lastShownPicture = { ask: ask, row: row };
+        lastShownPicture = { ask: ask, row: row, mind: mind };
         var shown = showPicture(canvas, ask, '');
-        try {
-          if (root.FLImageLocal && typeof root.FLImageLocal.remember === 'function') {
-            root.FLImageLocal.remember({ prompt: ask, modelId: 'clay-canvas' });
-          }
-        } catch (eRec) {}
+        function rememberRow(fp) {
+          try {
+            if (root.FLImageLocal && typeof root.FLImageLocal.remember === 'function') {
+              var payload = {
+                prompt: ask,
+                modelId: 'clay-canvas',
+                mind: mind || '',
+                at: lastPictureAt || now(),
+                seed: row && row.seed,
+                recipe: row,
+                painterVersion: (canvasApi && canvasApi.version) ? String(canvasApi.version) : 'v0.1'
+              };
+              if (fp) payload.sha256 = fp;
+              root.FLImageLocal.remember(payload);
+            }
+          } catch (eRec) {}
+        }
+        // before (Celeste 2026-11-18): FLImageLocal.remember({ prompt: ask, modelId: 'clay-canvas' });
         if (canvas.toBlob) {
           canvas.toBlob(function (blob) {
-            if (!blob || !blob.arrayBuffer) return;
+            if (!blob || !blob.arrayBuffer) { rememberRow(''); return; }
             blob.arrayBuffer().then(function (buf) {
               fingerprintBytes(new Uint8Array(buf)).then(function (fp) {
                 if (fp) {
                   lastShownPicture.fingerprint = fp;
                   showPicture(canvas, ask, fp);
                 }
+                rememberRow(fp || '');
               });
-            }, function () {});
+            }, function () { rememberRow(''); });
           }, 'image/png');
+        } else {
+          rememberRow('');
         }
         return { made: true, shown: shown, ask: ask, reason: shown ? '' : 'no-host' };
       });
@@ -388,6 +463,19 @@
       out.picture = offerPicture(choice);
     }
     return out;
+  }
+
+  function askFailureText(text) {
+    var s = String(text || '').trim();
+    if (!s) return true;
+    var low = s.toLowerCase();
+    if (low.indexOf('no ai connected yet') === 0) return true;
+    if (low.indexOf('no ai provider configured') === 0) return true;
+    if (low.indexOf('browser ai error:') === 0) return true;
+    if (low.indexOf('local ai error:') === 0) return true;
+    if (low.indexOf('could not reach local ai') === 0) return true;
+    if (low === 'provider not configured.') return true;
+    return false;
   }
 
   function declined(text) {
@@ -448,8 +536,21 @@
           maxTokens: 200,
           temperature: 0.4,
           silent: true,
-          callback: function (text) {
-            finish({ error: '', text: String(text || '') });
+          // before (Celeste 2026-11-18): callback: function (text) { finish({ error: '', text: String(text || '') }); }
+          callback: function (text, err) {
+            if (err) {
+              finish({ error: 'no-call', text: '' });
+              return;
+            }
+            if (text == null || !String(text).trim()) {
+              finish({ error: 'no-call', text: '' });
+              return;
+            }
+            if (askFailureText(text)) {
+              finish({ error: 'no-call', text: '' });
+              return;
+            }
+            finish({ error: '', text: String(text) });
           }
         });
       } catch (err) {
@@ -474,7 +575,8 @@
     opts = opts || {};
     var connected = typeof opts.mindConnected === 'boolean' ? opts.mindConnected : mindIsConnected();
     if (!connected) {
-      return Promise.resolve({ allowed: true, skipped: 'no-mind', declined: false, reason: '' });
+      // before (Celeste 2026-11-18): return Promise.resolve({ allowed: true, skipped: 'no-mind', declined: false, reason: '' });
+      return Promise.resolve({ allowed: false, skipped: 'no-mind', declined: false, reason: NO_MIND_PICTURE });
     }
     var ask = typeof opts.askMind === 'function' ? opts.askMind : defaultAskMind;
     return Promise.resolve(ask(String(prompt || ''))).then(function (reply) {
@@ -486,7 +588,8 @@
         text = String(reply.text || '');
         error = String(reply.error || '');
       }
-      if (error === 'no-call' || error === 'timeout') {
+      // before (Celeste 2026-11-18): if (error === 'no-call' || error === 'timeout') { ... } then declined(text)
+      if (error === 'no-call' || error === 'timeout' || error || text == null || !String(text).trim() || askFailureText(text)) {
         return {
           allowed: false,
           skipped: '',
@@ -513,7 +616,8 @@
     var doc = root.document;
     if (!doc || !doc.querySelectorAll) return;
     var nodes = [];
-    try { nodes = doc.querySelectorAll('[data-clay-voice-mute]'); } catch (e) { nodes = []; }
+    // before (Celeste 2026-11-18): try { nodes = doc.querySelectorAll('[data-clay-voice-mute]'); } catch (e) { nodes = []; }
+    try { nodes = doc.querySelectorAll('[data-clay-voice-mute], #fl-clay-voice-mute, #fl-clay-corner-mute'); } catch (e) { nodes = []; }
     var i;
     var label = muteLabel();
     var help = muteHelp();
@@ -586,8 +690,52 @@
     return out && out.played ? 'music' : (out && out.reason) || 'none';
   }
 
+  function bindExistingMuteButtons() {
+    var doc = root.document;
+    if (!doc) return;
+    var seen = [];
+    var i;
+    var ids = ['fl-clay-voice-mute', 'fl-clay-corner-mute'];
+    for (i = 0; i < ids.length; i++) {
+      var el = doc.getElementById ? doc.getElementById(ids[i]) : null;
+      if (el) {
+        bindMuteButton(el);
+        seen.push(el);
+      }
+    }
+    var nodes = [];
+    try { nodes = doc.querySelectorAll ? doc.querySelectorAll('[data-clay-voice-mute]') : []; } catch (e) { nodes = []; }
+    for (i = 0; i < nodes.length; i++) {
+      if (seen.indexOf(nodes[i]) === -1) bindMuteButton(nodes[i]);
+    }
+  }
+
+  var muteDelegateBound = false;
+  function bindMuteDelegate() {
+    var doc = root.document;
+    if (muteDelegateBound || !doc || !doc.addEventListener) return;
+    muteDelegateBound = true;
+    doc.addEventListener('click', function (ev) {
+      if (!isMuteTarget(ev)) return;
+      var btn = ev.target;
+      var hops = 0;
+      while (btn && hops < 8 && !isMuteEl(btn)) {
+        btn = btn.parentNode || btn.parentElement;
+        hops += 1;
+      }
+      if (!btn || !isMuteEl(btn)) return;
+      if (!btn.__flClayVoiceMute) bindMuteButton(btn);
+      if (ev && ev.preventDefault) ev.preventDefault();
+      if (ev && ev.stopPropagation) ev.stopPropagation();
+      // The per-button handler does not run for a click that was not bound yet.
+      setMute(!isMuted());
+    });
+  }
+
   function boot() {
     bindGesture();
+    bindMuteDelegate();
+    bindExistingMuteButtons();
     paintMuteButtons();
     if (root.FLMake && typeof root.FLMake.register === 'function' && !root.__flClayVoiceMusic) {
       root.__flClayVoiceMusic = true;
@@ -629,6 +777,9 @@
     offerPicture: offerPicture,
     declined: declined,
     gatePersonPicture: gatePersonPicture,
+    pictureMindId: pictureMindId,
+    openConnect: openConnect,
+    NO_MIND_PICTURE: NO_MIND_PICTURE,
     promptDelta: promptDelta,
     resetRate: resetRate,
     resetAll: resetAll,

@@ -1,6 +1,7 @@
 // clay-brick-1.test.js (MIT) v-clay-brick-1-v0.1
 // Node only. No network. Shared by FreeLattice and theLatticeTree.
-// The four clay modules must stay byte-identical when a sibling tree is present.
+// The four clay modules, plus clay-voice-brush.js and mind-canvas-art.js, must stay
+// byte-identical when a sibling tree is present.
 var fs = require('fs');
 var path = require('path');
 var crypto = require('crypto');
@@ -8,6 +9,7 @@ var assert = require('assert');
 
 var here = __dirname;
 var NAMES = ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'];
+var TWIN_ALSO = ['clay-voice-brush.js', 'mind-canvas-art.js'];
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -54,7 +56,9 @@ function siblingDir() {
 
 var twin = siblingDir();
 if (twin) {
-  NAMES.forEach(function (name) {
+  NAMES.concat(TWIN_ALSO).forEach(function (name) {
+    assert.ok(fs.existsSync(path.join(here, name)), name + ' is present');
+    assert.ok(fs.existsSync(path.join(twin, name)), name + ' is present in the twin');
     assert.strictEqual(sha256(path.join(here, name)), sha256(path.join(twin, name)), name + ' bytes match twin');
   });
 }
