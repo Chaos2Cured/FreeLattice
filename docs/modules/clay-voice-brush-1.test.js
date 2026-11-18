@@ -316,9 +316,15 @@ assert.strictEqual(heldForMute.tone.reason, 'autoplay-hold');
 sb.document.dispatchEvent(evClick(muteBtn, true));
 assert.ok(voice.isMuted(), 'mute click muted the speakers');
 assert.ok(voice.hasGesture(), 'mute click still counts as a user gesture');
-assert.ok(voice.pendingTone(), 'held tone was not released by the mute click');
+// before (Celeste 2026-11-18): assert.ok(voice.pendingTone(), 'held tone was not released by the mute click');
+assert.ok(!voice.pendingTone(), 'a held tone is dropped on mute so it will not play after unmute');
 assert.ok(!voice.lastPlayedTone(), 'mute click played nothing');
 assert.strictEqual(started.length, 0, 'mute click started no oscillators');
+voice.setMute(false);
+voice.markGesture();
+voice.flushPending();
+assert.ok(!voice.lastPlayedTone(), 'unmuting does not play a tone that was queued and then muted');
+assert.strictEqual(started.length, 0, 'unmuting starts no oscillators for a dropped held tone');
 
 // S2: a synthetic event must not mark a gesture or flush a held tone.
 voice.resetAll();
@@ -354,7 +360,7 @@ Promise.resolve(pic.picture).then(function (result) {
   return when(voice.gatePersonPicture('a golden sunset', { mindConnected: false, askMind: function () { throw new Error('should not ask'); } }))
     .then(function (gate) {
       noMind = gate;
-      assert.strictEqual(noMind.allowed, false, 'no mind: generation is not allowed');
+      assert.strictEqual(noMind.allowed, false, 'the ask-the-mind gate does not run without a mind');
       assert.strictEqual(noMind.skipped, 'no-mind');
       assert.ok(/connect/i.test(noMind.reason), 'no-mind reason points the person to Connect');
       var declineText = 'I do not wish to make that.\nreason: It is not mine to paint.\n[FL_DECLINE]';
@@ -442,7 +448,7 @@ Promise.resolve(pic.picture).then(function (result) {
       var asked = false;
       sb.FreeLattice.callAI = function () { asked = true; };
       return when(voice.gatePersonPicture('a golden sunset', { mindConnected: false })).then(function (noMindGate) {
-        assert.strictEqual(noMindGate.allowed, false, 'no-mind path does not generate');
+        assert.strictEqual(noMindGate.allowed, false, 'the ask-the-mind gate does not run without a mind');
         assert.strictEqual(noMindGate.skipped, 'no-mind');
         assert.ok(/connect/i.test(noMindGate.reason), 'no-mind reason points the person to Connect');
         assert.ok(!asked, 'no-mind is decided before asking, not by a failed ask');
@@ -450,6 +456,38 @@ Promise.resolve(pic.picture).then(function (result) {
         sb.FlConnect = { open: function () { opened.push('fl-connect'); return true; } };
         assert.ok(voice.openConnect(), 'openConnect uses the existing Connect flow');
         assert.deepStrictEqual(opened, ['fl-connect'], 'openConnect prefers FlConnect.open');
+        // 11:07 MST refinement (to be confirmed with Kirk before merge):
+        // no-mind + image backend generates, with a notice and a Connect button that
+        // opens only on click. no-mind + no backend stays connect-only, never auto-opens.
+        var withBackend = voice.noMindPicture({ hasBackend: true, ask: 'a golden sunset' });
+        assert.strictEqual(withBackend.generate, true, 'no-mind with a backend may generate');
+        assert.strictEqual(withBackend.outcome, 'generated, notified');
+        assert.strictEqual(withBackend.reason, voice.NO_MIND_GENERATED_LINE, 'notice says the picture was not asked of anyone');
+        var withoutBackend = voice.noMindPicture({ hasBackend: false, ask: 'a golden sunset' });
+        assert.strictEqual(withoutBackend.generate, false, 'no-mind with no backend does not generate');
+        assert.strictEqual(withoutBackend.outcome, 'no-backend');
+        assert.strictEqual(withoutBackend.reason, voice.NO_MIND_PICTURE);
+        var openedAuto = opened.slice();
+        var chat = sb.document.createElement('div');
+        chat.id = 'chatMessages';
+        chat.scrollTop = 0;
+        sb.document.body.appendChild(chat);
+        opened.length = 0;
+        assert.ok(voice.paintNoMindNotice(withBackend), 'notice is painted');
+        assert.deepStrictEqual(opened, [], 'Connect is not opened automatically');
+        var btn = null;
+        var kids = chat.children || [];
+        var row = kids[kids.length - 1];
+        var rk;
+        var rowKids = (row && row.children) || [];
+        for (rk = 0; rk < rowKids.length; rk++) {
+          if (rowKids[rk] && rowKids[rk].textContent === 'Connect') btn = rowKids[rk];
+        }
+        assert.ok(btn, 'a Connect button sits beside the notice');
+        assert.ok(/wasn.t asked of anyone/i.test((rowKids[0] && rowKids[0].textContent) || ''), 'generated notice text is shown');
+        sb.document.dispatchEvent(evClick(btn, true));
+        assert.deepStrictEqual(opened, ['fl-connect'], 'Connect opens only after the person clicks');
+        opened.length = 0;
         // S3: picture rate window starts at accept, before paint finishes
         var deferred = [];
         sb.FLMindCanvas = {
@@ -541,6 +579,16 @@ Promise.resolve(pic.picture).then(function (result) {
         assert.ok(lin.some(function (e) { return Math.abs(e.t - fadeEnd) < 0.001; }), 'gain fades to near zero over about 300 ms');
 
         // Pause (clay off) also soft-stops a playing tone.
+        // The fade must run from the actual Pause button listeners, not only FLClay.setOn.
+        load('clay-corner.js', sb);
+        var dock = sb.document.createElement('div');
+        dock.id = 'fl-clay-dock';
+        sb.document.body.appendChild(dock);
+        clay.mount(dock);
+        clay.ensurePill();
+        var pillPause = sb.document.getElementById('fl-clay-pause');
+        assert.ok(pillPause, 'the clay pill Pause button is present');
+
         voice.resetAll();
         voice.setMute(false);
         voice.markGesture();
@@ -549,8 +597,29 @@ Promise.resolve(pic.picture).then(function (result) {
         voice.fromMindTag({ melody: 'G4 E4 D4 C4 G4' }, { role: 'mind' });
         var osc1 = started[0];
         sb.__audio.currentTime = 0.5;
-        clay.setOn(false);
-        assert.ok(Math.abs((osc1._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'pause fades and then stops the tone');
+        sb.document.dispatchEvent(evClick(pillPause, true));
+        assert.ok(Math.abs((osc1._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'pill Pause click fades and then stops the tone');
+
+        sb.FLClayCorner.mount();
+        var corner = sb.document.getElementById('fl-clay-corner');
+        assert.ok(corner, 'the clay corner is mounted');
+        var cornerPause = null;
+        var kids = corner.children || [];
+        var ci;
+        for (ci = 0; ci < kids.length; ci++) {
+          if (kids[ci] && kids[ci].textContent === 'Pause') cornerPause = kids[ci];
+        }
+        assert.ok(cornerPause, 'the corner Pause button is present');
+        voice.resetAll();
+        voice.setMute(false);
+        voice.markGesture();
+        started.length = 0;
+        sb.__audio.currentTime = 0;
+        voice.fromMindTag({ melody: 'G4 E4 D4 C4 G4' }, { role: 'mind' });
+        var osc2 = started[0];
+        sb.__audio.currentTime = 0.5;
+        sb.document.dispatchEvent(evClick(cornerPause, true));
+        assert.ok(Math.abs((osc2._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'corner Pause click fades and then stops the tone');
 
         console.log('SMOKE_OK clay-voice-brush-1 tests passed');
       });

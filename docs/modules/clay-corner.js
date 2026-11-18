@@ -139,7 +139,15 @@
   function setOn(yes) {
     var boxs = storage();
     try { if (boxs) boxs.setItem(KEY, yes ? 'yes' : 'no'); } catch (e) {}
-    if (!yes) settle();
+    // before (Celeste 2026-11-18): if (!yes) settle();
+    if (!yes) {
+      try {
+        if (root.FLClayVoice && typeof root.FLClayVoice.softStop === 'function') {
+          root.FLClayVoice.softStop();
+        }
+      } catch (eSoft) {}
+      settle();
+    }
     paintChrome();
     return isOn();
   }

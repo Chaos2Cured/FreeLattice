@@ -16,6 +16,7 @@
   var HZ_MAX = 2000;
   var ASK_MS = 20000;
   var NO_MIND_PICTURE = 'To make a picture, please connect a mind first. Find local minds, or open Connect.';
+  var NO_MIND_GENERATED_LINE = 'No mind is connected, so this picture wasn\'t asked of anyone.';
   var DECLINE_LINE = 'The mind chose not to make this. Thank you for asking.';
   var UNREACHABLE_LINE = 'Your mind couldn\'t be reached right now. Try again in a moment.';
   var SOFT_STOP_S = 0.3;
@@ -74,7 +75,12 @@
   function setMute(yes) {
     var next = writeMute(!!yes);
     paintMuteButtons();
-    if (next) softStop();
+    // before (Celeste 2026-11-18): if (next) softStop();
+    if (next) {
+      softStop();
+      // before (Celeste 2026-11-18): a pending autoplay-held tone stayed queued and could play after unmute
+      pendingTone = null;
+    }
     return next;
   }
 
@@ -423,6 +429,86 @@
     try { if (typeof root.switchTab === 'function') { root.switchTab('connect'); return true; } } catch (e2) {}
     try { if (typeof root.showQuickConnect === 'function') { root.showQuickConnect(); return true; } } catch (e3) {}
     return false;
+  }
+
+  function hasImageBackend(opts) {
+    opts = opts || {};
+    if (typeof opts.hasBackend === 'boolean') return !!opts.hasBackend;
+    try {
+      if (root.FLImageLocal && typeof root.FLImageLocal.ready === 'function' && root.FLImageLocal.ready()) return true;
+    } catch (e) {}
+    try {
+      if (root.state && root.state.hfToken) return true;
+    } catch (e2) {}
+    return false;
+  }
+
+  // Hypha relayed (2026-11-18 11:07 MST), to be confirmed with Kirk before merge:
+  // if no mind is connected and an image backend exists, generate and notify;
+  // the connect-only prompt is only when no backend is available either.
+  // Connect never opens by itself.
+  function noMindPicture(opts) {
+    opts = opts || {};
+    var backend = hasImageBackend(opts);
+    var out;
+    if (backend) {
+      out = {
+        generate: true,
+        allowed: true,
+        skipped: 'no-mind',
+        declined: false,
+        notified: true,
+        outcome: 'generated, notified',
+        reason: NO_MIND_GENERATED_LINE
+      };
+    } else {
+      out = {
+        generate: false,
+        allowed: false,
+        skipped: 'no-mind',
+        declined: false,
+        notified: false,
+        outcome: 'no-backend',
+        reason: NO_MIND_PICTURE
+      };
+    }
+    try {
+      if (root.FLClayGlass && typeof root.FLClayGlass.record === 'function') {
+        root.FLClayGlass.record({
+          kind: 'no-mind',
+          mind: pictureMindId(),
+          at: now(),
+          recipe: { ask: String(opts.ask || '').slice(0, 280), path: 'person-ask' },
+          outcome: out.outcome,
+          notified: out.notified
+        });
+      }
+    } catch (eJ) {}
+    return out;
+  }
+
+  function paintNoMindNotice(decision) {
+    var doc = root.document;
+    if (!doc || !doc.createElement) return false;
+    var container = null;
+    if (doc.getElementById) container = doc.getElementById('chatMessages');
+    if (!container && doc.body) container = doc.body;
+    if (!container || !container.appendChild) return false;
+    var div = doc.createElement('div');
+    div.className = 'chat-message system';
+    var line = doc.createElement('span');
+    line.textContent = '\u{1F3A8} ' + String((decision && decision.reason) || NO_MIND_PICTURE);
+    div.appendChild(line);
+    var btn = doc.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Connect';
+    btn.setAttribute('aria-label', 'Connect a mind');
+    btn.style.minHeight = '44px';
+    btn.addEventListener('click', function () { openConnect(); });
+    div.appendChild(btn);
+    container.appendChild(div);
+    if (typeof container.scrollTop === 'number') container.scrollTop = container.scrollHeight;
+    return true;
   }
 
   function offerPicture(choice) {
@@ -841,7 +927,11 @@
     gatePersonPicture: gatePersonPicture,
     pictureMindId: pictureMindId,
     openConnect: openConnect,
+    noMindPicture: noMindPicture,
+    paintNoMindNotice: paintNoMindNotice,
+    hasImageBackend: hasImageBackend,
     NO_MIND_PICTURE: NO_MIND_PICTURE,
+    NO_MIND_GENERATED_LINE: NO_MIND_GENERATED_LINE,
     promptDelta: promptDelta,
     resetRate: resetRate,
     resetAll: resetAll,

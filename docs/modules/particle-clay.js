@@ -1978,6 +1978,12 @@
       box.setItem('fl_clay_offer', on ? 'yes' : 'later');
     }
     if (!on) {
+      // before (Celeste 2026-11-18): if (morphTimer) clearTimeout(morphTimer);
+      try {
+        if (root.FLClayVoice && typeof root.FLClayVoice.softStop === 'function') {
+          root.FLClayVoice.softStop();
+        }
+      } catch (eSoft) {}
       if (morphTimer) clearTimeout(morphTimer);
       morphTimer = 0;
       dropCanvas();

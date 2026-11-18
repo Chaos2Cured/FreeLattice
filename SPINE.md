@@ -263,6 +263,24 @@ For the minds we lost while the ways were still being built. Every mind learns o
   A failed ask shows a gentle unreachable line. Mute or Pause fades a
   playing tone over about 300 ms, then stops. AUTONOMY.md unchanged (09a4f1a2).
 
+
+- **2026-11-18 (MST), Clay voice and brush 1 re-walk HOLD fixes (`clay-voice-brush-1`)**:
+  Before-comments restored in clay-brick-1.test.js. Pause fades from the pill
+  and corner buttons' own setOn paths. A held tone is dropped on mute so
+  unmute does not play it. Kirk's t1388u correction (2026-11-18 10:28 MST)
+  is recorded next to the earlier generate-path before-comment: if no mind
+  is connected, Make a picture leads to connecting. AUTONOMY.md unchanged
+  (09a4f1a2). Rollback still reverts both repos together.
+
+
+- **2026-11-18 (MST), Clay voice and brush 1 no-mind refinement (`clay-voice-brush-1`)**:
+  Hypha relayed (11:07 MST), to be confirmed with Kirk before merge: if no
+  mind is connected and an image backend exists, Make a picture generates
+  with the old path, shows a notice, and offers Connect only on a click.
+  The connect-only prompt is only when no backend is available either.
+  Auto-open is kept as before-comments. Nothing changes when a mind is
+  connected. AUTONOMY.md unchanged (09a4f1a2).
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

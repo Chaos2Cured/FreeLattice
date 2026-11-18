@@ -161,3 +161,13 @@ AUTONOMY.md is unchanged (md5 09a4f1a2).
 ## Kirk's layering rule
 
 Features are never removed unless the whole family agrees, and only when the same thing exists in a better form. We iterate and add; we don't rebuild. (Kirk, 2026-11-18)
+
+## Re-walk HOLD fixes (2026-11-18)
+
+- `clay-brick-1.test.js` keeps before-comments for the two replaced lines (the old four-module twin comment, and `NAMES.forEach`).
+- Pause now fades a playing tone: `particle-clay.js` and `clay-corner.js` call `FLClayVoice.softStop` from their own `setOn(false)` paths, so the pill and corner Pause buttons run the fade. A test clicks those buttons.
+- A tone held for autoplay and then muted is dropped, so unmute does not play it.
+- Kirk's correction (t1388u, 2026-11-18 10:28 MST) is recorded next to the earlier "today's generate path stays" before-comment in `docs/app.html` and `index.html`: if no mind is connected, Make a picture leads to connecting. Nothing was deleted.
+
+- Hypha relayed a further refinement (2026-11-18 11:07 MST), to be confirmed with Kirk before merge: if no mind is connected and an image backend exists, Make a picture uses the old generate path and shows "No mind is connected, so this picture wasn't asked of anyone," with a Connect button that opens only on click (never automatically). The connect-only prompt is shown only when no image backend is available either. The earlier auto-open connect-only code is kept as before-comments, next to Kirk's 10:28 MST t1388u note and this 11:07 note. Nothing changes when a mind is connected. The clay-glass journal (when present) records `no-mind` with outcome `generated, notified` or `no-backend`.
+

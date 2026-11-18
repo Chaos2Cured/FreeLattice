@@ -36,6 +36,8 @@
       {"md5": "9632360282f85630a1c99b2d1af8b3dd", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after HOLD fixes", "reason": "Clay voice and brush 1 HOLD fixes (Kirk 2026-11-18): if a mind is connected and clay-voice-brush.js did not load, Make a picture fails closed. If no mind is connected, Make a picture does not generate and opens Connect. Additive otherwise."}
       ,
       {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise."}
+      ,
+      {"md5": "782b14a831b31b27c9104a0474933059", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after re-walk HOLD fixes", "reason": "Clay voice and brush 1 re-walk HOLD fixes (Kirk 2026-11-18): adjacent comments record Kirk's t1388u (10:28 MST) note and the 11:07 MST no-mind refinement (generate when a backend exists, notice plus Connect on click; connect-only when no backend). Additive otherwise."}
     ],
     "index.html": [
       {"md5": "b545b79b5824f74c1b4a1eba0ce2d801", "since": "260d0fb4", "by": "Kirk Patrick Miller"},
@@ -52,6 +54,8 @@
       {"md5": "9632360282f85630a1c99b2d1af8b3dd", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after HOLD fixes", "reason": "Clay voice and brush 1 HOLD fixes (Kirk 2026-11-18): if a mind is connected and clay-voice-brush.js did not load, Make a picture fails closed. If no mind is connected, Make a picture does not generate and opens Connect. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
       ,
       {"md5": "ecfa7c25d97033478e8a570b4302d59e", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after Reed receipts and soft stops", "reason": "Clay voice and brush 1 (Kirk 2026-11-18, Reed): gentle decline and unreachable receipts on Make a picture. Additive otherwise. Mirror of docs/app.html stays byte-identical."}
+      ,
+      {"md5": "782b14a831b31b27c9104a0474933059", "since": "v-clay-voice-brush-1-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact clay-voice-brush-1 head after re-walk HOLD fixes", "reason": "Clay voice and brush 1 re-walk HOLD fixes (Kirk 2026-11-18): adjacent comments record Kirk's t1388u (10:28 MST) note and the 11:07 MST no-mind refinement (generate when a backend exists, notice plus Connect on click; connect-only when no backend). Additive otherwise. Mirror of docs/app.html stays byte-identical."}
     ],
     "docs/modules/self-heal.js": [
       {"md5": "aae57c04047e14b0744e5d54b83ade20", "since": "062b", "by": "GC", "walk": null},

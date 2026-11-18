@@ -1,5 +1,6 @@
 // clay-brick-1.test.js (MIT) v-clay-brick-1-v0.1
 // Node only. No network. Shared by FreeLattice and theLatticeTree.
+// before (Celeste 2026-11-18): The four clay modules must stay byte-identical when a sibling tree is present.
 // The four clay modules, plus clay-voice-brush.js and mind-canvas-art.js, must stay
 // byte-identical when a sibling tree is present.
 var fs = require('fs');
@@ -56,6 +57,7 @@ function siblingDir() {
 
 var twin = siblingDir();
 if (twin) {
+  // before (Celeste 2026-11-18): NAMES.forEach(function (name) {
   NAMES.concat(TWIN_ALSO).forEach(function (name) {
     assert.ok(fs.existsSync(path.join(here, name)), name + ' is present');
     assert.ok(fs.existsSync(path.join(twin, name)), name + ' is present in the twin');
