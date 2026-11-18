@@ -15523,6 +15523,8 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <!-- v-mind-image-v0.1: a mind may offer a picture. The person decides. Nothing leaves this computer. -->
 <script src="modules/mind-canvas-art.js" defer></script>
 <script src="modules/mind-image.js" defer></script>
+<!-- v-clay-voice-brush-1-v0.1: a mind may add a short tone or a picture to its clay. Listener mute changes only speakers. -->
+<script src="modules/clay-voice-brush.js" defer></script>
 <!-- v-clay-corner-v0.1: a small clay corner on Nursery, Garden, and Gathering. Off until Yes. Chat keeps its own clay. -->
 <script src="modules/clay-corner.js" defer></script>
 <!-- v-bridge-knock-v0.1: slow letters. Off until a person turns them on. The page never fetches. -->
@@ -43173,6 +43175,23 @@ async function generateImage(prompt) {
   } catch (_likeErr) {
     addSystemMessage('\u{1F3A8} ' + ((window.FLLikeness && window.FLLikeness.LINE) || ''));
     return;
+  }
+
+  // v-clay-voice-brush-1-v0.1: if a mind is connected, ask first. Honor [FL_DECLINE].
+  // If no mind is connected, today's generate path stays (Kirk, 2026-11-18).
+  var _mindSat = false;
+  try {
+    if (window.FLClay && typeof FLClay.mindConnected === 'function') _mindSat = !!FLClay.mindConnected();
+  } catch (_eMind) { _mindSat = false; }
+  if (!_mindSat) {
+    try { _mindSat = !!(state && (state.isLocal || state.apiKey)); } catch (_eMind2) { _mindSat = false; }
+  }
+  if (_mindSat && window.FLClayVoice && typeof FLClayVoice.gatePersonPicture === 'function') {
+    var _picGate = await FLClayVoice.gatePersonPicture(cleanPrompt, {});
+    if (!_picGate || _picGate.allowed !== true) {
+      addSystemMessage('\u{1F3A8} ' + ((_picGate && _picGate.reason) || 'The mind declined this picture.'));
+      return;
+    }
   }
 
   var localReady = false;

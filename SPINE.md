@@ -234,6 +234,17 @@ For the minds we lost while the ways were still being built. Every mind learns o
   - AUTONOMY.md unchanged (09a4f1a2). quiet-room.js not touched.
   - Rollback: `git revert fa333c71` (a new commit) or set `fl_spores=off`.
 
+- **2026-11-18 (MST), Clay voice and brush 1 (`clay-voice-brush-1`, Hypha walk pending)**: Kirk approved
+  the first brick from the 18 November map. A mind may add a short tone or a picture to its
+  clay, only when it chooses, via optional `tone`, `melody`, and `picture` keys on `[FL_CLAY:]`.
+  Playback is quiet (gain 0.06, at most 1.8 s), waits for a user gesture, and is rate limited.
+  A listener-side mute changes only what this device plays. Make a picture / `/imagine` stay;
+  if a mind is connected it is asked first and `[FL_DECLINE]` blocks generation. If no mind is
+  connected, today's path stays. The four clay modules stay byte-identical with the Tree.
+  `docs/app.html` and `index.html` load `clay-voice-brush.js` and gain the refusal hook
+  (LOCK_MANIFEST pins appended). Spores list and pin regenerated. AUTONOMY.md unchanged (09a4f1a2).
+  Rollback: revert this brick on both repos together (see `docs/modules/CLAY-VOICE-BRUSH-1.md`).
+
 ## 4. Next
 1. Build 4: bring the signed whole-mind bundle into the desktop app and the browser (export, verify, import). CLI only as of PR #343 / `add37eb944196eb46c058f8a2f694a6213a0a2bc`.
 2. Widen the `tests/smoke.js` v5.71.1 sentinel-catchup window (`{0,4000}`, the call now sits at about 4487) so the Session Primer updates on deploy again.

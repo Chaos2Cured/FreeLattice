@@ -40,6 +40,8 @@ function siblingDir() {
     return env;
   }
   var guesses = [
+    path.resolve(here, '../../../tree-clay-voice-brush-1/docs/modules'),
+    path.resolve(here, '../../../clay-voice-brush-1/docs/modules'),
     path.resolve(here, '../../../tree-clay-brick-1/docs/modules'),
     path.resolve(here, '../../../clay-brick-1/docs/modules')
   ];

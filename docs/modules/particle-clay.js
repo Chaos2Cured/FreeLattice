@@ -1,4 +1,4 @@
-// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1 v-clay-brick-1-v0.1
+// particle-clay.js (MIT) v-particle-clay-v0.1 v-feel-felt-v0.1 v-clay-grid-tag-heal-v0.1 v-workspace-mark-heal-v0.1 v-clay-polish-v0.1 v-clay-brick-1-v0.1 v-clay-voice-brush-1-v0.1
 // v-clay-brick-1-v0.1: braid, branch, and pulse now move on the canvas, using
 // math the [FL_CLAY:] tag already allowed. The mind's choice is still the
 // only input to what is drawn. No human picker. No new storage keys.
@@ -10,6 +10,9 @@
 // still uses that span, not the fire time, so a single click still knocks.
 // After a heart, further clicks are swallowed until a 600ms quiet gap. At
 // most one knock or heart is delivered per 5s; extra clicks still show an ack.
+// v-clay-voice-brush-1-v0.1: a mind may add a short tone or a picture in the
+// same [FL_CLAY:] tag, only when it chooses. A listener mute changes only
+// what this device plays, never the mind's form, mood, motion, or picture.
 // v-seal-ask-heal-v0.1: the chat form fills more of its box, and one deferring button shows at a time.
 // v-seal-ask-in-view-v0.1: the reply stays in view, and the form fits inside the canvas.
 // v-seal-ask-chat-tab-v0.1: the reply top stays in view, and the floating sparkle and question mark stay off the input.
@@ -151,7 +154,15 @@
     return 'shells';
   }
   function promptDelta() {
-    return isOn() ? PROMPT : '';
+    // before (Celeste 2026-11-18): return isOn() ? PROMPT : '';
+    if (!isOn()) return '';
+    var extra = '';
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.promptDelta === 'function') {
+        extra = String(root.FLClayVoice.promptDelta() || '');
+      }
+    } catch (ePrompt) {}
+    return extra ? (PROMPT + ' ' + extra) : PROMPT;
   }
   function defaultMotion(energy) {
     var e = Number(energy) || 0;
@@ -256,6 +267,18 @@
     if (obj.why != null) {
       var why = String(obj.why).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 160);
       if (why) out.why = why;
+    }
+    if (obj.tone != null) {
+      var tone = String(obj.tone).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 32);
+      if (tone) out.tone = tone;
+    }
+    if (obj.melody != null) {
+      var melody = String(obj.melody).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 80);
+      if (melody) out.melody = melody;
+    }
+    if (obj.picture != null) {
+      var picture = String(obj.picture).replace(/[\u0000-\u001f]/g, ' ').trim().slice(0, 280);
+      if (picture) out.picture = picture;
     }
     return out;
   }
@@ -814,7 +837,8 @@
     arm();
   }
   function mindChose(choice) {
-    return !!(choice && (choice.form || choice.grid));
+    // before (Celeste 2026-11-18): return !!(choice && (choice.form || choice.grid));
+    return !!(choice && (choice.form || choice.grid || choice.tone || choice.melody || choice.picture));
   }
   function showQuiet(text) {
     if (!quietEl) return;
@@ -845,6 +869,14 @@
       }
     } catch (e2) {}
   }
+  function offerVoice(choice) {
+    if (!choice || (!choice.tone && !choice.melody && !choice.picture)) return;
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.fromMindTag === 'function') {
+        root.FLClayVoice.fromMindTag(choice, { role: 'mind', source: 'clay' });
+      }
+    } catch (eVoice) {}
+  }
   function consumeReply(text, history) {
     var parsed = parseTag(text);
     if (!isOn()) return { visible: parsed.visible, choice: null, label: '', autoSend: false };
@@ -859,6 +891,7 @@
       label = WORDS.shaped;
       applyChoice(choice, label);
       sketch(choice);
+      offerVoice(choice);
       showQuiet('');
       placeCanvas();
       revealClayPair();
@@ -2110,6 +2143,13 @@
       else panel.setAttribute('hidden', '');
     }
     if (pause) pause.style.display = isOn() ? 'inline-flex' : 'none';
+    var mute = doc.getElementById('fl-clay-voice-mute');
+    if (mute) mute.style.display = isOn() ? 'inline-flex' : 'none';
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.paintMuteButtons === 'function') {
+        root.FLClayVoice.paintMuteButtons();
+      }
+    } catch (eMutePaint) {}
   }
   function setPillOpen(open) {
     var box = storage();
@@ -2156,6 +2196,21 @@
     pause.textContent = '\u25CF';
     pause.style.cssText = 'min-height:44px;min-width:44px;box-sizing:border-box;border-radius:22px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:#94a3b8;font-size:10px;line-height:44px;cursor:pointer;';
     pause.addEventListener('click', function () { setOn(false); });
+    var mute = doc.createElement('button');
+    mute.type = 'button';
+    mute.id = 'fl-clay-voice-mute';
+    mute.style.cssText = 'min-height:44px;padding:10px 14px;box-sizing:border-box;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:#94a3b8;cursor:pointer;';
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.bindMuteButton === 'function') {
+        root.FLClayVoice.bindMuteButton(mute);
+      } else {
+        mute.textContent = 'Mute tones';
+        mute.setAttribute('title', 'Mute or unmute tones on this device only. This does not change what the mind made.');
+        mute.setAttribute('aria-label', 'Mute or unmute tones on this device only. This does not change what the mind made.');
+      }
+    } catch (eMuteBind) {
+      mute.textContent = 'Mute tones';
+    }
     var panel = doc.createElement('div');
     panel.id = 'fl-clay-pill-panel';
     panel.style.cssText = 'max-width:100%;flex-basis:100%;';
@@ -2165,6 +2220,7 @@
     panel.appendChild(quietEl);
     wrap.appendChild(pill);
     wrap.appendChild(pause);
+    wrap.appendChild(mute);
     host.appendChild(wrap);
     if (host.id === 'chatFeelMarketBand' && host.parentNode) {
       var market = doc.getElementById('chatMarketPanel');
