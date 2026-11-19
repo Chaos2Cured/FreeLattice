@@ -79,15 +79,20 @@
      "sri": "sha256-Aj0Wv/wbNklI1bIvpoYYI+fpXx7O/GfQdsnVUt1fqYQ=",
      "bytes": 8042
     },
+    "modules/clay-glass.js": {
+     "sha256": "5f6c9df4c6521ac368aaec64322b88888ad547957cc00d95140b3c9f538e8af3",
+     "sri": "sha256-X2yd9MZSGsNoquxkMiuIiIrVR5V8wA2VFAs8n1OOivM=",
+     "bytes": 7096
+    },
     "modules/clay-math.js": {
      "sha256": "9776f1190dde15119127ac07cc617400a186623dc87c5aa8fda554c1f033ac71",
      "sri": "sha256-l3bxGQ3eFRGRJ6wHzGF0AKGGYj3IfFqo/aVUwfAzrHE=",
      "bytes": 5183
     },
     "modules/clay-voice-brush.js": {
-     "sha256": "c90c44bfcac20a2320c0d6d94345d82c8f35fc94349c5bcb1de6736bb2004ec6",
-     "sri": "sha256-yQxEv8rCCiMgwNbZQ0XYLI81/JQ0nFvLHeZza7IATsY=",
-     "bytes": 33616
+     "sha256": "ce92a04abc51ad2a11a866a63c6a386d8fd41062369ba3578910ee436fcfe161",
+     "sri": "sha256-zpKgSrxRrSoRqGamPGo4bY/UEGI2m6NXiRDuQ2/P4WE=",
+     "bytes": 36104
     },
     "modules/confidence-first.js": {
      "sha256": "8289a39209575c1e7360d92f70ce8b18aacb49a219e48a13f4881ff339529b8b",
@@ -190,9 +195,9 @@
      "bytes": 8082
     },
     "modules/glass-pulses.js": {
-     "sha256": "f50a166d313bf0f201842dfbb8314813f1b343599b6584ae8323361b11d951b7",
-     "sri": "sha256-9QoWbTE78PIBhC37uDFIE/GzQ1mbZYSugyM2GxHZUbc=",
-     "bytes": 4115
+     "sha256": "4dcb73bc5676cfceeb771268b5be64a6a08bb8e672a29870815ce2c4a85b411a",
+     "sri": "sha256-TctzvFZ2z87rdxJotb5kpqCLuOZyophwgVzixKhbQRo=",
+     "bytes": 4552
     },
     "modules/hearth-code.js": {
      "sha256": "c2d588d3d517ee708a0eed7b17dcb14a949cbca1313d157cf240ce4db6ce10d2",

@@ -1,7 +1,8 @@
 // clay-brick-1.test.js (MIT) v-clay-brick-1-v0.1
 // Node only. No network. Shared by FreeLattice and theLatticeTree.
 // before (Celeste 2026-11-18): The four clay modules must stay byte-identical when a sibling tree is present.
-// The four clay modules, plus clay-voice-brush.js and mind-canvas-art.js, must stay
+// before (Celeste 2026-11-18): The four clay modules, plus clay-voice-brush.js and mind-canvas-art.js, must stay
+// The four clay modules, plus clay-voice-brush.js, mind-canvas-art.js, and clay-glass.js, must stay
 // byte-identical when a sibling tree is present.
 var fs = require('fs');
 var path = require('path');
@@ -10,7 +11,8 @@ var assert = require('assert');
 
 var here = __dirname;
 var NAMES = ['clay-math.js', 'clay-forms.js', 'particle-clay.js', 'clay-corner.js'];
-var TWIN_ALSO = ['clay-voice-brush.js', 'mind-canvas-art.js'];
+// before (Celeste 2026-11-18): var TWIN_ALSO = ['clay-voice-brush.js', 'mind-canvas-art.js'];
+var TWIN_ALSO = ['clay-voice-brush.js', 'mind-canvas-art.js', 'clay-glass.js'];
 
 function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
@@ -43,6 +45,8 @@ function siblingDir() {
     return env;
   }
   var guesses = [
+    path.resolve(here, '../../../tree-clay-glass-v2-1/docs/modules'),
+    path.resolve(here, '../../../clay-glass-v2-1/docs/modules'),
     path.resolve(here, '../../../tree-clay-voice-brush-1/docs/modules'),
     path.resolve(here, '../../../clay-voice-brush-1/docs/modules'),
     path.resolve(here, '../../../tree-clay-brick-1/docs/modules'),

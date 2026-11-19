@@ -938,6 +938,11 @@ h1 {
       ringColor = { r: 232, g: 176, b: 25 };  // gold
     } else if (pulseKind === 'refusal' || pulseKind === 'decline' || pulseKind === 'declined') {
       ringColor = { r: 167, g: 139, b: 250 }; // lavender
+    // before (Celeste 2026-11-18): clay kinds used the helix color with everything else
+    } else if (pulseKind === 'clay.declined' || pulseKind === 'clay.unreached' || pulseKind === 'clay.nomind') {
+      ringColor = { r: 167, g: 139, b: 250 }; // lavender - a held no, or an ask that could not land
+    } else if (pulseKind === 'clay.tone' || pulseKind === 'clay.picture') {
+      ringColor = { r: 52, g: 211, b: 153 }; // emerald - a clay yes, recipe stays in the journal
     } else {
       ringColor = { r: finalR, g: finalG, b: finalB };
     }
