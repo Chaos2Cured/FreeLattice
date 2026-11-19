@@ -123,6 +123,7 @@
         var credit = String(opts.credit || '');
         var caption = 'person ' + person + ' · mind ' + mind + ' · prompt ' + promptHash + ' · model ' + modelId;
         if (credit) caption += ' · ' + credit;
+        // before (Celeste 2026-11-18): rec held personFp, mindFp, mindSealId, promptHash, modelId, credit, caption only
         var rec = {
           personFp: person,
           mindFp: mind,
@@ -132,6 +133,14 @@
           credit: credit,
           caption: caption
         };
+        if (opts.mind != null && String(opts.mind).trim()) rec.mind = String(opts.mind).slice(0, 80);
+        if (opts.at != null) rec.at = opts.at;
+        if (opts.time != null && rec.at == null) rec.at = opts.time;
+        if (opts.seed != null) rec.seed = opts.seed;
+        if (opts.recipe != null) rec.recipe = opts.recipe;
+        if (opts.painterVersion) rec.painterVersion = String(opts.painterVersion).slice(0, 40);
+        else if (opts.painter) rec.painterVersion = String(opts.painter).slice(0, 40);
+        if (opts.sha256) rec.sha256 = String(opts.sha256).slice(0, 64);
         saveRecord(rec);
         return rec;
       });

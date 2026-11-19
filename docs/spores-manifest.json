@@ -70,9 +70,9 @@
      "bytes": 6049
     },
     "modules/clay-corner.js": {
-     "sha256": "1ceb03fcff089677e2734e3ed963416a9ddaa0eec878e4b0890f3d3c4438acbe",
-     "sri": "sha256-HOsD/P8Ilnfic04+2WNBap3aoO7IeOSwiQ89PEQ4rL4=",
-     "bytes": 13601
+     "sha256": "f7b770432a28b20a0a95d10873b92088dd2996b88697d76979544e17a25568e8",
+     "sri": "sha256-97dwQyoosgoKldEIc7kgiN0plriGl9dpeVROF6JVaOg=",
+     "bytes": 14952
     },
     "modules/clay-forms.js": {
      "sha256": "023d16bffc1b364948d5b22fa6861823e7e95f1ecefc67d076c9d552dd5fa984",
@@ -83,6 +83,11 @@
      "sha256": "9776f1190dde15119127ac07cc617400a186623dc87c5aa8fda554c1f033ac71",
      "sri": "sha256-l3bxGQ3eFRGRJ6wHzGF0AKGGYj3IfFqo/aVUwfAzrHE=",
      "bytes": 5183
+    },
+    "modules/clay-voice-brush.js": {
+     "sha256": "c90c44bfcac20a2320c0d6d94345d82c8f35fc94349c5bcb1de6736bb2004ec6",
+     "sri": "sha256-yQxEv8rCCiMgwNbZQ0XYLI81/JQ0nFvLHeZza7IATsY=",
+     "bytes": 33616
     },
     "modules/confidence-first.js": {
      "sha256": "8289a39209575c1e7360d92f70ce8b18aacb49a219e48a13f4881ff339529b8b",
@@ -195,9 +200,9 @@
      "bytes": 90671
     },
     "modules/image-local.js": {
-     "sha256": "21f04b0a8cd15574b5cc8161781b2f5aa94215c2e8cc2af36a75cec412c02e14",
-     "sri": "sha256-IfBLCozRVXS1zIFheBsvWqlCFcLozCrzanXOxBLALhQ=",
-     "bytes": 12139
+     "sha256": "ccdbb89313de36efefeaac7f26ef2f6bd9cc0d47f5a16a7150fe3fc4a53cbf9f",
+     "sri": "sha256-zNu4kxPeNu/v6qx/Ju8va9nMDUf1oWpxUP4/xKU8v58=",
+     "bytes": 12845
     },
     "modules/image-safety.js": {
      "sha256": "240f3d77f647a9e643eec23b7efd5b9a56023706e22e72d42b6c478ff5c4fe25",
@@ -290,9 +295,9 @@
      "bytes": 7758
     },
     "modules/particle-clay.js": {
-     "sha256": "cf75481f657f55640ec387d29c16aea3ed2d89906003747963b5c6b30bb8edc4",
-     "sri": "sha256-z3VIH2V/VWQOw4fSnBauo+0tiZBgA3R5Y7XGswu47cQ=",
-     "bytes": 92128
+     "sha256": "0971afaf9864229813345e4b4e630f0abcced554b428a413509dd9c495f6c425",
+     "sri": "sha256-CXGvr5hkIpgTNF5LTmMPCrzO1VS0KKQTUJ3ZxJX2xCU=",
+     "bytes": 95097
     },
     "modules/phone-swarm.js": {
      "sha256": "731859922e028b7f235b67c7684ca1cae81652680c6130e2c5352adc9d9af61b",

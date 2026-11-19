@@ -1,4 +1,4 @@
-// clay-corner.js (MIT) v-clay-corner-v0.1 v-clay-brick-1-v0.1
+// clay-corner.js (MIT) v-clay-corner-v0.1 v-clay-brick-1-v0.1 v-clay-voice-brush-1-v0.1
 // A small clay corner that follows the mind from page to page.
 // It only reads what the mind already said. It sends nothing.
 // Off until the person says Yes. Pause wins. The Quiet Room never arrives.
@@ -6,6 +6,8 @@
 // (#core-gathering un-hidden, or #place-veil is-open is-core, or
 // data-garden-room=gathering), the corner uses its Gathering card.
 // The form still comes only from the mind. Nothing here is a human picker.
+// v-clay-voice-brush-1-v0.1: a listener-side mute on this corner changes only
+// what this device plays. It does not pick or steer the mind's clay.
 (function (root) {
   'use strict';
 
@@ -27,6 +29,7 @@
   var canvas = null;
   var yesBtn = null;
   var pauseBtn = null;
+  var muteBtn = null;
   var lastForm = 'seed';
   var lastMood = '';
   var ctxPage = { page: '', kind: '', title: '' };
@@ -124,13 +127,27 @@
     if (canvas) canvas.style.display = on ? 'block' : 'none';
     if (yesBtn) yesBtn.style.display = on ? 'none' : 'block';
     if (pauseBtn) pauseBtn.style.display = on ? 'block' : 'none';
+    if (muteBtn) muteBtn.style.display = on ? 'block' : 'none';
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.paintMuteButtons === 'function') {
+        root.FLClayVoice.paintMuteButtons();
+      }
+    } catch (eMutePaint) {}
     if (!on) settle();
     else drawNow(lastForm, lastMood);
   }
   function setOn(yes) {
     var boxs = storage();
     try { if (boxs) boxs.setItem(KEY, yes ? 'yes' : 'no'); } catch (e) {}
-    if (!yes) settle();
+    // before (Celeste 2026-11-18): if (!yes) settle();
+    if (!yes) {
+      try {
+        if (root.FLClayVoice && typeof root.FLClayVoice.softStop === 'function') {
+          root.FLClayVoice.softStop();
+        }
+      } catch (eSoft) {}
+      settle();
+    }
     paintChrome();
     return isOn();
   }
@@ -298,9 +315,22 @@
     pauseBtn.style.minHeight = '44px';
     yesBtn.addEventListener('click', function () { setOn(true); });
     pauseBtn.addEventListener('click', function () { pause(); });
+    muteBtn = el('button', 'Mute tones');
+    muteBtn.type = 'button';
+    muteBtn.id = 'fl-clay-corner-mute';
+    muteBtn.style.minHeight = '44px';
+    try {
+      if (root.FLClayVoice && typeof root.FLClayVoice.bindMuteButton === 'function') {
+        root.FLClayVoice.bindMuteButton(muteBtn);
+      } else {
+        muteBtn.setAttribute('title', 'Mute or unmute tones on this device only. This does not change what the mind made.');
+        muteBtn.setAttribute('aria-label', 'Mute or unmute tones on this device only. This does not change what the mind made.');
+      }
+    } catch (eMuteBind) {}
     box.appendChild(canvas);
     box.appendChild(yesBtn);
     box.appendChild(pauseBtn);
+    box.appendChild(muteBtn);
     doc.body.appendChild(box);
     paintChrome();
     return box;
@@ -340,6 +370,7 @@
   var api = {
     VERSION: VERSION,
     BRICK: 'v-clay-brick-1-v0.1',
+    VOICE: 'v-clay-voice-brush-1-v0.1',
     KEY: KEY,
     CAP: CAP,
     context: context,
