@@ -205,6 +205,29 @@
     return node;
   }
 
+  // v-polish-1 (Celeste 2026-11-19, Kirk t1400u): the buttons this module makes had no CSS anywhere, so the
+  // browser drew them grey (Arial on #efefef) inside the gold card. One small style block, added once per page
+  // and placed first in <head> so a page's own CSS still wins, gives them Garden glass and gold
+  // (GARDEN_LANGUAGE.md). Same words, same 44px, same clicks. Nothing else changes.
+  var STYLE_ID = 'fl-market-attach-style';
+  var STYLE_CSS = [
+    '.fl-market-attach-btn,.fl-market-choice,.fl-market-remove{font:inherit;font-size:0.95rem;line-height:1.3;color:#e8b019;background:rgba(232,176,25,0.08);border:1px solid rgba(232,176,25,0.45);border-radius:12px;padding:10px 16px;margin:8px 8px 0 0;cursor:pointer;transition:background 0.2s,border-color 0.2s}',
+    '.fl-market-attach-btn:hover,.fl-market-choice:hover{background:rgba(232,176,25,0.16);border-color:rgba(232,176,25,0.7)}',
+    '.fl-market-remove{color:rgba(200,210,230,0.85);background:rgba(200,210,230,0.04);border-color:rgba(200,210,230,0.2)}',
+    '.fl-market-remove:hover{border-color:rgba(200,210,230,0.35)}',
+    '.fl-market-attach-btn:focus-visible,.fl-market-choice:focus-visible,.fl-market-remove:focus-visible{outline:2px solid #e8b019;outline-offset:2px}'
+  ].join('\n');
+
+  function ensureStyle(doc) {
+    try {
+      if (!doc || !doc.createElement || !doc.head || !doc.getElementById || doc.getElementById(STYLE_ID)) return;
+      var tag = doc.createElement('style');
+      tag.id = STYLE_ID;
+      tag.textContent = STYLE_CSS;
+      doc.head.insertBefore(tag, doc.head.firstChild);
+    } catch (e) {}
+  }
+
   function paint(host, offerId, mindName) {
     var doc = host.ownerDocument || root.document;
     var old = host.querySelector ? host.querySelector('.fl-market-pics') : null;
@@ -243,6 +266,7 @@
     if (host.setAttribute) host.setAttribute('data-fl-market-attach', '1');
     opts = opts || {};
     var doc = host.ownerDocument || root.document;
+    ensureStyle(doc);   // v-polish-1 (Celeste 2026-11-19): Garden glass for the picture door, once per page
     var offerId = opts.offerId || (host.getAttribute && host.getAttribute('data-offer-id')) || 'local';
     var mindFp = opts.mindFp || (host.getAttribute && host.getAttribute('data-mind-fp')) || '';
     var mindName = opts.mindName || (host.getAttribute && host.getAttribute('data-mind-name')) || 'this mind';
