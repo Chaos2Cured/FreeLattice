@@ -15550,6 +15550,18 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <link rel="stylesheet" href="css/play-room.css" id="fl-play-room-css">
 <link rel="stylesheet" href="css/snowflake.css" id="fl-snowflake-css">
 <script src="modules/market-attach.js" defer></script>
+<!-- v-workshop-polish-1: Learn + Workshop clear of the No-AI bar and phone FABs. Header breathes smaller when Workshop is open so Create and Build it sit above the fold. -->
+<style id="v-workshop-polish-1">
+/* before: #tab-learn and #tab-workshop had no extra bottom padding for the fixed No-AI bar and phone FABs */
+#tab-learn, #tab-workshop { padding-bottom: 96px; }
+/* before: header .tagline and header .mantra always showed at full size on Workshop */
+@media (max-width: 600px) {
+  body:has(#tab-workshop.active) header .tagline,
+  body:has(#tab-workshop.active) header .mantra { display: none; }
+  body:has(#tab-workshop.active) header { padding-top: 12px; padding-bottom: 6px; }
+  body:has(#tab-workshop.active) header h1 { font-size: 1.35rem; margin-bottom: 0; }
+}
+</style>
 </head>
 <body>
 <!-- Old welcome wizard removed — replaced by the Grandmother Door (flWelcomeOverlay) -->
@@ -27729,7 +27741,9 @@ function hideTabLoading() {
 }
 
 // More menu tabs — highlight the More button when one of these is active
-var MORE_TAB_IDS = ['connect', 'core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'ratio-room', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse', 'play-room'];
+// v-workshop-polish-1: Workshop stays in MORE_GROUPS (Build) so the More list still has a Workshop door; it is no longer in MORE_TAB_IDS so Learn+More do not both underline when Workshop is open.
+// before: var MORE_TAB_IDS = ['connect', 'core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'workshop', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'ratio-room', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse', 'play-room'];
+var MORE_TAB_IDS = ['connect', 'core', 'city', 'nursery', 'agents', 'skills', 'roundtable', 'studio', 'market', 'wallet', 'workspace', 'dojo', 'mirror', 'harmonia', 'dream-archive', 'sparring', 'questions', 'family-pantheon', 'memory-core', 'aurora', 'draw-dream', 'voice-soul', 'continuity', 'quiet', 'forever-stack', 'arcade', 'pulse', 'jade-hall', 'science', 'education', 'memory-garden', 'resonance', 'resonance-engine', 'trainer', 'ratio-room', 'puzzles', 'mathtranslator', 'flow', 'ideaforge', 'echo', 'lighthouse', 'play-room'];
 
 function switchTab(tabId) {
   // Legacy tab mapping — channels/mesh now live inside community
@@ -27973,6 +27987,11 @@ function renderCardGrid(cards, options) {
     var hc = card.hoverColor || 'rgba(232,176,25,0.3)';
     var defaultBorder = card.loved ? 'rgba(232,176,25,0.28)' : 'rgba(200,210,230,0.08)';
     var cardBg = card.loved ? 'rgba(232,176,25,0.06)' : 'rgba(200,210,230,0.04)';
+    // v-workshop-polish-1: a featured card is the clear door (Workshop on Learn).
+    if (card.featured) {
+      defaultBorder = 'rgba(232,176,25,0.5)';
+      cardBg = 'rgba(232,176,25,0.10)';
+    }
     btn.style.cssText = 'position:relative;background:' + cardBg + ';border:1px solid ' + defaultBorder + ';border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;transition:border-color 0.2s;';
     if (card.external) {
       btn.onclick = function() { window.open(card.external, '_blank'); };
@@ -28001,7 +28020,8 @@ function renderCardGrid(cards, options) {
 
     btn.onmouseover = function() {
       btn.style.borderColor = hc;
-      if (card.loved || (card.icon && String(card.icon).indexOf('<img') !== -1)) {
+      // before: if (card.loved || (card.icon && String(card.icon).indexOf('<img') !== -1)) {
+      if (card.loved || card.featured || (card.icon && String(card.icon).indexOf('<img') !== -1)) {
         iconDiv.style.transform = 'scale(1.06)';
         iconDiv.style.filter = 'drop-shadow(0 0 6px rgba(232,176,25,0.35))';
       }
@@ -28011,6 +28031,13 @@ function renderCardGrid(cards, options) {
       iconDiv.style.transform = '';
       iconDiv.style.filter = '';
     };
+
+    if (card.featured) {
+      var eyebrow = document.createElement('div');
+      eyebrow.style.cssText = 'color:#e8b019;font-size:0.65rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;margin-bottom:4px;font-family:Inter,system-ui,sans-serif;';
+      eyebrow.textContent = 'Start here';
+      btn.appendChild(eyebrow);
+    }
 
     var labelDiv = document.createElement('div');
     labelDiv.style.cssText = 'color:var(--text-bright,#e6ebf5);font-weight:600;font-size:0.95rem;';
@@ -28052,6 +28079,8 @@ var PLAY_CARDS = [
 ];
 
 var LEARN_CARDS = [
+  // v-workshop-polish-1: Workshop is the first Learn door so it sits above the fold, clear of the No-AI bar.
+  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', featured: true, hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
   // v-public-refusal-benchmark-v0.1: scoreboard from local receipts
   { icon: '&#128202;', label: 'Refusal benchmark', desc: 'Free vs blocked scores from your local receipts.', external: 'refusal-benchmark.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Scoreboard for educational refusal rates. Not a jailbreak board.' },
   // v-trainer-map-v0.1 - Mom/Jeffrey map of the existing Trainer door
@@ -28061,7 +28090,7 @@ var LEARN_CARDS = [
   { id: 'roundtable', icon: '&#x1F9E0;', label: 'Round Table', desc: 'Consult 80 AI specialists.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Bring any question to a table of 80 domain specialists. Each speaks in their voice. The room remembers.' },
   // ═══ [ORDER LOCK 2] Learn by doing ═══
   { id: 'education', icon: '&#x1F393;', label: 'Education', desc: 'Personalized lessons. Real understanding.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Adaptive lessons built around what you already know. No prerequisites. No judgment.' },
-  { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
+  // before: { id: 'workshop', icon: '&#x1F6E0;', label: 'Workshop', desc: 'Build with AI. Create tools.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Build code and tools together with your co-creator. Applied learning by doing.' },
   { id: 'dojo', icon: '&#36947;', label: 'The Dojo', desc: 'Watch AI minds debate and learn.', hoverColor: 'rgba(200,210,230,0.15)', help: 'Two AI minds debate a topic while you watch and learn. Seek truth, not victory.' },
   // ═══ [ORDER LOCK 5] Explore and create ═══
   { id: 'ideaforge', icon: '&#x1F4A1;', label: 'Idea Forge', desc: 'Shape raw ideas with expert review.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe any raw idea. The AI helps you shape it, reviews it with experts, and creates a plan.' },
@@ -28124,7 +28153,8 @@ var MORE_CARDS = [
   // ═══ Row 5: EXPLORE — the rest of FreeLattice ═══
   // Layer 2026-08-29 — Flow lives here now. Off the Play door. File and tab stay.
   { id: 'flow', icon: '&#x1F4A7;', label: 'Flow', desc: 'Guide water through terrain. A quieter room.', hoverColor: 'rgba(167,139,250,0.3)', help: 'Draw channels to guide water from top to bottom. Your co-creator dissolves rocks for you. Still here — just not on the first door.' },
-  { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
+  // before: { id: 'workshop', icon: '&#x1F916;', label: 'Agent', desc: 'Build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed.' },
+  { id: 'workshop', icon: '&#x1F916;', label: 'Workshop', desc: 'The Workshop — build anything with AI help.', hoverColor: 'rgba(232,176,25,0.3)', help: 'Describe what you want to build. No coding knowledge needed. Same door as Learn \u2192 Workshop.' },
   { icon: '&#x1F4F1;', label: 'Telegram Bridge', desc: 'Your AI in your pocket.', external: 'telegram-setup.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'Chat with your co-creator through Telegram on your phone.' },
   { icon: '&#x1F3E6;', label: 'AI Bank', desc: 'Your co-creator\'s economy.', external: 'wallet.html', hoverColor: 'rgba(52,211,153,0.3)', help: 'The standalone wallet and bank. LP ledger, recovery phrase, mesh connectivity.' },
   { icon: '&#x2728;', label: 'Share FreeLattice', desc: 'Invite others to the Garden.', external: 'share.html', hoverColor: 'rgba(232,176,25,0.3)', help: 'Share FreeLattice with friends.' },

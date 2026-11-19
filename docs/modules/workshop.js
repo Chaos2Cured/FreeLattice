@@ -137,6 +137,40 @@ function flAgentBridgeFetch(url, opts) {
       '  .ws-build-btn { width: 100%; }',
       '  .ws-actions { justify-content: center; }',
       '}'
+    ].join('\n')
+    // v-workshop-polish-1 — Garden glass overrides. Old GitHub-dark rules above are kept (never deleted).
+    + '\n/* v-workshop-polish-1: Garden glass (docs/library/GARDEN_LANGUAGE.md). Previous #0d1117 / #d4a017 / system-font rules remain above. */\n'
+    + [
+      '.ws-root { background: transparent; color: #e6edf3; font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif; min-height: 0; }',
+      '.ws-header { border-bottom-color: rgba(200,210,230,0.08); }',
+      '.ws-title { color: #e8b019; font-family: Georgia, serif; }',
+      '.ws-subtitle { color: rgba(200,210,230,0.55); }',
+      '.ws-prompt-row { border-bottom-color: rgba(200,210,230,0.08); }',
+      '.ws-prompt-input { background: rgba(200,210,230,0.04); border: 1px solid rgba(200,210,230,0.08); border-radius: 12px; color: #e6edf3; }',
+      '.ws-prompt-input:focus { border-color: #e8b019; }',
+      '.ws-build-btn { background: #e8b019; color: #0c0a1a; border-radius: 12px; }',
+      '.ws-build-btn:hover { background: #f0c43a; }',
+      '.ws-split { background: rgba(200,210,230,0.08); flex: 1 1 auto; }',
+      '.ws-code-pane, .ws-preview-pane, .ws-code-editor { background: rgba(12,10,26,0.55); }',
+      '.ws-code-label { color: rgba(200,210,230,0.45); border-bottom-color: rgba(200,210,230,0.08); }',
+      '.ws-code-editor { color: #9ecbff; }',
+      '.ws-preview-frame { background: #0c0a1a; }',
+      '.ws-actions { border-top-color: rgba(200,210,230,0.08); background: rgba(12,10,26,0.72); position: sticky; bottom: 0; z-index: 2; }',
+      '.ws-action-btn { background: rgba(200,210,230,0.04); border: 1px solid rgba(200,210,230,0.08); border-radius: 12px; }',
+      '.ws-action-btn:hover { border-color: #e8b019; color: #e8b019; }',
+      '.ws-chip { font-family: Inter, system-ui, sans-serif; color: #e8b019; border-color: rgba(232,176,25,0.28); }',
+      '.ws-ai-hint { font-size:0.78rem; color:rgba(232,176,25,0.85); margin:0 16px 8px; font-family: Inter, system-ui, sans-serif; }',
+      '.ws-for-builders { font-family: Inter, system-ui, sans-serif; }',
+      '#ws-create-view { display:flex; flex-direction:column; flex:1; min-height:0; }',
+      '@media (max-width: 600px) {',
+      '  .ws-root { padding-bottom: 96px; }',
+      '  .ws-header { padding: 8px 16px 6px; }',
+      '  .ws-title { font-size: 0.95rem; margin: 0; }',
+      '  .ws-subtitle { font-size: 0.7rem; }',
+      '  .ws-porch-chips { padding-top: 6px; }',
+      '  .ws-prompt-row { padding: 8px 16px; }',
+      '  .ws-code-pane, .ws-preview-pane { height: 32vh; }',
+      '}',
     ].join('\n');
     document.head.appendChild(style);
   }
@@ -197,9 +231,14 @@ function flAgentBridgeFetch(url, opts) {
     if (!host) return;
     var list = loadHistory();
     if (!list.length) {
-      host.innerHTML = '<div style="font-size:0.75rem;color:#64748b;font-family:Georgia,serif;padding:4px 2px;">No local builds yet. Build something — it will wait here.</div>';
+      // before: host.innerHTML = '<div style="font-size:0.75rem;color:#64748b;font-family:Georgia,serif;padding:4px 2px;">No local builds yet. Build something — it will wait here.</div>';
+      host.innerHTML = '';
+      var emptyShelf = document.getElementById('wsHistoryShelf');
+      if (emptyShelf) emptyShelf.style.display = 'none';
       return;
     }
+    var filledShelf = document.getElementById('wsHistoryShelf');
+    if (filledShelf) filledShelf.style.display = '';
     host.innerHTML = list.slice(0, 12).map(function (h) {
       var when = new Date(h.ts || Date.now()).toLocaleString();
       var safeName = String(h.name || 'Untitled').replace(/[<>&]/g, '');
@@ -288,7 +327,8 @@ function flAgentBridgeFetch(url, opts) {
 
   async function localPickFolder() {
     if (!('showDirectoryPicker' in window)) {
-      localSetStatus('Folder picker not in this browser — use Pick files (fallback).');
+      // before: localSetStatus('Folder picker not in this browser — use Pick files (fallback).');
+      localSetStatus('Folder picker not in this browser — use Pick files.');
       var fi = document.getElementById('wsLocalFileInput');
       if (fi) fi.click();
       return;
@@ -307,7 +347,8 @@ function flAgentBridgeFetch(url, opts) {
     } catch (e) {
       _localStage.walking = false;
       if (e && e.name === 'AbortError') localSetStatus('Folder pick cancelled.');
-      else localSetStatus('Could not open folder. Try Pick files (fallback).');
+      // before: else localSetStatus('Could not open folder. Try Pick files (fallback).');
+      else localSetStatus('Could not open folder. Try Pick files.');
     }
   }
 
@@ -424,7 +465,8 @@ function flAgentBridgeFetch(url, opts) {
     }
     var excerpt = text.length > 12000 ? text.slice(0, 12000) + '\n\n/* …truncated for Help */\n' : text;
     var ok = window.confirm(
-      'Send "' + (name || 'this file') + '" (or a short excerpt) to your connected local mind for help?\n\nConsent required. Nothing auto-sends. Prefer Bridge channel 11435 when Bridge is on.'
+      // before: 'Send "' + (name || 'this file') + '" (or a short excerpt) to your connected local mind for help?\n\nConsent required. Nothing auto-sends. Prefer Bridge channel 11435 when Bridge is on.'
+      'Send "' + (name || 'this file') + '" (or a short excerpt) to your connected local mind for help?\n\nConsent required. Nothing auto-sends.'
     );
     if (!ok) {
       localSetStatus('Help declined — nothing sent.');
@@ -490,7 +532,8 @@ function flAgentBridgeFetch(url, opts) {
   function buildUI(container) {
     injectStyles();
     container.innerHTML = [
-      '<div class="ws-root v-workshop-porch-v0">',
+      // before: '<div class="ws-root v-workshop-porch-v0">',
+      '<div class="ws-root v-workshop-porch-v0 v-workshop-polish-1">',
       '  <div class="ws-mode-bar">',
       '    <button id="ws-mode-create" class="ws-mode-create" onclick="Workshop.setMode(\'create\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid #d4a017;color:#d4a017;cursor:pointer;font-weight:600;">\u2728 Create</button>',
       '    <button id="ws-mode-code" class="ws-mode-secondary" onclick="Workshop.setMode(\'code\')" style="padding:10px;background:transparent;border:none;border-bottom:2px solid transparent;color:#64748b;cursor:pointer;" title="Deepen — AutoBuilder">\uD83D\uDD27 Code</button>',
@@ -511,7 +554,9 @@ function flAgentBridgeFetch(url, opts) {
       '    <textarea class="ws-prompt-input" id="wsPromptInput" rows="2" placeholder="Describe what you want to build\u2026 e.g. \u201CCreate a simple calculator\u201D"></textarea>',
       '    <button class="ws-build-btn" id="wsBuildBtn" onclick="window.Workshop.generate()">Build it \u2726</button>',
       '  </div>',
-      '  <div class="ws-history" id="wsHistoryShelf">',
+      '  <p class="ws-ai-hint" id="wsAiHint" hidden>Connect a mind first in Settings — then Build it can write with you.</p>',
+      // before: '  <div class="ws-history" id="wsHistoryShelf">',
+      '  <div class="ws-history" id="wsHistoryShelf" style="display:none;">',
       '    <div class="ws-history-head">',
       '      <span class="ws-history-title">Local History</span>',
       '      <button type="button" class="ws-history-clear" id="wsHistoryClear">Clear\u2026</button>',
@@ -543,9 +588,15 @@ function flAgentBridgeFetch(url, opts) {
       '    <div style="text-align:center;margin-bottom:16px;">',
       '      <h2 style="font-size:1.1rem;color:#d4a017;font-family:Georgia,serif;margin:0;">\uD83D\uDD27 Lattice Code</h2>',
       '      <div style="font-size:0.78rem;color:rgba(255,255,255,0.4);margin-top:4px;">Describe what you want. The AI builds, tests, and iterates.</div>',
-      '      <div id="code-status" style="font-size:0.72rem;margin-top:6px;color:rgba(255,255,255,0.3);">Checking Agent Bridge...</div>',
+      // before: '      <div id="code-status" style="font-size:0.72rem;margin-top:6px;color:rgba(255,255,255,0.3);">Checking Agent Bridge...</div>',
+      '      <div id="code-status" style="font-size:0.72rem;margin-top:6px;color:rgba(255,255,255,0.3);">Checking the local builder...</div>',
+      '      <details class="ws-for-builders" style="margin:8px auto 0;max-width:36rem;text-align:left;font-size:0.75rem;color:rgba(200,210,230,0.55);">',
+      '        <summary style="cursor:pointer;color:#e8b019;text-align:center;">For builders</summary>',
+      '        <p style="margin:8px 0 0;line-height:1.5;">For local builds, run: <code>node tools/agent-bridge.js</code></p>',
+      '      </details>',
       '    </div>',
-      '    <textarea id="code-task" rows="3" placeholder="e.g., Fix the CORS guide in Settings to show the launchctl command" style="width:100%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>',
+      // before: '    <textarea id="code-task" rows="3" placeholder="e.g., Fix the CORS guide in Settings to show the launchctl command" style="width:100%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>',
+      '    <textarea id="code-task" rows="3" placeholder="e.g., Add a tip calculator to this page" style="width:100%;background:rgba(200,210,230,0.04);border:1px solid rgba(200,210,230,0.08);border-radius:12px;padding:12px;color:#e2e8f0;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;"></textarea>',
       '    <div style="display:flex;gap:8px;margin:12px 0;">',
       '      <button onclick="AutoBuilder.start(document.getElementById(\'code-task\').value)" style="padding:10px 24px;background:#d4a017;color:#0a0a14;border:none;border-radius:8px;cursor:pointer;font-weight:600;font-size:0.88rem;min-height:44px;">\uD83D\uDD27 Build it</button>',
       '      <button id="wsAutoStopBtn" onclick="AutoBuilder.stop()" title="Stop — cancel this build (no time limit; you choose)" style="padding:10px 16px;background:rgba(244,114,182,0.1);border:1px solid rgba(244,114,182,0.35);border-radius:8px;cursor:pointer;color:#f472b6;font-size:0.85rem;min-height:44px;">Stop</button>',
@@ -570,10 +621,12 @@ function flAgentBridgeFetch(url, opts) {
       '  </div>',
       '  <div id="ws-local-view" class="v-workshop-local-stage-v0" style="display:none;padding:16px;max-width:720px;margin:0 auto;">',
       '    <h2 style="color:#d4a017;font-family:Georgia,serif;margin:0 0 4px;">\uD83D\uDCC1 Local Stage</h2>',
-      '    <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin:0 0 16px;line-height:1.55;">Build on your machine. See it in the browser. No GitHub required. No Terminal as step one. Mom / Jeffrey path.</p>',
+      // before: '    <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin:0 0 16px;line-height:1.55;">Build on your machine. See it in the browser. No GitHub required. No Terminal as step one. Mom / Jeffrey path.</p>',
+      '    <p style="color:rgba(255,255,255,0.45);font-size:0.85rem;margin:0 0 16px;line-height:1.55;">Build on your machine. See it in the browser. No GitHub required. No Terminal as step one. Gentle path.</p>',
       '    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">',
       '      <button type="button" class="ws-action-btn primary" id="wsLocalPickFolder" style="min-height:44px;">Pick folder</button>',
-      '      <button type="button" class="ws-action-btn" id="wsLocalPickFiles" style="min-height:44px;">Pick files (fallback)</button>',
+      // before: '      <button type="button" class="ws-action-btn" id="wsLocalPickFiles" style="min-height:44px;">Pick files (fallback)</button>',
+      '      <button type="button" class="ws-action-btn" id="wsLocalPickFiles" style="min-height:44px;">Pick files</button>',
       '      <button type="button" class="ws-action-btn" id="wsLocalSaveCopy" style="min-height:44px;">Save copy</button>',
       '      <button type="button" class="ws-action-btn v-workshop-local-help-v0" id="wsLocalHelp" style="min-height:44px;border-color:rgba(52,211,153,0.4);color:#34d399;" title="Ask the connected local mind about this file (consent first)">Help on this file</button>',
       '      <button type="button" class="ws-action-btn" id="wsLocalStop" style="min-height:44px;border-color:rgba(244,114,182,0.35);color:#f472b6;" title="Stop — clear preview / cancel help (you choose)">Stop</button>',
@@ -592,7 +645,12 @@ function flAgentBridgeFetch(url, opts) {
       '    </div>',
       '    <div class="v-workshop-local-help-v0" style="margin-top:12px;background:rgba(52,211,153,0.06);border:1px solid rgba(52,211,153,0.22);border-radius:10px;padding:12px;">',
       '      <div style="font-size:0.72rem;color:#34d399;margin-bottom:6px;">Help (local mind)</div>',
-      '      <pre id="wsLocalHelpOut" style="white-space:pre-wrap;margin:0;min-height:4rem;font-family:Georgia,serif;font-size:0.85rem;color:rgba(230,235,245,0.88);">Preview a file, then Help on this file. Consent before anything leaves this pane to your connected mind. Prefer Bridge channel 11435 when Bridge is on.</pre>',
+      // before: '      <pre id="wsLocalHelpOut" style="white-space:pre-wrap;margin:0;min-height:4rem;font-family:Georgia,serif;font-size:0.85rem;color:rgba(230,235,245,0.88);">Preview a file, then Help on this file. Consent before anything leaves this pane to your connected mind. Prefer Bridge channel 11435 when Bridge is on.</pre>',
+      '      <pre id="wsLocalHelpOut" style="white-space:pre-wrap;margin:0;min-height:4rem;font-family:Georgia,serif;font-size:0.85rem;color:rgba(230,235,245,0.88);">Preview a file, then Help on this file. Consent before anything leaves this pane to your connected mind.</pre>',
+      '      <details class="ws-for-builders" style="margin-top:8px;font-size:0.75rem;color:rgba(148,163,184,0.85);">',
+      '        <summary style="cursor:pointer;color:#e8b019;">For builders</summary>',
+      '        <p style="margin:8px 0 0;line-height:1.5;">Prefer Bridge channel 11435 when Bridge is on.</p>',
+      '      </details>',
       '    </div>',
       '    <p style="font-size:0.75rem;color:rgba(148,163,184,0.75);margin:12px 0 0;line-height:1.5;">Projects still deepen via GitHub. Local Stage stays on this device. Spec: <a href="library/WORKSHOP_LOCAL_STAGE_v0.md" style="color:#e8b019;">Local Stage</a> · <a href="library/WORKSHOP_LOCAL_HELP_v0.md" style="color:#e8b019;">Local Help</a>.</p>',
       '  </div>',
@@ -640,6 +698,7 @@ function flAgentBridgeFetch(url, opts) {
       });
     }
     var clearBtn = document.getElementById('wsHistoryClear');
+    revealWorkshopPorch();
     if (clearBtn) clearBtn.addEventListener('click', clearHistoryConsent);
     renderHistory();
     bindLocalStage();
@@ -674,6 +733,35 @@ function flAgentBridgeFetch(url, opts) {
 
   // ── Generate code from prompt ──
   // v-workshop-porch-v0 — Stop via FLHangCancel('workshop'); Cancel ≠ timeout
+  // v-workshop-polish-1: a calm line near Build it when no mind is connected yet.
+  function workshopHasAI() {
+    try {
+      if (typeof state !== 'undefined' && state) {
+        if (state.isLocal) return true;
+        if (state.apiKey && String(state.apiKey).length > 5) return true;
+        if (state.provider === 'browser') return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+  function updateWorkshopAiHint() {
+    var hint = document.getElementById('wsAiHint');
+    if (!hint) return;
+    if (workshopHasAI()) hint.setAttribute('hidden', '');
+    else hint.removeAttribute('hidden');
+  }
+  // v-workshop-polish-1: arriving from a scrolled More grid (or a tall tab) should still land on Create.
+  function revealWorkshopPorch() {
+    try {
+      if (typeof window !== 'undefined' && window.scrollTo) window.scrollTo(0, 0);
+      var tab = document.getElementById('tab-workshop');
+      if (tab) tab.scrollTop = 0;
+      var root = document.querySelector('.ws-root');
+      if (root) root.scrollTop = 0;
+    } catch (e) {}
+    updateWorkshopAiHint();
+  }
+
   function generate() {
     if (isGenerating) {
       try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.abort('workshop'); } catch (e) {}
@@ -898,9 +986,19 @@ function flAgentBridgeFetch(url, opts) {
     init: function(containerId) {
       var container = document.getElementById(containerId);
       if (!container) return;
-      if (initialized && container.querySelector('.ws-root')) return;
+      // before: if (initialized && container.querySelector('.ws-root')) return;
+      if (initialized && container.querySelector('.ws-root')) {
+        revealWorkshopPorch();
+        return;
+      }
       initialized = true;
       buildUI(container);
+      try {
+        if (typeof LatticeEvents !== 'undefined' && LatticeEvents.on) {
+          LatticeEvents.on('tabVisible:workshop', revealWorkshopPorch);
+          LatticeEvents.on('tabActivated:workshop', revealWorkshopPorch);
+        }
+      } catch (e) {}
     },
     destroy: function() {
       initialized = false;
@@ -933,9 +1031,11 @@ function flAgentBridgeFetch(url, opts) {
       if (mode === 'local') {
         var st = document.getElementById('wsLocalStatus');
         if (st && !('showDirectoryPicker' in window)) {
-          st.textContent = 'Folder picker needs Chrome / Edge / Brave. Use Pick files (fallback) — still no CMD.';
+          // before: st.textContent = 'Folder picker needs Chrome / Edge / Brave. Use Pick files (fallback) — still no CMD.';
+          st.textContent = 'Folder picker needs Chrome / Edge / Brave. Use Pick files.';
         }
       }
+      revealWorkshopPorch();
     },
     localStageMarker: 'v-workshop-local-stage-v0',
 
@@ -989,7 +1089,8 @@ function flAgentBridgeFetch(url, opts) {
         if (window.FLAgentBridge && el.parentNode && typeof window.FLAgentBridge.renderPairedList === 'function') window.FLAgentBridge.renderPairedList(el.parentNode);
       } catch(e) {
         // No scary error. Gentle guidance.
-        el.textContent = 'For local builds, run: node tools/agent-bridge.js';
+        // before: el.textContent = 'For local builds, run: node tools/agent-bridge.js';
+        el.textContent = 'A local builder path is available when you want it. Open For builders below.';
         el.style.color = 'rgba(255,255,255,0.3)';
       }
     },
@@ -1468,7 +1569,8 @@ window.AutoBuilder = (function() {
     var useBridge = await hasBridge();
     if (!useBridge) {
       log('Agent Bridge not running.', 'error');
-      log('Start it with: node tools/agent-bridge.js', 'info');
+      // before: log('Start it with: node tools/agent-bridge.js', 'info');
+      log('The local builder is not running yet. Open For builders on this page if you want the command.', 'info');
       log('The AutoBuilder needs the bridge to read files, apply patches, and run tests.', 'info');
       running = false;
       try { if (typeof FLHangCancel !== 'undefined') FLHangCancel.end('workshop'); } catch (e1) {}
