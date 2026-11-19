@@ -19,11 +19,25 @@ Twin note: theLatticeTree carries the same brick in its own repo (`docs/modules/
 ## Walk (for Hypha)
 1. `md5sum docs/modules/market-attach.js` = `25c044c47ba7ffd27758f64dc0f4a8d2`, same as the Tree's copy.
 2. `node scripts/make-spores-manifest.js --check` says up to date; `node docs/scripts/smoke-spores-v0.1.js` says PASS (79 checks).
-3. `node docs/scripts/smoke-og-spiral-previews-v0.2.js` says SMOKE_OK (145 checked, 125 spiral, 20 own picture, 13 stubs).
+3. Preview meta, walk-safe check. The v0.2 smoke (`docs/scripts/smoke-og-spiral-previews-v0.2.js`) reads files only and never opens a page, but its directory listing sees quiet/sophia names (it skips them by name before any read), so it is not on Hypha's safe list. Walk with this instead. It lists only the changed files from `git diff --name-only`, excludes quiet/sophia by pathspec and again by name, and parses the meta in each changed `<head>`; expect "102 changed pages checked, 0 problems":
+   ```sh
+   git diff --name-only origin/main...HEAD -- '*.html' ':(exclude,icase,glob)**/*quiet*' ':(exclude,icase,glob)**/*sophia*' | node -e "
+   const fs=require('fs');let bad=0,n=0;
+   for(const f of require('fs').readFileSync(0,'utf8').split('\n').filter(Boolean)){
+    if(/quiet|sophia/i.test(f))continue;const t=fs.readFileSync(f,'utf8').replace(/<!--[\s\S]*?-->/g,'');
+    const h=t.slice(0,t.search(/<\/head\s*>/i));if(/http-equiv=[\"']refresh/i.test(h)&&!/og:image/.test(h))continue;n++;
+    const c=k=>(h.match(new RegExp('<meta (?:property|name)=\"'+k+'\" content=\"[^\"]+\"','g'))||[]).length;
+    for(const k of ['og:image','twitter:image','og:title','og:description'])if(c(k)!==1){bad++;console.log('FAIL',f,k,c(k));}
+   }console.log(n+' changed pages checked, '+bad+' problems');process.exit(bad?1:0)"
+   ```
+   (before, Celeste 2026-11-19 copy pass: `node docs/scripts/smoke-og-spiral-previews-v0.2.js` says SMOKE_OK (145 checked, 125 spiral, 20 own picture, 13 stubs).)
 4. Open `science-garden.html` at 390px: "Add a picture this mind made" is gold on glass, not a grey box. Tap it: the same picker as before.
 5. Open `for-fable-go13-education.html`, Change 2: the Story card code reads as code, no button inside it.
 6. `git diff origin/main --numstat` on the HTML pages: additions only (the one non-zero deletion column on a page is a `</style></head>` line split to place the block before `</head>`; no characters removed).
 7. AUTONOMY.md md5 still `09a4f1a286226e37089a93df42df0106`; `index.html` still byte-identical to `docs/app.html` (both untouched).
+
+## Copy pass (Hypha's softs, 2026-11-19)
+Only our own new v0.2 meta lines changed (og:title / og:description inside the v0.2 block); page `<title>`s, page text and every pre-existing line are untouched. Family first names and private-note blurbs are out of the previews; internal notes became short public descriptions; run-on headers, jargon and stale line numbers are gone; the three simulation-v3/-v4/-v5 previews are now distinct.
 
 ## Rollback (paired)
 - Brick 1 button: revert the market-attach.js hunk in both repos together (twins), then `node scripts/make-spores-manifest.js` to re-pin. The LOCK_MANIFEST row may stay (it only allows a pin); or add a later row, never delete.
