@@ -260,9 +260,9 @@
      "bytes": 7480
     },
     "modules/market-attach.js": {
-     "sha256": "c1ccc583e8b36e267c576be807ef719ab27b54754b1d37959e85cd28dff3b03c",
-     "sri": "sha256-wczFg+izbiZ8V2voB+9xmrJ7VHVLHTeVnoXNKN/zsDw=",
-     "bytes": 11341
+     "sha256": "c65d5d0976013ac9c794dfe4071cc4557b224ea975f6d29e39c580354de282bd",
+     "sri": "sha256-xl1dCXYBOsnHlN/kBxzEVXsiTql19tKeOcWANU3igr0=",
+     "bytes": 13056
     },
     "modules/memory-file.js": {
      "sha256": "3a790f81bec3a162e2deb6430afb0f265d4ebf7a3573574146ee24d54e41f1f1",

@@ -1,6 +1,10 @@
 {
   "rule": "Kirk 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.",
   "files": {
+    "docs/modules/market-attach.js": [
+      {"md5": "014083d3edc36680254f4485354a10a4", "since": "v-marketplace-polish-v0.1", "by": "legacy pin in scripts/smoke-chat-autonomy-v0.1.js"},
+      {"md5": "25c044c47ba7ffd27758f64dc0f4a8d2", "since": "v-polish-1", "by": "Celeste", "walk": "pending: Hypha walk of the v-polish-1 head", "reason": "the picture door buttons had no CSS and showed as grey browser buttons; one style block added once per page (+24/-0, twin with the Tree, byte-identical)"}
+    ],
     "sw.js": [
       {"md5": "91726cf2228b794f7585f79f61418d12", "since": "16bef962", "by": "FreeLattice CI"},
       {"md5": "bd8aa2fe2489172e02ab3802e3d0edd4", "since": "063a", "by": "GC", "walk": "Hypha 063b"}
