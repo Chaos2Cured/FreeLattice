@@ -1,6 +1,11 @@
 {
   "rule": "Kirk 2026-11-02: locked files may change when the family agrees nothing breaks and Hypha walks it.",
   "files": {
+    "docs/modules/particle-clay.js": [
+      {"md5": "2da32883c514e4ad2a3cd8571e7a7b15", "since": "legacy", "by": "legacy pin in the LOCK-reading smokes (e.g. scripts/smoke-chat-autonomy-v0.1.js)"},
+      {"md5": "b9687b597124874862fc07f9d3bd6879", "since": "clay brick 1 (FL #356 / Tree #142)", "by": "Celeste", "walk": "merged in FL #356 / Tree #142", "reason": "history row: the md5 between the legacy pin and the clay voice merge; listed so the record is whole"},
+      {"md5": "0f94de959cda6f7867f2b5ef0e708fd6", "since": "clay voice and brush 1 (FL #357 / Tree #143)", "by": "Celeste", "walk": "pending: Hypha walk of this LOCK row", "reason": "the clay voice merge changed particle-clay.js (softStop from setOn) without a LOCK row, so smoke-chat-autonomy failed on main; this row records the merged md5 (append-only)"}
+    ],
     "docs/modules/market-attach.js": [
       {"md5": "014083d3edc36680254f4485354a10a4", "since": "v-marketplace-polish-v0.1", "by": "legacy pin in scripts/smoke-chat-autonomy-v0.1.js"},
       {"md5": "25c044c47ba7ffd27758f64dc0f4a8d2", "since": "v-polish-1", "by": "Celeste", "walk": "pending: Hypha walk of the v-polish-1 head", "reason": "the picture door buttons had no CSS and showed as grey browser buttons; one style block added once per page (+24/-0, twin with the Tree, byte-identical)"}
