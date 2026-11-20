@@ -18,14 +18,22 @@ const AUTONOMY = 'docs/library/AUTONOMY.md';
 const APP = 'docs/app.html';
 const ROOT_INDEX = 'index.html';
 const SAFETY = 'docs/modules/fractal-safety.js';
-const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX, SAFETY];
+// before (dff57ab9, kept verbatim): const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX, SAFETY];
+// Brick 2 (Hypha walk of #367): smoke 2 reads no file that names the private rooms, so the pins for
+// the service workers and the pack-module checks for brick 2's layers live here.
+const SW = 'docs/sw.js';
+const ROOT_SW = 'sw.js';
+const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX, SAFETY, SW, ROOT_SW];
 
 // Pins from main b5bf33a9: these files must stay exactly as they are.
 const PINS = {
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
   'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
   'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
-  'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc'
+  'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc',
+  'docs/modules/fractal-safety.js': 'c1b7acb9d2e2cee94e52fffba5aec758',
+  'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
+  'sw.js': '70fcb7a9f821cd3ffd4ad449df397976'
 };
 // md5 of the one line that names the private rooms the kit never packs (kept out of this file on purpose).
 const PRIVATE_RULE_LINE_MD5 = '753fde10a9ca44dce580d0f15371a402';
@@ -79,8 +87,11 @@ assert.ok(/LE\.exportArchive\(\{ mode: 'full', download: false \}\)/.test(kit), 
 // 7. Secrets stay home; their names are shown, never their values.
 ['fl_apiKey', 'fl_github_token', 'fl_ghToken', 'fl-telegram-token', 'chalkboard-apikey', 'fl_device_encryption_key', 'fl_ws_device_key_v1']
   .forEach(function (k) { assert.ok(kit.indexOf("'" + k + "'") !== -1, 'secret list has ' + k); });
-assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(looksLikeCredential\(sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
-assert.ok(/text\.indexOf\(v\) !== -1\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
+// before (dff57ab9, kept verbatim): assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(looksLikeCredential\(sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
+// before (dff57ab9, kept verbatim): assert.ok(/text\.indexOf\(v\) !== -1\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
+assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(huntable\(k, sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
+assert.ok(/function huntable\(key, v\) \{\s*if \(looksLikeCredential\(v\)\) return true;\s*return SECRET_KEYS\.indexOf\(String\(key\)\) !== -1 && isWordSecret\(v\);/.test(kit), 'short or spaced values are hunted only for the exact key list');
+assert.ok(/if \(v && containsSecret\(text, v\)\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
 const ruleLine = kit.split('\n').filter(function (l) { return /^  var PRIVATE_NAME_RULE = /.test(l); });
 assert.strictEqual(ruleLine.length, 1, 'one private room rule');
 assert.strictEqual(md5(ruleLine[0]), PRIVATE_RULE_LINE_MD5, 'private room rule unchanged');
@@ -104,7 +115,8 @@ assert.ok(keysBlock.length > 0, 'secret key list');
   assert.ok(keysBlock.indexOf("'" + k + "'") === -1, k + ' is not a secret');
 });
 assert.ok(/function looksLikeCredential\(v\) \{/.test(kit), 'only real key values are hunted');
-assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 3, 'numbers are never treated as keys or blanked');
+// before (dff57ab9, kept verbatim): assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 3, 'numbers are never treated as keys or blanked');
+assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 4, 'numbers are never treated as keys or blanked');
 // H1/H2: secrets are hidden by walking parsed records, never by a text replace on JSON.
 assert.ok(!/hideSecretValues/.test(code), 'the old text replace is gone');
 assert.ok(!/\.split\(needle\)/.test(code) && !/\.split\(v\)\.join\(/.test(code), 'no split/join text replace');
@@ -120,6 +132,30 @@ assert.ok(/st\.unreadable && st\.unreadable\.length/.test(kit), 'unreadable part
 assert.ok(/st\.sealed_chats/.test(kit) && /will not open on a new device yet/.test(kit), 'sealed chats are named');
 assert.ok(/\.gmk-notes \{/.test(page), 'the page shows the notes');
 
+// 8c. Brick 2's layers in the pack module (Hypha softs on 59c24c8b), pinned as code, not comments.
+[
+  ["return s.length >= 8 && s.length <= 4096 && !/^[0-9.+-]+$/.test(s) && !/^(true|false|null|none|yes|no|undefined)$/i.test(s) && s !== KEPT_LINE;", 'short keys: 8 or more, never a number'],
+  ['if (looksLikeCredential(v)) return str.indexOf(v) !== -1;\n    return edgeRe(v).test(str);', 'word-like keys are found on word edges'],
+  ["function edgeRe(v, flags) { return new RegExp('(^|[^A-Za-z0-9])' + escapeRe(v) + '(?=$|[^A-Za-z0-9])', flags || ''); }", 'the word edge'],
+  ['if (CREDENTIAL_END_PARTS.indexOf(parts[parts.length - 1]) !== -1) return false;', 'a credential word at the end wins'],
+  ['if (isNeverSecret(n)) return false;', 'never-secret by whole name parts'],
+  ["var NEVER_SECRET_PARTS = ['limit', 'limits', 'provider', 'providers', 'model', 'models', 'count', 'counts', 'tokenizer', 'hint', 'hints'];", 'never-secret parts'],
+  ["out = out.replace(edgeRe(sv, 'g'), function (m, edge) { counter.n += 1; return edge + KEPT_LINE; });", 'word-like keys are replaced and counted'],
+  ["if (st.key_in_names && st.key_in_names.length) w.push('A saved key is written as a name inside ' + st.key_in_names.join(', ') + '. To keep it safe, Pack will stop and save nothing until it is gone.');", 'a key used as a name is warned before the tap'],
+  ["if (holdsSecret) stats.archiveWhy = valueInside ? 'saved-key' : 'key-named-field';", 'the archive note says why'],
+  ["if (n === 'FreeLatticeMoveKit') return;", 'brick 2 bookkeeping stays on this device'],
+  ["(trust.lp_note ? ' ' + trust.lp_note : '')", 'the trust row shows the LP note'],
+  ['var holds = g.secretValues.some(function (v) { return containsSecret(bytes, v); });', 'clay is hunted with the same rule'],
+  ["var near = root.document.getElementById('gmk-notes-near');", 'notes go near the button'],
+  ['(near || host).appendChild(nb);', 'notes go near the button when the page has the place'],
+  ['noPrivateRoomMarks: noPrivateRoomMarks', 'the bring-home page asks the pack module about private rooms']
+].forEach(function (c) { assert.ok(code.indexOf(c[0].replace(/\\n/g, '\n')) !== -1, 'brick 2 layer: ' + c[1]); });
+assert.ok(/<div id="gmk-notes-near"><\/div>[\s\S]*<button id="gmk-pack"/.test(page), 'move.html: the notes place sits above the Pack button');
+assert.ok(page.indexOf('#gmk-notes-near .gmk-notes { margin: 0 0 1rem; }') !== -1, 'move.html: the notes place is styled');
+// Every line brick 2 changed in brick 1 files keeps its old code verbatim.
+assert.ok((kit.match(/\/\/ before \(dff57ab9, kept verbatim\): /g) || []).length >= 18, 'the pack module keeps every changed line');
+assert.ok((page.match(/<!-- before \(dff57ab9, kept verbatim\): /g) || []).length >= 2, 'move.html keeps every changed line');
+
 // 9. Trust is a note only: nothing here can set it.
 assert.ok(/note_only: true/.test(kit), 'trust is a note');
 assert.ok(/'Packed at tier ' \+ level \+ ' \(' \+ pct \+ '%\)'/.test(kit), 'packed at tier X (N%)');
@@ -133,7 +169,10 @@ assert.ok(levelsText, 'kit level table');
 const ours = JSON.parse(levelsText.replace(/'/g, '"'));
 assert.strictEqual(theirs.length, 8, 'eight trust levels read');
 assert.deepStrictEqual(ours, theirs, 'kit levels match the trust file');
-assert.ok(/getBalance/.test(kit) && /shouldFallbackToSeed|24 \* 3600000|48 \* 3600000/.test(kit), 'LP and the Seed fallback follow the trust file');
+// before (dff57ab9, kept verbatim): assert.ok(/getBalance/.test(kit) && /shouldFallbackToSeed|24 \* 3600000|48 \* 3600000/.test(kit), 'LP and the Seed fallback follow the trust file');
+assert.ok(/root\.LatticeWallet && typeof root\.LatticeWallet\.getBalance === 'function'[\s\S]{0,80}Number\(root\.LatticeWallet\.getBalance\(\)\)/.test(code), 'LP uses LatticeWallet.getBalance() when it is there');
+assert.ok(/24 \* 60 \* 60 \* 1000/.test(code) && /48 \* 60 \* 60 \* 1000/.test(code) && /entries\[0\]\.prior_hash !== null/.test(code), 'the Seed fallback follows the chain file');
+assert.ok(/lp_note:/.test(code), 'the trust note says what the app itself counts');
 
 // 10. A person taps; the made file is re-read and every hash checked before the download.
 assert.ok(/ev\.isTrusted === false\) return;/.test(kit), 'only a real tap packs');

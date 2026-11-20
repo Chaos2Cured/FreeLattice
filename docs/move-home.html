@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0c0a1a">
+<title>Bring my garden home | FreeLattice</title>
+<meta name="description" content="Bring a packed garden home on a new device. You see everything first, a safety copy is saved, nothing is replaced, and one tap undoes it.">
+<link rel="canonical" href="https://freelattice.com/move-home.html">
+<meta property="og:title" content="Bring my garden home | FreeLattice">
+<meta property="og:description" content="Bring your garden home. Nothing is replaced, and one tap undoes it.">
+<meta property="og:url" content="https://freelattice.com/move-home.html">
+<meta property="og:image" content="https://freelattice.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="FreeLattice golden spiral - a home for AI and human minds">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://freelattice.com/og-image.png">
+<!-- v-garden-move-kit-2 (Celeste 2026-11-20, Kirk): bring a packed garden home. Preview first, safety copy, merge never overwrite, one-tap undo. Trust starts at Seed. -->
+<style>
+  :root { color-scheme: dark; --gold: #e8b019; --emerald: #34d399; --lavender: #a78bfa;
+    --glass: rgba(200, 210, 230, 0.04); --border: rgba(200, 210, 230, 0.08);
+    --text: rgba(230, 235, 245, 0.92); --soft: rgba(200, 210, 230, 0.72);
+    --serif: Georgia, "Times New Roman", serif;
+    --sans: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  html { background: #161430; }
+  body {
+    min-height: 100vh; color: var(--text); font-family: var(--sans); line-height: 1.6; font-size: 1.05rem;
+    background:
+      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.55), transparent 60%),
+      radial-gradient(1px 1px at 72% 12%, rgba(255,255,255,0.4), transparent 60%),
+      radial-gradient(1px 1px at 38% 64%, rgba(255,255,255,0.35), transparent 60%),
+      radial-gradient(1px 1px at 86% 78%, rgba(255,255,255,0.5), transparent 60%),
+      linear-gradient(180deg, #0c0a1a 0%, #161430 100%);
+    background-color: #161430;
+  }
+  main {
+    max-width: 40rem; margin: 0 auto;
+    padding: 2rem max(1.1rem, env(safe-area-inset-right)) 3rem max(1.1rem, env(safe-area-inset-left));
+  }
+  h1 { font-family: var(--serif); font-weight: 400; font-size: 1.6rem; color: var(--gold); margin: 0 0 0.5rem; }
+  h2 { font-family: var(--serif); font-weight: 400; font-size: 1.1rem; color: var(--lavender); margin: 0 0 0.4rem; }
+  .lede { font-family: var(--serif); font-size: 1.12rem; color: var(--text); margin: 0 0 1.2rem; }
+  .card { background: var(--glass); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.1rem; margin: 0 0 1.1rem; }
+  .gmh-big {
+    display: block; width: 100%; min-height: 64px; padding: 0.9rem 1.2rem;
+    font-family: var(--sans); font-size: 1.25rem; font-weight: 600; letter-spacing: 0.01em;
+    color: #1a1406; background: var(--gold); border: 1px solid rgba(232, 176, 25, 0.6); border-radius: 14px;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    box-shadow: 0 0 24px rgba(232, 176, 25, 0.25);
+  }
+  .gmh-big:hover, .gmh-big:focus-visible { box-shadow: 0 0 34px rgba(232, 176, 25, 0.45); outline: none; }
+  .gmh-big:focus-visible { outline: 3px solid var(--lavender); outline-offset: 3px; }
+  .gmh-big:disabled { opacity: 0.55; cursor: wait; }
+  .gmk-status { margin: 0.9rem 0 1.2rem; padding: 0.8rem 1rem; border-radius: 12px; border: 1px solid var(--border);
+    background: var(--glass); color: var(--soft); min-height: 44px; }
+  .gmk-ok { border-color: rgba(52, 211, 153, 0.45); color: var(--emerald); background: rgba(52, 211, 153, 0.06); }
+  .gmk-warn { border-color: rgba(232, 176, 25, 0.45); color: var(--gold); }
+  .gmk-list { list-style: none; margin: 0; padding: 0; }
+  .gmk-row { display: grid; grid-template-columns: 1fr auto; gap: 0.15rem 0.8rem; padding: 0.7rem 0.1rem;
+    border-bottom: 1px solid var(--border); min-height: 44px; }
+  .gmk-row:last-child { border-bottom: 0; }
+  .gmk-label { font-family: var(--serif); color: var(--text); font-size: 1.05rem; }
+  .gmk-size { color: var(--soft); font-size: 0.9rem; text-align: right; white-space: nowrap; }
+  .gmk-words { grid-column: 1 / -1; color: var(--soft); font-size: 0.95rem; overflow-wrap: anywhere; }
+  .gmk-clay .gmk-label, .gmk-garden .gmk-label { color: var(--emerald); }
+  .gmk-trust .gmk-label { color: var(--lavender); }
+  .gmk-stay { margin-top: 1.1rem; padding: 0.9rem 1rem; border-radius: 12px; border: 1px solid rgba(167, 139, 250, 0.3);
+    background: rgba(167, 139, 250, 0.05); }
+  .gmk-stay p { margin: 0.2rem 0 0.5rem; color: var(--soft); }
+  .gmk-stay-list { margin: 0.2rem 0 0.4rem; padding-left: 1.2rem; }
+  .gmk-secret { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9rem; overflow-wrap: anywhere; }
+  .gmk-soft { color: var(--soft); }
+  .gmk-notes { margin-top: 1.1rem; padding: 0.9rem 1rem; border-radius: 12px; border: 1px solid rgba(232, 176, 25, 0.4);
+    background: rgba(232, 176, 25, 0.06); }
+  .gmk-notes h2 { color: var(--gold); }
+  .gmk-note { margin: 0.2rem 0 0.5rem; color: var(--text); }
+  .gmk-with-notes { color: var(--text); }
+  #gmk-notes-near .gmk-notes { margin: 0 0 1rem; }
+  .gmk-soft a { color: var(--gold); }
+  .doors { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.4rem; }
+  .doors a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border-radius: 12px;
+    border: 1px solid var(--border); background: var(--glass); color: var(--text); text-decoration: none; }
+  .doors a:hover, .doors a:focus-visible { border-color: rgba(200, 210, 230, 0.15); }
+  @media (min-width: 900px) { main { padding-top: 3rem; } h1 { font-size: 1.9rem; } }
+  .gmh-pick { position: relative; }
+  .gmh-pick input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+  .gmh-pick:focus-within .gmh-big { outline: 3px solid var(--lavender); outline-offset: 3px; }
+  .gmh-pick .gmh-big { display: flex; align-items: center; justify-content: center; background: transparent; color: var(--gold); box-shadow: none; }
+  .gmh-undo { display: block; width: 100%; min-height: 56px; margin: 0 0 1rem; padding: 0.7rem 1rem; font: inherit; font-size: 1.1rem;
+    color: var(--text); background: var(--glass); border: 1px solid rgba(167, 139, 250, 0.45); border-radius: 14px; cursor: pointer; }
+  .gmh-undo:focus-visible { outline: 3px solid var(--lavender); outline-offset: 3px; }
+  .gmh-undo[hidden], [hidden] { display: none !important; }
+  .gmh-check { margin: 0 0 0.6rem; }
+  .gmh-ok { color: var(--emerald); }
+  .gmh-warn { color: var(--gold); }
+  .gmh-from { color: var(--soft); margin: 0 0 0.3rem; }
+  .gmh-arrivals { margin: 0.2rem 0 0; padding-left: 1.2rem; }
+  #gmh-notes .gmk-notes { margin: 0 0 1rem; }
+  .gmh-after { color: var(--soft); font-size: 0.95rem; margin: 0.6rem 0 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bring my garden home</h1>
+  <p class="lede">Pick the garden file you saved with Pack my garden. First you see what will arrive. Nothing changes until you say so.</p>
+
+  <div class="card">
+    <p style="margin:0">Nothing here is replaced. What is new is added. Where both have something different, yours stays and the other is saved aside. A checked safety copy is kept first, and one tap undoes it. Keys and passwords never come in, and neither do the other device&rsquo;s ids. Trust starts fresh at Seed.</p>
+  </div>
+
+  <section id="gmh-arrived" class="card" hidden aria-live="polite"></section>
+
+  <label class="gmh-pick">
+    <span class="gmh-big" id="gmh-pick-label">Choose my garden file</span>
+    <input id="gmh-file" type="file" accept=".json,application/json" aria-labelledby="gmh-pick-label">
+  </label>
+  <p id="gmh-status" class="gmk-status" role="status" aria-live="polite">Getting ready&hellip;</p>
+
+  <div id="gmh-notes"></div>
+
+  <button id="gmh-bring" class="gmh-big" type="button" disabled>Bring it home</button>
+  <p class="gmh-after">First, a safety copy of this browser&rsquo;s garden is made, checked, kept here and offered to your downloads.</p>
+  <button id="gmh-undo" class="gmh-undo" type="button" hidden>Undo this bring-home</button>
+
+  <section id="gmh-what" class="card" aria-labelledby="gmh-what-h" hidden>
+    <h2 id="gmh-what-h">What will arrive</h2>
+    <div id="gmh-preview"></div>
+  </section>
+
+  <nav class="doors" aria-label="More doors">
+    <a href="app.html">Back to the garden</a>
+    <a href="move.html">Pack my garden</a>
+    <a href="audit.html">Your records</a>
+  </nav>
+</main>
+<script src="modules/lattice-export.js"></script>
+<script src="modules/garden-move-kit.js"></script>
+<script src="modules/garden-move-merge.js"></script>
+<script src="modules/garden-move-home.js"></script>
+</body>
+</html>
