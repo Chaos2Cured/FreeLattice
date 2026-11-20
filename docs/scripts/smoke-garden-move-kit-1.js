@@ -17,7 +17,8 @@ const DOOR = 'docs/modules/lattice-export.js';
 const AUTONOMY = 'docs/library/AUTONOMY.md';
 const APP = 'docs/app.html';
 const ROOT_INDEX = 'index.html';
-const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX];
+const SAFETY = 'docs/modules/fractal-safety.js';
+const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX, SAFETY];
 
 // Pins from main b5bf33a9: these files must stay exactly as they are.
 const PINS = {
@@ -74,13 +75,11 @@ assert.ok(/var VERSION = 'v-garden-move-kit-1';/.test(kit), 'marker');
 
 // 6. The existing archive goes inside, unchanged and without its own download.
 assert.ok(/LE\.exportArchive\(\{ mode: 'full', download: false \}\)/.test(kit), 'embeds the full archive without a second download');
-assert.ok(/archive: \{ file_name: file\.name, text: text \}/.test(kit), 'the archive is kept as the exact text it makes');
 
 // 7. Secrets stay home; their names are shown, never their values.
 ['fl_apiKey', 'fl_github_token', 'fl_ghToken', 'fl-telegram-token', 'chalkboard-apikey', 'fl_device_encryption_key', 'fl_ws_device_key_v1']
   .forEach(function (k) { assert.ok(kit.indexOf("'" + k + "'") !== -1, 'secret list has ' + k); });
-assert.ok(/var SECRET_NAME_RULE = \/\(api\[_-\]\?key\|apikey\|token\|secret\|password/.test(kit), 'secret name rule');
-assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(sv && sv\.length >= 6\) secretValues\.push\(sv\); return;/.test(kit), 'secret keys are skipped, values only kept in memory for the check');
+assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(looksLikeCredential\(sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
 assert.ok(/text\.indexOf\(v\) !== -1\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
 const ruleLine = kit.split('\n').filter(function (l) { return /^  var PRIVATE_NAME_RULE = /.test(l); });
 assert.strictEqual(ruleLine.length, 1, 'one private room rule');
@@ -91,11 +90,50 @@ assert.ok(/privacyHidden\(value\) \{ return value === 'private' \|\| value === '
 // 8. Clay is carried byte-for-byte and never changed.
 assert.ok(/var CLAY_PREFIX = 'fl_clay_';/.test(kit), 'clay prefix');
 assert.ok(/if \(key\.indexOf\(CLAY_PREFIX\) === 0\) return 'clay';/.test(kit), 'clay first');
-assert.ok(/if \(name === 'clay'\) \{/.test(kit) && /\} else if \(g\.secretValues\.length\) \{/.test(kit), 'clay is never rewritten by the secret hider');
+assert.ok(/if \(name === 'clay'\) \{/.test(kit) && /\} else if \(name !== 'archive' && g\.secretValues\.length\) \{/.test(kit), 'clay and the archive are never touched by the secret hider');
+assert.ok(/if \(holds\) \{ clayLeft\.push\(k\); delete data\.ls\[k\]; \}/.test(kit), 'clay holding a saved key stays home whole, never edited');
+
+// 8b. Hypha HOLD fixes on c84f41a4.
+// H1: limits, provider names, model names and counts are not secrets, and numbers are never cut.
+const neverLine = (kit.match(/var NEVER_SECRET_RULE = \/([^\n]*)\/i;/) || [])[1] || '';
+['limit', 'provider', 'model', 'max_?tokens', 'tokens?_?count', 'tokenizer', 'client_?id', 'hint']
+  .forEach(function (w) { assert.ok(neverLine.split('|').indexOf(w) !== -1, 'never a secret: ' + w); });
+const keysBlock = (kit.match(/var SECRET_KEYS = \[[\s\S]*?\];/) || [''])[0];
+assert.ok(keysBlock.length > 0, 'secret key list');
+['fl_apiKey_provider', 'fl_tokenLimit', 'fl_googleDriveClientId'].forEach(function (k) {
+  assert.ok(keysBlock.indexOf("'" + k + "'") === -1, k + ' is not a secret');
+});
+assert.ok(/function looksLikeCredential\(v\) \{/.test(kit), 'only real key values are hunted');
+assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 3, 'numbers are never treated as keys or blanked');
+// H1/H2: secrets are hidden by walking parsed records, never by a text replace on JSON.
+assert.ok(!/hideSecretValues/.test(code), 'the old text replace is gone');
+assert.ok(!/\.split\(needle\)/.test(code) && !/\.split\(v\)\.join\(/.test(code), 'no split/join text replace');
+assert.ok(/function hideSecretLeaves\(v, values, counter, depth\) \{/.test(kit), 'structured walk over string leaves');
+// H3: the archive text is never edited; a broken or unchecked seal is said out loud.
+assert.ok(/if \(holdsSecret\) \{ stats\.archiveLeftHome = true; return; \}/.test(kit), 'an archive holding a key stays home');
+assert.ok(/sections\.archive = \{ archive: \{ file_name: file\.name, text: text, seal: seal \} \};/.test(kit), 'the archive text goes in as made');
+assert.ok(/function sealOf\(parsed\) \{/.test(kit) && /archive_seal: g\.stats\.archiveSeal/.test(kit), 'the archive seal is recorded');
+assert.ok(/seal !== arc\.seal \|\| seal !== kit\.archive_seal/.test(kit), 'the self-check re-checks the archive seal');
+['does-not-verify', 'unchecked', 'not-packed', 'archive_left_home'].forEach(function (s2) { assert.ok(kit.indexOf(s2) !== -1, 'seal state ' + s2); });
+assert.ok(/function warningsOf\(kit\) \{/.test(kit), 'honest notes');
+assert.ok(/st\.unreadable && st\.unreadable\.length/.test(kit), 'unreadable parts are named');
+assert.ok(/st\.sealed_chats/.test(kit) && /will not open on a new device yet/.test(kit), 'sealed chats are named');
+assert.ok(/\.gmk-notes \{/.test(page), 'the page shows the notes');
 
 // 9. Trust is a note only: nothing here can set it.
 assert.ok(/note_only: true/.test(kit), 'trust is a note');
 assert.ok(/'Packed at tier ' \+ level \+ ' \(' \+ pct \+ '%\)'/.test(kit), 'packed at tier X (N%)');
+// The kit's level table matches the trust file it mirrors (read here as text, never run).
+const safety = readAllowed(SAFETY, 'utf8');
+const theirs = [];
+safety.replace(/\b(\w+):\s*\{ min: (\d+),\s*time: (\d+)(?: \* 86400)?,\s*confidence: ([\d.]+),\s*rank: '(\w+)'/g,
+  function (m, k, min, days, conf, rank) { theirs.push([rank, +min, +days, +conf]); });
+const levelsText = (kit.match(/var LEVELS = (\[[\s\S]*?\]);/) || [])[1];
+assert.ok(levelsText, 'kit level table');
+const ours = JSON.parse(levelsText.replace(/'/g, '"'));
+assert.strictEqual(theirs.length, 8, 'eight trust levels read');
+assert.deepStrictEqual(ours, theirs, 'kit levels match the trust file');
+assert.ok(/getBalance/.test(kit) && /shouldFallbackToSeed|24 \* 3600000|48 \* 3600000/.test(kit), 'LP and the Seed fallback follow the trust file');
 
 // 10. A person taps; the made file is re-read and every hash checked before the download.
 assert.ok(/ev\.isTrusted === false\) return;/.test(kit), 'only a real tap packs');

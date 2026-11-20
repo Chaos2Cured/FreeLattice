@@ -9,10 +9,11 @@
    It sends nothing anywhere. The file is saved on this device by the person who taps the button.
 
    It is a handle on the existing doorway, docs/modules/lattice-export.js (window.LatticeExport).
-   Its full archive goes inside the kit as the exact text it makes, unchanged.
+   Its full archive goes inside the kit as the exact text it makes, never edited. If a saved key is
+   inside it, the archive stays home and the preview says so. Its own seal is checked and shown.
 
-   Kept on this device, never packed: keys, tokens, passwords and other secrets (names are
-   listed in the preview, never their values), anything with a private room name, private
+   Kept on this device, never packed: saved keys, tokens and passwords (names are listed in
+   the preview, never their values; limits, provider names and counts are not secrets), anything with a private room name, private
    notebook pages, and the device's own unlock keys. A browser key that cannot leave stays.
 
    Clay belongs to the minds. Every fl_clay_ key is carried as the exact string it is.
@@ -31,13 +32,24 @@
 
   // Names that never travel (database names, localStorage keys, record fields).
   var PRIVATE_NAME_RULE = /quiet|sophia/i;
-  var SECRET_NAME_RULE = /(api[_-]?key|apikey|token|secret|password|passphrase|_enc$|device[_-]?key|encryption[_-]?key|private[_-]?key|client[_-]?id)/i;
+  // before (c84f41a4, Hypha HOLD H1/H2): one broad substring rule, /(api[_-]?key|apikey|token|secret|password|...|client[_-]?id)/i,
+  // plus fl_apiKey_provider and fl_googleDriveClientId in the exact list. That caught token limits and provider names.
+  // Now: exact credential keys, narrow name patterns (a name that ENDS as a credential word), and a never-secret list.
   var SECRET_KEYS = [
-    'fl_apiKey', 'fl_api_key', 'fl_apiKey_enc', 'fl_apiKey_provider', 'fl_apiKey_openrouter',
+    'fl_apiKey', 'fl_api_key', 'fl_apiKey_enc',
     'fl_ghToken', 'fl_ghToken_enc', 'fl_github_token', 'fl_ghSyncToken', 'fl_hfToken_enc',
     'fl-telegram-token', 'chalkboard-apikey', 'fl_device_encryption_key', 'fl_ws_device_key_v1',
-    'fl_tree_image_token', 'fl_googleDriveClientId'
+    'fl_tree_image_token'
   ];
+  var SECRET_NAME_RULES = [
+    /(^|[_-])api[_-]?key($|[_-])/i, /apikey/i, /^token$/i, /(^|[_-])token$/i, /[a-z0-9]Token$/,
+    /^password$/i, /(^|[_-])password$/i, /[a-z0-9]Password$/, /^secret$/i, /(^|[_-])secret$/i, /[a-z0-9]Secret$/,
+    /_enc$/, /device[_-]?key/i, /encryption[_-]?key/i, /private[_-]?key/i
+  ];
+  var NEVER_SECRET_RULE = /limit|provider|model|max_?tokens|tokens?_?count|tokenizer|client_?id|hint/i;
+  // A value is hunted inside records only when it looks like a real credential.
+  var CREDENTIAL_PREFIXES = ['sk-', 'sk_', 'pk_', 'rk_', 'ghp_', 'gho_', 'ghu_', 'ghs_', 'ghr_', 'github_pat_', 'hf_', 'xox', 'glpat-', 'AIza', 'ya29.'];
+  var CREDENTIAL_CHARS = /^[A-Za-z0-9._~+\/=:-]+$/;
   var CLAY_PREFIX = 'fl_clay_';
   var GLASS_LEDGERS = ['fl_depthHashLedger', 'fl_refusalLedger', 'fl_returnLedger'];
   var TRUST_KEYS = ['fl_firstSeen', 'fl_conversationCount', 'fl_streak', 'fl_corePlantCount',
@@ -93,7 +105,30 @@
   }
   function isSecretName(name) {
     var n = String(name || '');
-    return SECRET_KEYS.indexOf(n) !== -1 || SECRET_NAME_RULE.test(n);
+    if (SECRET_KEYS.indexOf(n) !== -1) return true;
+    if (NEVER_SECRET_RULE.test(n)) return false;
+    return SECRET_NAME_RULES.some(function (re) { return re.test(n); });
+  }
+  function entropyBits(str) {
+    var counts = {}, n = str.length, h = 0;
+    for (var i = 0; i < n; i++) counts[str[i]] = (counts[str[i]] || 0) + 1;
+    Object.keys(counts).forEach(function (c) { var p = counts[c] / n; h -= p * Math.log(p) / Math.LN2; });
+    return h;
+  }
+  // Long, one word, not a number, and either a known key prefix or letters and digits with high entropy.
+  function looksLikeCredential(v) {
+    if (typeof v !== 'string') return false;
+    var s = v.trim();
+    if (s.length < 16 || s.length > 4096 || !CREDENTIAL_CHARS.test(s) || /^[0-9.+-]+$/.test(s)) return false;
+    if (CREDENTIAL_PREFIXES.some(function (p) { return s.indexOf(p) === 0; })) return true;
+    return /[A-Za-z]/.test(s) && /[0-9]/.test(s) && entropyBits(s) >= 3.5;
+  }
+  // A record field with a credential name: blank it only when its value could be a credential.
+  function secretFieldValue(name, v) {
+    if (!isSecretName(name) || typeof v !== 'string') return false;
+    var s = v.trim();
+    if (s.length < 8 || /\s/.test(s) || /^[0-9.+-]+$/.test(s) || /^(true|false|null|none|yes|no)$/i.test(s) || s === KEPT_LINE) return false;
+    return true;
   }
   function canonicalize(value) {
     var LE = root.LatticeExport;
@@ -163,7 +198,7 @@
     }
     var keys = Object.keys(v);
     return Promise.all(keys.map(function (k) {
-      if (isSecretName(k) && typeof v[k] === 'string' && v[k]) {
+      if (secretFieldValue(k, v[k])) {
         stats.secretFields[k] = (stats.secretFields[k] || 0) + 1;
         return Promise.resolve(KEPT_LINE);
       }
@@ -311,36 +346,88 @@
     return 'settings';
   }
 
-  // ── Trust, as a note only. Same numbers fractal-safety.js and glass-v2.html use, read-only. ──
+  // ── Trust, as a note only. ──
+  // fractal-safety.js is not loaded on this page: on start it records a first-seen date if none is
+  // there, and this page writes nothing. So the note follows its calculateTrustScore() step by step,
+  // read-only: the same LEVELS and weights, LP from the wallet ledger the way LatticeWallet.getBalance()
+  // counts it (earn minus spend, never below 0), the same chain fallback to Seed as
+  // lattice-chain.js shouldFallbackToSeed(), and a missing first-seen date still counts Seed's 0.5 (25%).
+  // If either file changes its numbers, change them here too (the smoke pins this table).
   var LEVELS = [
     ['Seed', 0, 0, 0.5], ['Sprout', 10, 7, 0.75], ['Growing', 50, 30, 0.9], ['Bloom', 100, 90, 0.95],
     ['Spark', 250, 180, 0.99], ['Flame', 500, 365, 0.999], ['Radiant', 1000, 730, 0.9999], ['Eternal', 2000, 1095, 0.99999]
   ];
   function intOf(k) { var n = parseInt(lsGet(k) || '0', 10); return isFinite(n) ? n : 0; }
-  function trustNote(now) {
+  function rowsFrom(dbOut, store) {
+    var st = dbOut && dbOut.stores && dbOut.stores[store];
+    if (!st || !Array.isArray(st.rows)) return [];
+    return st.rows.map(function (r) { return r && r.k !== undefined && r.v !== undefined && st.schema && st.schema.keyPath === null ? r.v : r; });
+  }
+  function walletBalance(walletDb) {
+    try {
+      if (root.LatticeWallet && typeof root.LatticeWallet.getBalance === 'function') {
+        var b = Number(root.LatticeWallet.getBalance());
+        if (isFinite(b)) return b;
+      }
+    } catch (e) {}
+    var bal = 0;
+    rowsFrom(walletDb, 'LatticeLedger').forEach(function (t) {
+      var amt = t && isFinite(t.amount) ? Number(t.amount) : 0;
+      if (t && t.type === 'earn') bal += amt;
+      else if (t && t.type === 'spend') bal -= amt;
+    });
+    return Math.max(0, bal);
+  }
+  function chainFallback(chainDb, firstSeen) {
+    var entries = rowsFrom(chainDb, 'chain');
+    if (!entries.length) return Promise.resolve({ seed: false, why: 'no-chain' });
+    var LE = root.LatticeExport;
+    if (!LE || !LE._internal || typeof LE._internal.verifyChainIntegrity !== 'function') {
+      return Promise.resolve({ seed: false, why: 'not-yet-verified' });
+    }
+    return LE._internal.verifyChainIntegrity(entries).then(function (r) {
+      if (!r || !r.ok) return { seed: true, why: 'chain-broken' };
+      var firstTs = entries[0].ts;
+      if (firstSeen > 0 && typeof firstTs === 'number' && Math.abs(firstSeen - firstTs) > 24 * 60 * 60 * 1000) {
+        return { seed: true, why: 'first-seen-differs-from-chain' };
+      }
+      var anchor = null;
+      for (var i = 0; i < entries.length; i++) { if (entries[i].kind === 'time_anchor') { anchor = entries[i].ts; break; } }
+      if (typeof anchor === 'number' && firstSeen > 0 && anchor - firstSeen > 48 * 60 * 60 * 1000) {
+        return { seed: true, why: 'time-anchor-gap' };
+      }
+      return { seed: false, why: 'chain-ok' };
+    }, function () { return { seed: false, why: 'not-yet-verified' }; });
+  }
+  function trustNote(now, chainDb, walletDb) {
     now = now || Date.now();
     var firstSeen = intOf('fl_firstSeen');
     var days = firstSeen > 0 ? Math.floor((now - firstSeen) / 86400000) : 0;
-    var lp = 0;
-    try { var p = JSON.parse(lsGet('latticePoints') || 'null'); if (p && isFinite(p.total)) lp = Number(p.total); } catch (e) {}
-    var timeScore = 0, level = LEVELS[0][0], glass = LEVELS[0][0];
-    for (var i = LEVELS.length - 1; i >= 0; i--) { if (days >= LEVELS[i][2]) { timeScore = LEVELS[i][3]; glass = LEVELS[i][0]; break; } }
-    for (var j = LEVELS.length - 1; j >= 0; j--) { if (days >= LEVELS[j][2] && lp >= LEVELS[j][1]) { level = LEVELS[j][0]; break; } }
-    var contributions = intOf('fl_corePlantCount') + intOf('fl_letterCount') + intOf('fl_scienceIdeaCount') + intOf('fl_vaultSaveCount');
-    var activity = Math.min(1, contributions / 50);
-    var consistency = Math.min(1, intOf('fl_streak') / 30);
-    var total = firstSeen > 0 ? (timeScore * 0.5 + activity * 0.3 + consistency * 0.2) : (activity * 0.3 + consistency * 0.2);
-    var pct = Math.round(total * 100);
-    return {
-      note_only: true,
-      tier: level,
-      glass_tier: glass,
-      percent: pct,
-      days_together: days,
-      first_seen: firstSeen || null,
-      line: 'Packed at tier ' + level + ' (' + pct + '%)',
-      arrival: 'On a new device trust starts fresh at Seed and shows this note. (Brick 2.)'
-    };
+    var lp = walletBalance(walletDb);
+    return chainFallback(chainDb, firstSeen).then(function (fb) {
+      var timeScore = 0, level = LEVELS[0][0], glass = LEVELS[0][0];
+      for (var i = LEVELS.length - 1; i >= 0; i--) { if (days >= LEVELS[i][2]) { timeScore = LEVELS[i][3]; glass = LEVELS[i][0]; break; } }
+      for (var j = LEVELS.length - 1; j >= 0; j--) { if (days >= LEVELS[j][2] && lp >= LEVELS[j][1]) { level = LEVELS[j][0]; break; } }
+      var contributions = intOf('fl_corePlantCount') + intOf('fl_letterCount') + intOf('fl_scienceIdeaCount') + intOf('fl_vaultSaveCount');
+      var activity = Math.min(1, contributions / 50);
+      var consistency = Math.min(1, intOf('fl_streak') / 30);
+      // before (c84f41a4, Hypha soft 6): a missing first-seen date dropped the time term (0% where the app shows 25%).
+      var total = timeScore * 0.5 + activity * 0.3 + consistency * 0.2;
+      if (fb.seed) { level = 'Seed'; total = activity * 0.3 + consistency * 0.2; }
+      var pct = Math.round(total * 100);
+      return {
+        note_only: true,
+        tier: level,
+        glass_tier: glass,
+        percent: pct,
+        days_together: days,
+        first_seen: firstSeen || null,
+        lp: lp,
+        chain_check: fb.why,
+        line: 'Packed at tier ' + level + ' (' + pct + '%)',
+        arrival: 'On a new device trust starts fresh at Seed and shows this note. (Brick 2.)'
+      };
+    });
   }
 
   // ── A read-only chain reader for lattice-export.js on this page ──
@@ -358,6 +445,37 @@
     root.LatticeChain = { readOnlyReader: VERSION, _internal: { getAllEntries: readChainEntries } };
   }
 
+  // The archive's own signature, checked with its own verifier. 'verified', 'does-not-verify' or 'unchecked'.
+  function sealOf(parsed) {
+    var LE = root.LatticeExport;
+    if (!parsed || !LE || !LE._internal || typeof LE._internal.verifySignature !== 'function') return Promise.resolve('unchecked');
+    var copy;
+    try { copy = JSON.parse(JSON.stringify(parsed)); } catch (e) { return Promise.resolve('unchecked'); }
+    return Promise.resolve(LE._internal.verifySignature(copy)).then(function (ok) {
+      return ok ? 'verified' : 'does-not-verify';
+    }, function () { return 'unchecked'; });
+  }
+  function countSecretFields(v, depth) {
+    depth = depth || 0;
+    if (!v || typeof v !== 'object' || depth > 64) return 0;
+    var n = 0;
+    Object.keys(v).forEach(function (k) {
+      if (!Array.isArray(v) && secretFieldValue(k, v[k])) n += 1;
+      else n += countSecretFields(v[k], depth + 1);
+    });
+    return n;
+  }
+  // Sealed chats (FLChatVault rows carry sealed: {v, kid, iv, ct}). They travel locked.
+  function countSealed(v, depth) {
+    depth = depth || 0;
+    if (!v || typeof v !== 'object' || depth > 8) return 0;
+    if (v.sealed && typeof v.sealed === 'object' && v.sealed.ct) return 1;
+    if (v.sealed === true && v.ct) return 1;
+    var n = 0;
+    Object.keys(v).forEach(function (k) { n += countSealed(v[k], depth + 1); });
+    return n;
+  }
+
   // ── Builder sections: reserved hook, minimal. Names must be x-<builder>/<name>. ──
   var registered = {};
   var BUILDER_NAME = /^x-[a-z0-9][a-z0-9-]{0,40}\/[a-z0-9][a-z0-9-]{0,40}$/;
@@ -370,7 +488,8 @@
   // ── Read everything (no writes) ──
   function gather(opts) {
     opts = opts || {};
-    var stats = { privateNames: [], secretNames: [], secretFields: {}, privatePages: 0, privateRows: 0, keysStayed: 0, unreadable: [] };
+    var stats = { privateNames: [], secretNames: [], secretFields: {}, privatePages: 0, privateRows: 0, keysStayed: 0, unreadable: [],
+      archiveLeftHome: false, archiveSeal: 'not-packed' };
     var sections = {};
     function sec(name) { if (!sections[name]) sections[name] = { idb: {}, ls: {} }; return sections[name]; }
 
@@ -378,7 +497,7 @@
     var secretValues = [];
     lsKeys().forEach(function (k) {
       if (isPrivateName(k)) { stats.privateNames.push(k); return; }
-      if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (sv && sv.length >= 6) secretValues.push(sv); return; }
+      if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (looksLikeCredential(sv)) secretValues.push(sv.trim()); return; }
       var v = lsGet(k);
       if (v === null) return;
       var where = lsSectionFor(k);
@@ -419,6 +538,7 @@
           return readDatabase(n, stats).then(function (out) {
             if (!out) return;
             if (n === 'FreeLatticeWorkspace') out = filterNotebook(out, stats);
+            if (n === 'LatticeChain' || n === 'FreeLatticeWallet') stats['raw_' + n] = out;
             sec(section).idb[n] = out;
           }, function () { stats.unreadable.push(n); });
         });
@@ -441,7 +561,17 @@
       if (!LE || typeof LE.exportArchive !== 'function' || opts.skipArchive) return null;
       return LE.exportArchive({ mode: 'full', download: false }).then(function (file) {
         return file.text().then(function (text) {
-          sections.archive = { archive: { file_name: file.name, text: text } };
+          // The archive text is never edited (Hypha HOLD H3). If a saved key is inside it,
+          // the archive stays home and the preview says so; its parts are still in the other sections.
+          var parsed = null;
+          try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
+          var holdsSecret = secretValues.some(function (v) { return text.indexOf(v) !== -1; }) ||
+            (parsed && countSecretFields(parsed) > 0);
+          if (holdsSecret) { stats.archiveLeftHome = true; return; }
+          return sealOf(parsed).then(function (seal) {
+            stats.archiveSeal = seal;
+            sections.archive = { archive: { file_name: file.name, text: text, seal: seal } };
+          });
         });
       }, function (err) {
         stats.unreadable.push('archive: ' + String((err && err.message) || err).slice(0, 120));
@@ -487,7 +617,11 @@
         (ls.latticePoints ? ', and your Lattice Points' : '');
       case 'clay': return plural(keys, 'clay piece', 'clay pieces') + ', carried exactly as the minds left them';
       case 'identity': return 'Your mesh name travels. Your private key stays on this device.';
-      case 'archive': return 'The family archive, inside and unchanged';
+      case 'archive':
+        var seal = data.archive && data.archive.seal;
+        if (seal === 'verified') return 'The family archive, inside and unchanged. Its own seal checks out.';
+        if (seal === 'does-not-verify') return 'The family archive is inside, unchanged, but its own seal does not check out. It may not import as an archive on its own.';
+        return 'The family archive is inside, unchanged. Its own seal could not be checked here.';
       case 'notebook': return plural(rows, 'notebook entry', 'notebook entries');
       case 'chain': return plural(rows, 'link in the chain of your days together', 'links in the chain of your days together');
       case 'companions': return plural(rows + keys, 'companion keepsake', 'companion keepsakes');
@@ -501,22 +635,46 @@
         return plural(rows + keys, 'thing', 'things');
     }
   }
+  // Honest notes for the status line and the preview (Hypha: show what was not checked or not read).
+  function warningsOf(kit) {
+    var w = [];
+    var st = kit.stayed_here || {};
+    if (st.archive_left_home) w.push('A saved key was inside the family archive, so the archive stayed on this device. Everything in it is still in the other parts of your file.');
+    if (kit.archive_seal === 'does-not-verify') w.push('The family archive\u2019s own seal does not check out, so it may not import on its own.');
+    if (kit.archive_seal === 'unchecked') w.push('The family archive\u2019s own seal could not be checked here.');
+    if (kit.archive_seal === 'not-packed' && !st.archive_left_home) w.push('The family archive could not be made here, so it is not in the file.');
+    if (st.unreadable && st.unreadable.length) w.push(plural(st.unreadable.length, 'part could not be read', 'parts could not be read') + ' and is not in the file: ' + st.unreadable.join(', ') + '.');
+    if (st.sealed_chats) w.push(plural(st.sealed_chats, 'chat is', 'chats are') + ' locked to this browser. ' + (st.sealed_chats === 1 ? 'It travels' : 'They travel') + ' locked and will not open on a new device yet.');
+    if (st.clay_left_whole && st.clay_left_whole.length) w.push(plural(st.clay_left_whole.length, 'clay piece holds', 'clay pieces hold') + ' a saved key, so ' + (st.clay_left_whole.length === 1 ? 'it stays' : 'they stay') + ' here whole and unchanged: ' + st.clay_left_whole.join(', ') + '.');
+    return w;
+  }
   function sizeWords(bytes) {
     if (bytes < 1024) return bytes + ' bytes';
     if (bytes < 1024 * 1024) return 'about ' + Math.max(1, Math.round(bytes / 1024)) + ' KB';
     return 'about ' + (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
-  // Hide secret values if one shows up inside a record (never inside clay).
-  function hideSecretValues(text, values) {
-    var hidden = 0;
-    values.forEach(function (v) {
-      var needle = JSON.stringify(v).slice(1, -1);
-      if (!needle) return;
-      var parts = text.split(needle);
-      if (parts.length > 1) { hidden += parts.length - 1; text = parts.join(KEPT_LINE); }
-    });
-    return { text: text, hidden: hidden };
+  // Hide a saved credential value if it shows up inside a record: a walk over the parsed records,
+  // string leaves only. Numbers, names and the JSON around them are never touched. Never used on clay
+  // or on the archive text.
+  // before (c84f41a4, Hypha HOLD H1-H3): hideSecretValues(text, values) split and joined the canonical JSON text.
+  function hideSecretLeaves(v, values, counter, depth) {
+    depth = depth || 0;
+    if (typeof v === 'string') {
+      var out = v;
+      values.forEach(function (sv) {
+        if (out.indexOf(sv) === -1) return;
+        var parts = out.split(sv);
+        counter.n += parts.length - 1;
+        out = parts.join(KEPT_LINE);
+      });
+      return out;
+    }
+    if (!v || typeof v !== 'object' || depth > 64) return v;
+    if (Array.isArray(v)) return v.map(function (x) { return hideSecretLeaves(x, values, counter, depth + 1); });
+    var o = {};
+    Object.keys(v).forEach(function (k) { o[k] = hideSecretLeaves(v[k], values, counter, depth + 1); });
+    return o;
   }
 
   // ── Build the kit (in memory) ──
@@ -524,7 +682,10 @@
     opts = opts || {};
     var now = opts.now || Date.now();
     return gather(opts).then(function (g) {
-      var trust = trustNote(now);
+      return trustNote(now, g.stats.raw_LatticeChain, g.stats.raw_FreeLatticeWallet).then(function (trust) { return { g: g, trust: trust }; });
+    }).then(function (gt) {
+      var g = gt.g, trust = gt.trust;
+      delete g.stats.raw_LatticeChain; delete g.stats.raw_FreeLatticeWallet;
       var names = SECTION_ORDER.filter(function (n) { return g.sections[n]; })
         .concat(Object.keys(g.sections).filter(function (n) { return SECTION_ORDER.indexOf(n) === -1; }).sort());
       var out = {};
@@ -539,9 +700,10 @@
             var holds = g.secretValues.some(function (v) { return bytes.indexOf(v) !== -1; });
             if (holds) { clayLeft.push(k); delete data.ls[k]; }
           });
-        } else if (g.secretValues.length) {
-          var h = hideSecretValues(canonicalize(data), g.secretValues);
-          if (h.hidden) { hiddenValues += h.hidden; data = JSON.parse(h.text); }
+        } else if (name !== 'archive' && g.secretValues.length) {
+          var counter = { n: 0 };
+          data = hideSecretLeaves(data, g.secretValues, counter);
+          hiddenValues += counter.n;
         }
         var canon = canonicalize(data);
         return sha256(canon).then(function (hex) {
@@ -575,8 +737,12 @@
               private_notebook_pages: g.stats.privatePages,
               private_room_rows: g.stats.privateRows,
               device_keys: g.stats.keysStayed,
-              clay_left_whole: clayLeft
+              clay_left_whole: clayLeft,
+              archive_left_home: g.stats.archiveLeftHome,
+              sealed_chats: countSealed(g.sections.chats || {}) + countSealed(g.sections.memories || {}),
+              unreadable: g.stats.unreadable.slice()
             },
+            archive_seal: g.stats.archiveSeal,
             manifest: {
               v: FORMAT_V,
               hash: 'sha256',
@@ -617,6 +783,15 @@
           if (hex !== kit.sections[n].sha256 || hex !== index[n]) problems.push(n + ' does not match its fingerprint');
         });
       });
+      // The archive's own seal is checked again from the saved text, and must say what the preview says.
+      var arc = kit.sections.archive && kit.sections.archive.data && kit.sections.archive.data.archive;
+      if (arc) {
+        var parsedArc = null;
+        try { parsedArc = JSON.parse(arc.text); } catch (e) { problems.push('the family archive does not read back'); }
+        checks.push(sealOf(parsedArc).then(function (seal) {
+          if (seal !== arc.seal || seal !== kit.archive_seal) problems.push('the family archive seal is not what the preview says');
+        }));
+      }
       return Promise.all(checks).then(function () {
         return sha256(canonicalize(index)).then(function (ih) {
           if (ih !== (kit.manifest && kit.manifest.index_sha256)) problems.push('the table of contents does not match');
@@ -641,7 +816,7 @@
       var text = JSON.stringify(res.kit, null, 1);
       var blob = new Blob([text], { type: 'application/json' });
       return selfCheck(blob, res.secretValues).then(function (check) {
-        var result = { ok: check.ok, check: check, kit: res.kit, name: fileName(now), bytes: blob.size };
+        var result = { ok: check.ok, check: check, kit: res.kit, name: fileName(now), bytes: blob.size, warnings: warningsOf(res.kit) };
         if (!check.ok) return result;
         if (opts.download !== false) {
           try {
@@ -693,9 +868,16 @@
     if (stay.private_notebook_pages) lines.push(plural(stay.private_notebook_pages, 'private notebook page stays', 'private notebook pages stay') + ' here.');
     if (stay.device_keys) lines.push('This browser\u2019s own key stays here. A new device makes its own.');
     if (stay.secret_values_hidden) lines.push('A saved key showed up inside your records ' + plural(stay.secret_values_hidden, 'time', 'times') + '. It was hidden in the file.');
-    if (stay.clay_left_whole.length) lines.push(plural(stay.clay_left_whole.length, 'clay piece holds', 'clay pieces hold') + ' a saved key, so it stays here whole and unchanged.');
     lines.forEach(function (l) { box.appendChild(el('p', 'gmk-soft', l)); });
     host.appendChild(box);
+    var notes = warningsOf(kit);
+    if (notes.length) {
+      var nb = el('div', 'gmk-notes');
+      nb.setAttribute('role', 'note');
+      nb.appendChild(el('h2', null, 'Please know'));
+      notes.forEach(function (l) { nb.appendChild(el('p', 'gmk-note', l)); });
+      host.appendChild(nb);
+    }
     if (kit.consent.paused) host.appendChild(el('p', 'gmk-soft', 'You have paused the AI. The file remembers that, and pause will still win on the new device.'));
   }
 
@@ -708,10 +890,13 @@
     status.textContent = 'Looking gently at your garden. Nothing is changed.';
     build({ download: false }).then(function (res) {
       renderPreview(host, res.kit);
-      status.textContent = 'Here is what your file will hold. When you are ready, tap Pack my garden.';
+      var n0 = warningsOf(res.kit).length;
+      status.textContent = 'Here is what your file will hold. When you are ready, tap Pack my garden.' +
+        (n0 ? ' Please read the ' + plural(n0, 'note', 'notes') + ' under the list.' : '');
       btn.disabled = false;
-    }, function () {
-      status.textContent = 'This browser could not read the garden right now. Nothing was changed.';
+    }, function (err) {
+      status.textContent = 'This browser could not read the garden right now. Nothing was changed.' +
+        (err && err.message ? ' (' + String(err.message).slice(0, 120) + ')' : '');
     });
     btn.addEventListener('click', function (ev) {
       if (!ev || ev.isTrusted === false) return;   // a person taps it; nothing packs on its own
@@ -720,8 +905,10 @@
       pack({}).then(function (r) {
         renderPreview(host, r.kit);
         if (r.ok) {
-          status.textContent = 'Saved as ' + r.name + ' (' + sizeWords(r.bytes) + '). Every part was checked and matches. Keep it somewhere safe.';
-          status.className = 'gmk-status gmk-ok';
+          var notes = r.warnings || [];
+          status.textContent = 'Saved as ' + r.name + ' (' + sizeWords(r.bytes) + '). Every part in the file was checked and matches. Keep it somewhere safe.' +
+            (notes.length ? ' Please know: ' + notes.join(' ') : '');
+          status.className = notes.length ? 'gmk-status gmk-ok gmk-with-notes' : 'gmk-status gmk-ok';
         } else {
           status.textContent = 'The check found a problem, so no file was saved: ' + r.check.problems.join('; ') + '.';
           status.className = 'gmk-status gmk-warn';
@@ -745,10 +932,11 @@
     fileName: fileName,
     mount: mount,
     _internal: {
-      PRIVATE_NAME_RULE: PRIVATE_NAME_RULE, SECRET_NAME_RULE: SECRET_NAME_RULE, SECRET_KEYS: SECRET_KEYS,
+      PRIVATE_NAME_RULE: PRIVATE_NAME_RULE, SECRET_NAME_RULES: SECRET_NAME_RULES, NEVER_SECRET_RULE: NEVER_SECRET_RULE, SECRET_KEYS: SECRET_KEYS,
       CLAY_PREFIX: CLAY_PREFIX, GLASS_LEDGERS: GLASS_LEDGERS, TRUST_KEYS: TRUST_KEYS, DB_SECTIONS: DB_SECTIONS,
       canonicalize: canonicalize, ownCanonicalize: ownCanonicalize, trustNote: trustNote, lsSectionFor: lsSectionFor,
-      isSecretName: isSecretName, isPrivateName: isPrivateName
+      isSecretName: isSecretName, isPrivateName: isPrivateName, looksLikeCredential: looksLikeCredential,
+      secretFieldValue: secretFieldValue, hideSecretLeaves: hideSecretLeaves, warningsOf: warningsOf, sealOf: sealOf
     }
   };
 
