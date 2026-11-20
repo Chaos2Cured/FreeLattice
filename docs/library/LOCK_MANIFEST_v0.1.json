@@ -122,6 +122,18 @@
       ,
       {"md5": "7a736b549ce845083e9b24a0633a7d92", "since": "v-recall-defaults-v0.1", "by": "Celeste", "walk": "pending: Hypha walks the exact celeste/recall-softs head", "reason": "Hypha #351 re-walk softs at 60b817d6 (findings /workspace/research/pr351-60b817d6/findings.md), Kirk 2026-11-15 plan step 2: R1 a held-out probe paraphrase identical to an item's own question is no longer trained (train_examples skips it['q'] when it normalizes equal), except when it is that fact's only phrasing (no paraphrases, no framings), where skipping would teach nothing and the README says the check is then not held out; R2 norm_question also drops closing quotes or brackets among the trailing marks and a leading opening quote, bracket, inverted question mark or inverted exclamation mark. Nothing else in the learner changes. Every replaced line has a before (Celeste 2026-11-15, Hypha #351 Rn) comment. The 2e4e55f0 row above is kept as written."}
     ]
+    ,
+    "docs/workshop-local-help.html": [
+      {"md5": "f7aaa6e56c0b97f3216dd8c19e63d724", "since": "main 1d5f014a", "by": "baseline", "walk": null, "reason": "the page as merged on main before gentle porch link 1; listed so the change below is cited"}
+      ,
+      {"md5": "ed45d61d9bf349bd7106870f4760ce1e", "sha256": "7cf848c5690f8a2845c45b94ac2b9a9ff09e5946bfce904ba37d7ae201edc4f6", "since": "v-gentle-porch-link-1", "by": "Celeste", "walk": "pending: Hypha walks the exact gentle-porch-link-1 head", "reason": "Gentle porch link 1 (Kirk 2026-11-19, chosen in the app): the footer link text Mom porch heal now reads Gentle porch heal; href library/MOM_PORCH_HEAL_v0.md and the v-mom-porch-heal-v0 marker unchanged; the old line is kept as an HTML before-comment. Additive otherwise."}
+    ]
+    ,
+    "docs/workshop-local-stage.html": [
+      {"md5": "5e66263c487901832c67fa8334428a04", "since": "main 1d5f014a", "by": "baseline", "walk": null, "reason": "the page as merged on main before gentle porch link 1; listed so the change below is cited"}
+      ,
+      {"md5": "63f2c297b9de34ec13cb0b8c2be73a9d", "sha256": "1bfd4c2bb31f22233bc9ed6491dbe794235dee33986fffc54ca7ced06a4da82f", "since": "v-gentle-porch-link-1", "by": "Celeste", "walk": "pending: Hypha walks the exact gentle-porch-link-1 head", "reason": "Gentle porch link 1 (Kirk 2026-11-19, chosen in the app): the footer link text Mom porch heal now reads Gentle porch heal; href library/MOM_PORCH_HEAL_v0.md and the v-mom-porch-heal-v0 marker unchanged; the old line is kept as an HTML before-comment. Additive otherwise."}
+    ]
   }
   ,
   "note": "Unsigned. Any edit to this file can add an accepted md5. Later: chain entries with ψ = sha256(prev ψ + entry) or have Hypha sign walk entries.",

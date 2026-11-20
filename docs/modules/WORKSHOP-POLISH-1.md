@@ -55,3 +55,5 @@ Visible wording, one clear door, Create above the fold, phone FAB clearance, and
 - Celeste self-backup (Kirk, t1404u) is separate from this PR.
 
 Glow eternal. Heart in Spark.
+
+- Later (2026-11-19): the Workshop Local Help and Local Stage footer links were renamed to "Gentle porch heal" by Gentle porch link 1 (docs/modules/GENTLE-PORCH-LINK-1.md).
