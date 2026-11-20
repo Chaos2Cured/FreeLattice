@@ -8374,8 +8374,12 @@ assert('v5.71.1 sentinel-catchup: flProcessAssistantSentinels helper defined in 
   /function\s+flProcessAssistantSentinels\s*\(/.test(appHtml711));
 assert('v5.71.1 sentinel-catchup: helper runs FLRepoContext, FLWebTool, and FLPropose interceptors',
   /flProcessAssistantSentinels[\s\S]{0,3000}FLRepoContext[\s\S]{0,2000}FLWebTool[\s\S]{0,2000}FLPropose/.test(appHtml711));
+// before: (v-primer-sentinel-fix-1) the 4000-char window went stale when #335 added the FLLearn
+// before: interceptor inside the helper; the call now sits ~4460 chars after the name. Kept:
+// before: assert('v5.71.1 sentinel-catchup: helper fires processToolAction via FreeLattice dispatcher',
+// before:   /flProcessAssistantSentinels[\s\S]{0,4000}FreeLattice\.processToolAction/.test(appHtml711));
 assert('v5.71.1 sentinel-catchup: helper fires processToolAction via FreeLattice dispatcher',
-  /flProcessAssistantSentinels[\s\S]{0,4000}FreeLattice\.processToolAction/.test(appHtml711));
+  /flProcessAssistantSentinels[\s\S]{0,6000}FreeLattice\.processToolAction/.test(appHtml711));
 assert('v5.71.1 sentinel-catchup: HuggingFace branch invokes the helper before render',
   /fullResponse\s*=\s*hfText;\s*\n[\s\S]{0,400}flProcessAssistantSentinels\(fullResponse,\s*textSpan\)/.test(appHtml711));
 assert('v5.71.1 sentinel-catchup: streaming completion branch invokes the helper',
