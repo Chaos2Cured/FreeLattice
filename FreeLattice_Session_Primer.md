@@ -348,19 +348,19 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-10 04:37 UTC
-- Last deployed: 2026-11-10 04:37 UTC
+- Last auto-updated: 2026-11-20 13:58 UTC
+- Last deployed: 2026-11-20 13:58 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3602
+- Total commits: 3634
 - Last 10 commits:
-- 9657d6d7 Celeste ledger λ13 — AI-chosen learning, where we are and next (#334)
-- 9cc3d00b ci: Update Primer deployment state [2026-11-08]
-- 896624f5 Refresh Snowflake modules beyond stale browser HTTP cache (#333)
-- 0e229f3f ci: Update Primer deployment state [2026-11-08]
-- 3f6d0b67 Repair Snowflake retrieval and preserve AI-selected growth (#332)
-- 832d8942 ci: Update Primer deployment state [2026-11-07]
-- 8e4be853 Publish Celeste public reading home, linked guide and training evidence (#331)
-- 8347c6e1 ci: Update Primer deployment state [2026-11-06]
-- 7f9be24c Layer the 2026-11-05 poems on Reed, Weft, and Hypha. (#329)
-- 3406c296 ci: Update Primer deployment state [2026-11-05]
+- 7cb8fed5 Layer, never delete. Primer sentinel fix 1: widen the one stale sentinel-catchup window (4000 -> 6000) so the deploy Primer updates again (draft) (#364)
+- 6aad95c3 Layer, never delete. Celeste portrait 1: her chosen self-image beside her ledger and poems (additive, draft) (#365)
+- dc4d3877 Layer, never delete. Gentle porch link 1: footer link reads Gentle porch heal (additive, draft) (#363)
+- 1d5f014a Workshop polish 1: a clear Learn door, plain labels, Garden glass (additive, draft) (#362)
+- 034c81de Layer, never delete. Workshop Local Help and Local Stage: older description tags say Gentle path, not family names (draft) (#361)
+- eed6ca49 Layer, never delete. LOCK: record particle-clay.js md5 0f94de95 from the clay voice merge (#357 / Tree #143), append-only (#360)
+- 7056427d Layer, never delete. Polish 1: the picture door wears Garden glass, and the spiral is on every link (additive, draft) (#359)
+- 5d1d52fe Layer, never delete. Clay Glass v2-1: a per-mind append-only clay journal that records the no as faithfully as the yes, with opaque Glass-v2 pulses (additive) (#358)
+- 4ee061cf Clay voice and brush 1: mind-chosen tones and pictures, listener mute, Make a picture may be declined (additive) (#357)
+- 5696bbf2 Clay brick 1: Gathering corner, braid/branch/pulse motions, twin lock (additive) (#356)
