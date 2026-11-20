@@ -15550,7 +15550,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 <link rel="stylesheet" href="css/play-room.css" id="fl-play-room-css">
 <link rel="stylesheet" href="css/snowflake.css" id="fl-snowflake-css">
 <script src="modules/market-attach.js" defer></script>
-<!-- v-workshop-polish-1: Learn + Workshop clear of the No-AI bar and phone FABs. Header breathes smaller when Workshop is open so Create and Build it sit above the fold. -->
+<!-- v-workshop-polish-1: Learn + Workshop clear of the No-AI bar and phone FABs. Header breathes smaller when Workshop is open so Create and Build it sit above the fold. On phone widths, leave room above the Workshop tabs and to the right of the header for the clay corner's top fallback (place() uses top:72px when the bottom steps collide) without targeting the corner itself. -->
 <style id="v-workshop-polish-1">
 /* before: #tab-learn and #tab-workshop had no extra bottom padding for the fixed No-AI bar and phone FABs */
 #tab-learn, #tab-workshop { padding-bottom: 96px; }
@@ -15558,8 +15558,26 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
 @media (max-width: 600px) {
   body:has(#tab-workshop.active) header .tagline,
   body:has(#tab-workshop.active) header .mantra { display: none; }
-  body:has(#tab-workshop.active) header { padding-top: 12px; padding-bottom: 6px; }
+  /* before: body:has(#tab-workshop.active) header { padding-top: 12px; padding-bottom: 6px; } */
+  body:has(#tab-workshop.active) header {
+    padding-top: 12px;
+    padding-bottom: 6px;
+    /* 12px + 128px corner + 8px air: keep the LP badge out of the top-fallback band on the right. */
+    padding-right: 148px;
+  }
   body:has(#tab-workshop.active) header h1 { font-size: 1.35rem; margin-bottom: 0; }
+  /* before: #tab-workshop had no extra top padding; mode tabs sat at y=99, under the top:72px fallback (72–120). */
+  body:has(#tab-workshop.active) #tab-workshop { padding-top: 32px; }
+}
+/* before: Create porch padding on short phones was only the workshop.js 600px rules; after the top spacing, Build it sat under the FABs at 360x780. */
+@media (max-width: 600px) and (max-height: 800px) {
+  body:has(#tab-workshop.active) .ws-header { padding-top: 2px; padding-bottom: 0; }
+  body:has(#tab-workshop.active) .ws-porch-chips { padding-top: 2px; }
+  body:has(#tab-workshop.active) .ws-chip { padding: 3px 8px; }
+  body:has(#tab-workshop.active) .ws-prompt-row { padding-top: 4px; padding-bottom: 4px; }
+  body:has(#tab-workshop.active) .ws-ai-hint { margin-bottom: 4px; }
+  /* before: .ws-subtitle stayed visible on short phones */
+  body:has(#tab-workshop.active) .ws-subtitle { display: none; }
 }
 </style>
 </head>
