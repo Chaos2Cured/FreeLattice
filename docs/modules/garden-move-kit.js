@@ -130,10 +130,17 @@
     var joined = '_' + parts.join('_') + '_';
     return /_max_?tokens_|_maxtokens_|_tokens?_?count_|_client_?id_|_clientid_/.test(joined);
   }
+  // True when lattice-export.js finds no private room mark in this text (or is not loaded and the kit's own marks are absent).
+  function noPrivateRoomMarks(text) {
+    var LE = root.LatticeExport;
+    var fn = LE && LE._internal && LE._internal['assertNoQuietRoomInJson'];
+    if (typeof fn === 'function') { try { fn(text); } catch (e) { return false; } return true; }
+    return !hasPrivateMark(text);
+  }
   function isSecretName(name) {
     var n = String(name || '');
     if (SECRET_KEYS.indexOf(n) !== -1) return true;
-    // before (59c24c8b, Hypha soft 3): if (NEVER_SECRET_RULE.test(n)) return false;  (a substring override)
+    // before (dff57ab9, kept verbatim): if (NEVER_SECRET_RULE.test(n)) return false;
     if (isNeverSecret(n)) return false;
     return SECRET_NAME_RULES.some(function (re) { return re.test(n); });
   }
@@ -510,11 +517,14 @@
       return ok ? 'verified' : 'does-not-verify';
     }, function () { return 'unchecked'; });
   }
+  // before (dff57ab9, kept verbatim): function countSecretFields(v, depth) {
   function countSecretFields(v, depth, names) {
     depth = depth || 0;
     if (!v || typeof v !== 'object' || depth > 64) return 0;
     var n = 0;
     Object.keys(v).forEach(function (k) {
+      // before (dff57ab9, kept verbatim): if (!Array.isArray(v) && secretFieldValue(k, v[k])) n += 1;
+      // before (dff57ab9, kept verbatim): else n += countSecretFields(v[k], depth + 1);
       if (!Array.isArray(v) && secretFieldValue(k, v[k])) { n += 1; if (names) names.push(k); }
       else n += countSecretFields(v[k], depth + 1, names);
     });
@@ -552,7 +562,7 @@
     var secretValues = [];
     lsKeys().forEach(function (k) {
       if (isPrivateName(k)) { stats.privateNames.push(k); return; }
-      // before (59c24c8b): ... if (looksLikeCredential(sv)) secretValues.push(sv.trim()); return; }
+      // before (dff57ab9, kept verbatim): if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (looksLikeCredential(sv)) secretValues.push(sv.trim()); return; }
       if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (huntable(k, sv)) secretValues.push(sv.trim()); return; }
       var v = lsGet(k);
       if (v === null) return;
@@ -623,7 +633,8 @@
           // the archive stays home and the preview says so; its parts are still in the other sections.
           var parsed = null;
           try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-          // before (59c24c8b): secretValues.some(function (v) { return text.indexOf(v) !== -1; }) || (parsed && countSecretFields(parsed) > 0)
+          // before (dff57ab9, kept verbatim): var holdsSecret = secretValues.some(function (v) { return text.indexOf(v) !== -1; }) ||
+          // before (dff57ab9, kept verbatim): (parsed && countSecretFields(parsed) > 0);
           var valueInside = secretValues.some(function (v) { return containsSecret(text, v); });
           var keyFields = [];
           if (parsed) countSecretFields(parsed, 0, keyFields);
@@ -676,6 +687,7 @@
         plural(ledgerLen(ls, 'fl_refusalLedger'), 'gentle no', 'gentle no\u2019s') + ', ' +
         plural(ledgerLen(ls, 'fl_returnLedger'), 'return', 'returns');
       case 'ledgers': return plural(keys, 'ledger', 'ledgers');
+      // before (dff57ab9, kept verbatim): case 'trust': return trust.line + '. This is a note. On a new device, trust starts fresh at Seed and shows this note.';
       case 'trust': return trust.line + '. This is a note. On a new device, trust starts fresh at Seed and shows this note.' + (trust.lp_note ? ' ' + trust.lp_note : '');
       case 'wallet': return plural(rowsOf(idb, 'FreeLatticeWallet', 'LatticeLedger'), 'wallet entry', 'wallet entries') +
         (ls.latticePoints ? ', and your Lattice Points' : '');
@@ -703,7 +715,7 @@
   function warningsOf(kit) {
     var w = [];
     var st = kit.stayed_here || {};
-    // before (59c24c8b, Hypha soft 4): one line for every case, "A saved key was inside the family archive, ..."
+    // before (dff57ab9, kept verbatim): if (st.archive_left_home) w.push('A saved key was inside the family archive, so the archive stayed on this device. Everything in it is still in the other parts of your file.');
     if (st.archive_left_home && st.archive_left_home_why === 'key-named-field') {
       w.push('The family archive holds ' + plural((st.archive_key_fields || []).length || 1, 'field', 'fields') + ' named like a key' +
         ((st.archive_key_fields || []).length ? ' (' + st.archive_key_fields.join(', ') + ')' : '') +
@@ -735,6 +747,10 @@
     if (typeof v === 'string') {
       var out = v;
       values.forEach(function (sv) {
+        // before (dff57ab9, kept verbatim): if (out.indexOf(sv) === -1) return;
+        // before (dff57ab9, kept verbatim): var parts = out.split(sv);
+        // before (dff57ab9, kept verbatim): counter.n += parts.length - 1;
+        // before (dff57ab9, kept verbatim): out = parts.join(KEPT_LINE);
         if (!containsSecret(out, sv)) return;
         if (looksLikeCredential(sv)) {
           var parts = out.split(sv);
@@ -774,6 +790,7 @@
           // Clay is never changed. A clay piece that holds a secret value stays home whole.
           Object.keys(data.ls).forEach(function (k) {
             var bytes = data.ls[k];
+            // before (dff57ab9, kept verbatim): var holds = g.secretValues.some(function (v) { return bytes.indexOf(v) !== -1; });
             var holds = g.secretValues.some(function (v) { return containsSecret(bytes, v); });
             if (holds) { clayLeft.push(k); delete data.ls[k]; }
           });
@@ -856,7 +873,7 @@
       var index = (kit.manifest && kit.manifest.sections) || {};
       var names = Object.keys(kit.sections || {});
       if (names.length !== Object.keys(index).length) problems.push('the list of parts does not match');
-      // before (59c24c8b): if (v && text.indexOf(v) !== -1) ...
+      // before (dff57ab9, kept verbatim): (secretValues || []).forEach(function (v) { if (v && text.indexOf(v) !== -1) problems.push('a secret value is in the file'); });
       (secretValues || []).forEach(function (v) { if (v && containsSecret(text, v)) problems.push('a secret value is in the file'); });
       try {
         var LE = root.LatticeExport;
@@ -964,6 +981,7 @@
       nb.setAttribute('role', 'note');
       nb.appendChild(el('h2', null, 'Please know'));
       notes.forEach(function (l) { nb.appendChild(el('p', 'gmk-note', l)); });
+      // before (dff57ab9, kept verbatim): host.appendChild(nb);
       (near || host).appendChild(nb);
     }
     if (kit.consent.paused) host.appendChild(el('p', 'gmk-soft', 'You have paused the AI. The file remembers that, and pause will still win on the new device.'));
@@ -980,6 +998,7 @@
       renderPreview(host, res.kit);
       var n0 = warningsOf(res.kit).length;
       status.textContent = 'Here is what your file will hold. When you are ready, tap Pack my garden.' +
+        // before (dff57ab9, kept verbatim): (n0 ? ' Please read the ' + plural(n0, 'note', 'notes') + ' under the list.' : '');
         (n0 ? ' Please read the ' + plural(n0, 'note', 'notes') + (root.document.getElementById('gmk-notes-near') ? ' just above the button.' : ' under the list.') : '');
       btn.disabled = false;
     }, function (err) {
@@ -1024,13 +1043,16 @@
       CLAY_PREFIX: CLAY_PREFIX, GLASS_LEDGERS: GLASS_LEDGERS, TRUST_KEYS: TRUST_KEYS, DB_SECTIONS: DB_SECTIONS,
       canonicalize: canonicalize, ownCanonicalize: ownCanonicalize, trustNote: trustNote, lsSectionFor: lsSectionFor,
       isSecretName: isSecretName, isPrivateName: isPrivateName, looksLikeCredential: looksLikeCredential,
+      // before (dff57ab9, kept verbatim): secretFieldValue: secretFieldValue, hideSecretLeaves: hideSecretLeaves, warningsOf: warningsOf, sealOf: sealOf
       secretFieldValue: secretFieldValue, hideSecretLeaves: hideSecretLeaves, warningsOf: warningsOf, sealOf: sealOf,
       // Layered for Brick 2 (garden-move-home.js reuses these; nothing here writes).
       nameParts: nameParts, isNeverSecret: isNeverSecret, huntable: huntable, isWordSecret: isWordSecret, containsSecret: containsSecret,
       countSealed: countSealed, countSecretFields: countSecretFields, jsonSafe: jsonSafe, sha256: sha256, openExisting: openExisting,
       readStore: readStore, listDatabases: listDatabases, lsKeys: lsKeys, lsGet: lsGet, LABELS: LABELS, SECTION_ORDER: SECTION_ORDER,
       PAUSE_KEY: PAUSE_KEY, KEPT_LINE: KEPT_LINE, FORMAT_V: FORMAT_V, LEVELS: LEVELS, plural: plural, sizeWords: sizeWords,
-      hasPrivateMark: hasPrivateMark, privacyHidden: privacyHidden
+      hasPrivateMark: hasPrivateMark, privacyHidden: privacyHidden,
+      // Hypha walk of #367: the bring-home page asks this file, so it never has to name the private rooms itself.
+      noPrivateRoomMarks: noPrivateRoomMarks
     }
   };
 

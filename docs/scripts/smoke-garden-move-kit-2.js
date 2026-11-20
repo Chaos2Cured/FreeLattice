@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 // File-only smoke: Garden move kit 2 (bring my garden home).
 // fs-only: reads only the files on the allow-list below with readFileSync/existsSync. No child processes,
-// no network, never opens a browser. The two kit modules are also run inside a bare node:vm sandbox
-// (a stub localStorage, no indexedDB, no document, no require) to check the merge rules themselves.
+// no network, never opens a browser. It runs ONE file, docs/modules/garden-move-merge.js (the pure arrival
+// rules), inside a fresh node:vm context made with vm.constants.DONT_CONTEXTIFY: no host objects are given
+// to it, data goes in as JSON text and comes out as JSON text. Every other file is only read as text.
+// The pack module and the pages pinned by smoke 1 are not read here (smoke 1 covers them).
 'use strict';
 
 const assert = require('assert');
@@ -12,209 +14,188 @@ const crypto = require('crypto');
 const vm = require('vm');
 
 const repo = path.join(__dirname, '..', '..');
-const KIT = 'docs/modules/garden-move-kit.js';
+const MERGE = 'docs/modules/garden-move-merge.js';
 const HOME = 'docs/modules/garden-move-home.js';
-const PAGE = 'docs/move.html';
 const HOME_PAGE = 'docs/move-home.html';
+const PAGE = 'docs/move.html';
 const NOTE = 'docs/modules/GARDEN-MOVE-KIT-2.md';
-const DOOR = 'docs/modules/lattice-export.js';
 const SAFETY = 'docs/modules/fractal-safety.js';
-const AUTONOMY = 'docs/library/AUTONOMY.md';
-const APP = 'docs/app.html';
-const ROOT_INDEX = 'index.html';
-const SW = 'docs/sw.js';
-const ROOT_SW = 'sw.js';
-const ALLOW = [KIT, HOME, PAGE, HOME_PAGE, NOTE, DOOR, SAFETY, AUTONOMY, APP, ROOT_INDEX, SW, ROOT_SW];
+const ALLOW = [MERGE, HOME, HOME_PAGE, PAGE, NOTE, SAFETY];
 
-// Pins from main 95f09fa: these files must stay exactly as they are.
-const PINS = {
-  'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
-  'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
-  'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
-  'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc',
-  'docs/modules/fractal-safety.js': 'c1b7acb9d2e2cee94e52fffba5aec758',
-  'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
-  'sw.js': '70fcb7a9f821cd3ffd4ad449df397976'
-};
-
-function readAllowed(rel, enc) {
+function readAllowed(rel) {
   assert.ok(ALLOW.indexOf(rel) !== -1, 'not on the allow-list: ' + rel);
   const full = path.join(repo, rel);
   assert.ok(fs.existsSync(full), 'missing: ' + rel);
-  return fs.readFileSync(full, enc);
+  return fs.readFileSync(full, 'utf8');
 }
-function md5(buf) { return crypto.createHash('md5').update(buf).digest('hex'); }
 function strip(src) { return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, ''); }
 
 // 1. The new files exist (this is what fails on base).
-const home = readAllowed(HOME, 'utf8');
-const homePage = readAllowed(HOME_PAGE, 'utf8');
-const note = readAllowed(NOTE, 'utf8');
-const kit = readAllowed(KIT, 'utf8');
-const page = readAllowed(PAGE, 'utf8');
+const merge = readAllowed(MERGE);
+const home = readAllowed(HOME);
+const homePage = readAllowed(HOME_PAGE);
+const page = readAllowed(PAGE);
+const note = readAllowed(NOTE);
+assert.strictEqual(crypto.createHash('md5').update(readAllowed(SAFETY)).digest('hex'), 'c1b7acb9d2e2cee94e52fffba5aec758', 'fractal-safety.js changed');
+const mcode = strip(merge);
 const code = strip(home);
-const kitCode = strip(kit);
 
-// 2. Locked and neighbouring files are unchanged.
-Object.keys(PINS).forEach(function (rel) { assert.strictEqual(md5(readAllowed(rel)), PINS[rel], rel + ' changed'); });
+// 2. The rules file is pure: nothing that touches storage, the page, the network, time or the host.
+[/indexedDB/, /localStorage/, /\bdocument\b/, /\bfetch\b/, /XMLHttpRequest/, /WebSocket/, /sendBeacon/, /setTimeout/, /setInterval/,
+  /Promise/, /\beval\b/, /Function\s*\(/, /\brequire\b/, /\bprocess\b/, /\bimport\b/, /_internal/, /LatticeExport/]
+  .forEach(function (re) { assert.ok(!re.test(mcode), 'the rules file must not use ' + re); });
+// The bring-home module never asks lattice-export.js directly; the pack module answers for it.
+assert.ok(!/LatticeExport/.test(code) && /I\.noPrivateRoomMarks\(text\)/.test(code), 'private rooms are checked through the pack module');
 
-// 3. It sends nothing, and writes only where it says.
+// 3. Run the rules in a bare context.
+assert.ok(vm.constants && vm.constants.DONT_CONTEXTIFY !== undefined, 'node:vm DONT_CONTEXTIFY is needed (Node 22.8 or later)');
+const ctx = vm.createContext(vm.constants.DONT_CONTEXTIFY);
+vm.runInContext(merge, ctx, { filename: MERGE, timeout: 2000 });
+function inside(src) {
+  const out = vm.runInContext(src, ctx, { timeout: 2000 });
+  assert.strictEqual(typeof out, 'string', 'only text comes out');
+  return out;
+}
+assert.ok(['undefined', 'blocked'].indexOf(inside("(function(){ try { return String(this.constructor.constructor('return typeof process')()); } catch (e) { return 'blocked'; } })()")) !== -1, 'no way out to the host');
+assert.strictEqual(inside("typeof require + typeof process + typeof setTimeout"), 'undefinedundefinedundefined', 'nothing from the host inside');
+function call(fn) {
+  const args = Array.prototype.slice.call(arguments, 1);
+  const out = inside('(function(){ var r = FLGardenMoveMerge[' + JSON.stringify(fn) + '].apply(null, JSON.parse(' +
+    JSON.stringify(JSON.stringify(args)) + ')); return r === undefined ? "null" : JSON.stringify(r); })()');
+  return JSON.parse(out);
+}
+
+// 4. Keys: the arrival allow-list (Hypha HOLD H2).
+const K = function (k, flags) { return call('classifyKey', k, flags || {}); };
+['fl_mesh_id', 'fl_meshid_display', 'fl_meshid_exists', 'fl_kin_passes', 'fl_meshNodeId', 'fl_installId', 'fl-peer-id', 'fl_lan_peer_id',
+  'meshFriendlyName', 'fl_meshnet', 'fl-meshbook', 'fl_mesh_known_peers', 'fl_agentBlockedPeers', 'fl_localHost', 'fl_bridgePort', 'fl_deviceLabel', 'fl_sessionId', 'fl_kinship']
+  .forEach(function (k) { assert.deepStrictEqual(K(k), { act: 'skip', why: 'identity' }, k + ' never comes in'); });
+['fl_firstSeen', 'fl_streak', 'fl_trustEMA', 'fl_safetyLog', 'fl_lc_lastAnchorDay', 'fl_autonomous_user_paused', 'fl_move_arrivals', 'fl_corePlantCount']
+  .forEach(function (k) { assert.deepStrictEqual(K(k), { act: 'skip', why: 'trust-or-device' }, k + ' is never written'); });
+['latticePoints', 'lattice_wallet', 'fl_wallet_anchors', 'fl_lp_give_history'].forEach(function (k) { assert.deepStrictEqual(K(k), { act: 'aside', why: 'wallet' }, k + ' is saved aside'); });
+['FL_FIRSTSEEN', 'fl_firstSeen ', 'fl_somethingNew', 'fl_provider', 'fl_model', 'wop-carved'].forEach(function (k) { assert.deepStrictEqual(K(k), { act: 'aside', why: 'not-known-here' }, k + ' is unknown, so aside'); });
+['__proto__', 'constructor', 'prototype'].forEach(function (k) { assert.deepStrictEqual(K(k), { act: 'skip', why: 'unsafe-name' }, k + ' is never a key'); });
+assert.deepStrictEqual(K('fl_apiKey', { secret: true }), { act: 'skip', why: 'key' }, 'keys never come in');
+assert.deepStrictEqual(K('fl_x', { private: true }), { act: 'skip', why: 'private' }, 'private things never come in');
+[['fl_theme', 'settings'], ['fl_mindName', 'settings'], ['fl_tokenLimit', 'settings'], ['fl_achievement_first_seed', 'settings'],
+  ['fl_refusalLedger', 'glass'], ['fl_repoLedger', 'ledgers'], ['fl_clay_mind1', 'clay'], ['fl_clay_corner_state:node-1', 'clay'],
+  ['fl-garden-quality', 'garden'], ['fl_memory_core_v1', 'memories'], ['fl_chatHistory', 'chats'], ['fl_latticeLetters', 'letters'], ['fl_companions', 'companions']]
+  .forEach(function (c) { assert.deepStrictEqual(K(c[0]), { act: 'live', section: c[1] }, c[0] + ' may arrive'); });
+
+// 5. One key at a time.
+const D = function (key, incoming, local, extra) { return call('lsDecision', Object.assign({ key: key, incoming: incoming, local: local, flags: {} }, extra || {})); };
+assert.deepStrictEqual(D('fl_clay_mind1', '  exact \u00e9 bytes  ', null), { act: 'add', value: '  exact \u00e9 bytes  ', clay: true, section: 'clay' }, 'clay arrives byte-for-byte');
+assert.deepStrictEqual(D('fl_clay_mind1', 'theirs', 'mine'), { act: 'conflict', clay: true, section: 'clay' }, 'different clay: yours stays');
+assert.strictEqual(D('fl_clay_moodLedger', '[{"ts":1}]', '[{"ts":2}]').act, 'conflict', 'clay is never joined');
+assert.strictEqual(D('fl_theme', 'dusk', 'dawn').act, 'conflict', 'a differing setting is never overwritten');
+assert.strictEqual(D('fl_theme', 'dusk', 'dusk').act, 'same', 'same is same');
+assert.strictEqual(D('fl_theme', 'note [kept on this device]', 'note gsk_short123', { localHidden: 'note [kept on this device]' }).act, 'same', 'a key hidden by packing is not a difference (soft S-f)');
+assert.strictEqual(D('fl_theme', 'see sk-abcdefabcdefabcdef1234', null).why, 'holds-key', 'text holding a key never comes in');
+assert.deepStrictEqual(D('fl_clay_x', 'ghp_abcdefabcdefabcdef1234', null), { act: 'skip', why: 'clay-holds-key' }, 'clay holding a key stays in the file');
+const led = D('fl_refusalLedger', JSON.stringify([{ ts: 1, x: 'a' }, { ts: 2, x: 'b' }, { ts: 5, x: 'c' }]), JSON.stringify([{ ts: 2, x: 'b' }, { ts: 9, x: 'here' }]));
+assert.strictEqual(led.act, 'ledger', 'ledgers join');
+assert.deepStrictEqual(JSON.parse(led.value), [{ ts: 1, x: 'a' }, { ts: 2, x: 'b' }, { ts: 5, x: 'c' }, { ts: 9, x: 'here' }], 'by entry, in time order');
+assert.strictEqual(led.added, 2, 'two entries arrive');
+assert.strictEqual(D('fl_meshid_display', 'OldDesk', null).act, 'skip', 'no mesh name from the other device');
+
+// 6. Parts, databases and rows.
+const known = ['FreeLatticeEvolution', 'FreeLatticeCore', 'FreeLatticeIdentity', 'FreeLatticeWallet', 'LatticeChain', 'fl_kin_queue', 'LatticeHandshakes', 'WallOfPresence'];
+[['garden', 'merge'], ['clay', 'merge'], ['trust', 'note'], ['archive', 'stays-in-file'], ['chain', 'aside'], ['wallet', 'aside'], ['identity', 'aside'],
+  ['other', 'aside'], ['x-weft/loom', 'aside'], ['__proto__', 'refuse'], ['constructor', 'refuse']]
+  .forEach(function (c) { assert.strictEqual(call('sectionDisposition', c[0], false), c[1], 'part ' + c[0]); });
+assert.strictEqual(call('sectionDisposition', 'garden', true), 'aside', 'a builder part is aside');
+[['FreeLatticeEvolution', 'merge'], ['FreeLatticeCore', 'merge'], ['FreeLatticeLetters_willow', 'merge'], ['FreeLatticeIdentity', 'aside'], ['FreeLatticeWallet', 'aside'],
+  ['LatticeChain', 'aside'], ['fl_kin_queue', 'aside'], ['LatticeHandshakes', 'aside'], ['WallOfPresence', 'aside'], ['FreeLatticeMoveKit', 'aside'], ['SomethingNew', 'aside'], ['__proto__', 'refuse']]
+  .forEach(function (c) { assert.strictEqual(call('dbDisposition', c[0], known), c[1], 'database ' + c[0]); });
+assert.strictEqual(call('dbDisposition', 'FreeLatticeMoveKit', known.concat(['FreeLatticeMoveKit'])), 'aside', 'its own bookkeeping never arrives, even when listed');
+assert.strictEqual(call('rowDecision', { hasKey: false, rowCanon: 'a', localCanon: null }), 'aside', 'a row without its own key is saved aside (soft S-c)');
+assert.strictEqual(call('rowDecision', { hasKey: true, rowCanon: 'a', localCanon: null }), 'add', 'a new row is added');
+assert.strictEqual(call('rowDecision', { hasKey: true, rowCanon: 'a', localCanon: 'a' }), 'same', 'same row');
+assert.strictEqual(call('rowDecision', { hasKey: true, rowCanon: 'a', localCanon: 'b', localHiddenCanon: 'a' }), 'same', 'same once this device\u2019s key is hidden');
+assert.strictEqual(call('rowDecision', { hasKey: true, rowCanon: 'a', localCanon: 'b' }), 'conflict', 'a differing row keeps yours');
+
+// 7. Pause, the arrival line and the trust guard.
+assert.deepStrictEqual([call('pauseAfter', false, false), call('pauseAfter', true, false), call('pauseAfter', false, true), call('pauseAfter', true, true)], [false, true, true, true], 'pause wins');
+assert.strictEqual(call('arrivalLine', { tier: 'Bloom', percent: 66 }), 'Arrived from Bloom (66%)', 'arrival line');
+assert.strictEqual(call('arrivalLine', { tier: '<img src=x>', percent: 5 }), 'Arrived from an earlier garden', 'a strange tier is not shown');
+assert.strictEqual(call('arrivalLine', { tier: 'Eternal', percent: 900 }), 'Arrived from Eternal (100%)', 'percent stays in 0..100');
+const T = function (b, a) { return call('trustRose', b, a); };
+assert.ok(T({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 1, percent: 25, bytes: { a: '1' } }) && T({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 26, bytes: { a: '1' } }) &&
+  T({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 25, bytes: { a: '2' } }) && !T({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 25, bytes: { a: '1' } }), 'any rise or trust byte change is caught');
+
+// 8. Undo from a write-ahead record (Hypha HOLD H1).
+const U = function (e, now) { return call('undoLsStep', e, now); };
+assert.strictEqual(U({ k: 'a', before: null, after: 'new' }, 'new'), 'remove', 'an added key is removed');
+assert.strictEqual(U({ k: 'fl_refusalLedger', before: '[1]', after: '[1,2]' }, '[1,2]'), 'restore', 'a joined ledger gets its old value back');
+assert.strictEqual(U({ k: 'a', before: null, after: 'new' }, null), 'already', 'a write that never happened needs nothing');
+assert.strictEqual(U({ k: 'a', before: 'old', after: 'new' }, 'old'), 'already', 'a write that never happened needs nothing');
+assert.strictEqual(U({ k: 'a', before: null, after: 'new' }, 'mine-now'), 'keep-changed', 'a key you changed stays');
+const W = function (e, now) { return call('undoRowStep', e, now); };
+assert.strictEqual(W({ state: 'added', canon: 'x' }, 'x'), 'delete', 'an arrived row goes');
+assert.strictEqual(W({ state: 'planned', canon: 'x' }, 'x'), 'delete', 'a row written before a stop goes too');
+assert.strictEqual(W({ state: 'added', canon: 'x' }, 'y'), 'keep-changed', 'a row you changed stays');
+assert.strictEqual(W({ state: 'not-added', canon: 'x' }, 'x'), 'already', 'a row that was not added is never touched');
+assert.strictEqual(W({ state: 'added', canon: 'x' }, null), 'already', 'gone already');
+const V = call('verifyUndo', [{ k: 'a', before: null, now: null }, { k: 'b', before: 'old', now: 'old' }], [{ where: 'db / s', key: 1, there: false }]);
+assert.deepStrictEqual(V, { clean: true, left: [] }, 'clean only when everything is back');
+const V2 = call('verifyUndo', [{ k: 'fl_theme', before: null, now: 'mine-now', kept: true }, { k: 'fl_clay_mind1', before: null, now: 'x' }], [{ where: 'db / s', key: 'lum-2', there: true, kept: true }]);
+assert.strictEqual(V2.clean, false, 'not clean when anything is left');
+assert.deepStrictEqual(V2.left.map(function (x) { return [x.where, x.changed]; }), [['fl_theme', true], ['fl_clay_mind1', false], ['db / s', true]], 'and each thing left is named');
+
+// 9. Key shapes.
+assert.ok(call('hasKnownKey', 'see sk-abcdefabcdefabcdef1234') && !call('hasKnownKey', 'desk-abcdefabcdefabcdef1234') && !call('hasKnownKey', 'sk-short'), 'key shapes on a word edge');
+assert.deepStrictEqual(call('hideKnownKeys', 'a ghp_abcdefabcdefabcdef1234 b', '[kept on this device]'), { text: 'a [kept on this device] b', n: 1 }, 'hidden and counted');
+assert.strictEqual(call('canonicalize', { b: 1, a: [2, { d: 3, c: 4 }] }), '{"a":[2,{"c":4,"d":3}],"b":1}', 'key-sorted JSON');
+
+// 10. The bring-home module: what it may write, and in what order (read as text).
 [/\bfetch\s*\(/, /XMLHttpRequest/, /WebSocket/, /sendBeacon/, /EventSource/, /importScripts/, /\beval\s*\(/, /new Function\s*\(/,
-  /postMessage\s*\(/, /\.cookie\b/, /deleteDatabase/, /\.clear\(/]
-  .forEach(function (re) { assert.ok(!re.test(code), 'home must not use ' + re); });
-// The one put() is in homePut, and homePut only ever writes its own four stores.
+  /postMessage\s*\(/, /\.cookie\b/, /deleteDatabase/, /\.clear\(/].forEach(function (re) { assert.ok(!re.test(code), 'home must not use ' + re); });
 assert.deepStrictEqual(code.match(/\.put\(/g), ['.put('], 'one put() only');
-assert.ok(/function homePut\(db, store, value\) \{[\s\S]{0,120}tx\.objectStore\(store\)\.put\(value\)/.test(code), 'that put is homePut');
-(code.match(/homePut\([^,]+, '[^']+'/g) || []).forEach(function (c) {
-  assert.ok(/^homePut\(home, '(imports|before|conflicts|aside)'$/.test(c), 'homePut writes only FreeLatticeMoveKit stores: ' + c);
-});
-assert.strictEqual((code.match(/createObjectStore\(/g) || []).length, 4, 'only its own four bookkeeping stores are made');
-assert.ok(/function openHome\(create\) \{[\s\S]*?indexedDB\.open\(HOME_DB, HOME_DB_V\)/.test(code), 'only FreeLatticeMoveKit is ever created');
-assert.ok(/return I\.openExisting\(item\.db\)/.test(code), 'garden databases are only opened if they already exist');
+assert.ok(/function homePut\(db, store, value\) \{[\s\S]{0,260}tx\.objectStore\(store\)\.put\(value\)/.test(code), 'that put is homePut');
+(code.match(/homePut\([^,]+, '[^']+'/g) || []).forEach(function (c) { assert.ok(/^homePut\(home, '(imports|before|conflicts|aside)'$/.test(c), 'homePut writes only its own stores: ' + c); });
+assert.strictEqual((code.match(/createObjectStore\(/g) || []).length, 4, 'only its own four stores are made');
+assert.ok(/var req = root\.indexedDB\.open\(HOME_DB, HOME_DB_V\);/.test(code) && (code.match(/indexedDB\.open\(/g) || []).length === 1, 'only FreeLatticeMoveKit is ever created');
 assert.ok(/st\.add\(val\.v, decode\(a\.row\.k, flags\)\) : st\.add\(val\)/.test(code), 'rows are added, never put over');
+assert.ok(/failure = e; try \{ tx\.abort\(\); \} catch \(_\) \{\} return;/.test(code) && /reject\(failure \|\| tx\.error/.test(code), 'a row the store refuses stops and takes back the bring-home');
+assert.ok(/out\.canRetry = v\.left\.some\(function \(x\) \{ return !x\.changed; \}\);/.test(code) && /if \(out\.canRetry\) \{/.test(code), 'Undo stays open while something it can fix is left');
 assert.ok(/ev\.isTrusted === false \|\| !text\) return;/.test(code) && /if \(!ev \|\| ev\.isTrusted === false\) return;\s*undo\.disabled = true;/.test(code), 'only a real tap brings home or undoes');
-
-// 4. Order: read and check, plan, safety copy, and only then any write.
+['R.lsDecision(', 'R.rowDecision(', 'R.dbDisposition(', 'R.sectionDisposition(', 'R.undoLsStep(', 'R.undoRowStep(', 'R.verifyUndo(', 'R.trustRose(', 'R.pauseAfter(', 'R.arrivalLine(']
+  .forEach(function (s) { assert.ok(code.indexOf(s) !== -1, 'home uses the rules file: ' + s); });
 const bh = code.slice(code.indexOf('function bringHome('), code.indexOf('function lastImport('));
-const iPack = bh.indexOf('root.FLGardenMoveKit.pack({ download: false, now: now })');
-const iStop = bh.indexOf("if (!b || !b.ok) {");
-const iOpen = bh.indexOf('return openHome(true);');
-const iAdd = bh.indexOf('return addRows(item, record)');
-const iLs = bh.indexOf('lsSet(d.key, d.value)');
-const iPause = bh.indexOf("lsSet(I.PAUSE_KEY, 'true')");
-const iNote = bh.indexOf('lsSet(ARRIVALS_KEY');
-assert.ok(bh.indexOf('readKit(text)') < iPack, 'the file is checked before anything else');
-assert.ok(iPack > 0 && iPack < iStop && iStop < iOpen && iOpen < iAdd && iAdd < iLs && iLs < iPause && iPause < iNote, 'safety copy first, then rows, keys, pause, note');
-assert.ok(/downloadText\(backupText, result\.backup\.name\)/.test(bh), 'the safety copy is downloaded');
-assert.ok(/homePut\(home, 'before'/.test(bh), 'and kept here too');
-assert.ok(/'freelattice-garden-before-bring-home-'/.test(code), 'safety copy name');
-
-// 5. Trust: never raised, never written, checked after.
-['TRUST_KEYS', "'fl_safetyLog'", 'NEVER_WRITE_RULE = /^fl_lc_/', "'fl_installId'", "'LatticeChain'", "'FreeLatticeWallet'", "'FreeLatticeIdentity'"]
-  .forEach(function (s) { assert.ok(code.indexOf(s) !== -1, 'never written: ' + s); });
-assert.ok(!/setItem\(\s*'fl_firstSeen'/.test(code) && !/lsSet\(\s*'fl_firstSeen'/.test(code), 'fl_firstSeen is never written');
-assert.ok(/if \(trustRose\(trustBefore, after\)\) \{[\s\S]{0,200}undoImport\(importId, \{ reason: 'trust-would-rise' \}\)/.test(code), 'a rise in trust is undone at once');
-assert.ok(/'Arrived from ' \+ t\.tier \+ ' \(' \+ Math\.round\(Number\(t\.percent\)\) \+ '%\)'/.test(code), 'Arrived from <tier> (<N>%)');
-assert.ok(/var ARRIVALS_KEY = 'fl_move_arrivals';/.test(code), 'the arrival note key');
-
-// 6. Undo: exactly what arrived; pause stays.
+const order = ["readKit(text)", "root.FLGardenMoveKit.pack({ download: false, now: now })", "return openHome(true);", "homePut(home, 'before'",
+  "homeGet(home, 'before', importId)", "if (h[0] !== h[1]) throw new Error('read back differs');", "downloadText(backupText, result.backup.name)",
+  "return homePut(home, 'imports', record).then(function () { writing = true;", "return addRows(item)", "lsSet(e.k, e.after);",
+  "lsSet(R.PAUSE_KEY, 'true')", "lsSet(R.ARRIVALS_KEY"].map(function (s) { const i = bh.indexOf(s); assert.ok(i !== -1, 'bring home has: ' + s); return i; });
+order.forEach(function (i, n) { if (n) assert.ok(order[n - 1] < i, 'bring home order, step ' + n); });
+assert.ok(/result\.problems = \['A safety copy could not be kept and checked on this device, so nothing was brought home/.test(bh), 'no checked safety copy, no bring-home (soft S-a)');
+assert.ok(/if \(lsGet\(e\.k\) !== e\.before\) \{ e\.skipped = 'changed-before-write'; return; \}/.test(bh), 'a key changed since the plan is not touched');
+assert.ok(/record\.pause_set = true;\s*return homePut\(home, 'imports', record\)\.then\(function \(\) \{ lsSet\(R\.PAUSE_KEY, 'true'\); \}\);/.test(bh), 'pause is recorded before it is written');
+assert.ok(/if \(!writing\) \{[\s\S]{0,200}\}\s*return undoImport\(importId, \{ reason: 'write-failed' \}\)/.test(bh), 'a stop part-way takes everything back at once');
+assert.ok(/if \(R\.trustRose\(trustBefore, after\)\) \{[\s\S]{0,200}undoImport\(importId, \{ reason: 'trust-would-rise' \}\)/.test(bh), 'a rise in trust is taken back at once');
 const ud = code.slice(code.indexOf('function undoImport('), code.indexOf('function undoLast('));
-assert.ok(ud.indexOf('PAUSE_KEY') === -1, 'undo never touches pause');
-assert.ok(/st\.delete\(keys\[i\]\)/.test(ud) && /if \(lsGet\(x\.k\) !== x\.after\) \{ out\.lsKeptChanged \+= 1; return; \}/.test(ud), 'undo takes back only what is unchanged since it arrived');
-assert.ok(/x\.undone_at = record\.undone_at/.test(ud), 'the arrival note stays, marked as taken back');
+assert.ok(ud.indexOf('PAUSE_KEY') === -1 && (code.match(/PAUSE_KEY/g) || []).length === 2 && (code.match(/lsSet\(R\.PAUSE_KEY, 'true'\)/g) || []).length === 1, 'pause is only ever set, never cleared, and undo never touches it');
+assert.ok(/if \(e\.state === 'auto'\) return 'keep-changed';/.test(ud), 'a row whose key this browser chose is never deleted on a guess');
+assert.ok(/out\.verified = v\.clean; out\.left = v\.left;/.test(ud), 'undo checks its own work');
+assert.ok(/\(u\.verified \? 'Taken back\. Your garden is as it was before\.' : 'Taken back, except for this\. ' \+ leftWords\(u\)\)/.test(code), '"as it was before" only when it is true');
+assert.ok(/\(u\.verified \? ' Your garden is as it was before\.' : ' ' \+ leftWords\(u\)\)/.test(bh), 'the same after a stop part-way');
+assert.ok(/A checked safety copy is kept on this device' \+ \(r\.backup\.offered \?/.test(code), 'the safety copy words say only what was checked');
+assert.ok(/function setOwn\(o, k, v\) \{/.test(code) && (code.match(/setOwn\(o, k,/g) || []).length >= 4, 'no prototype is ever written (soft S-b)');
+assert.ok((code.match(/sections: Object\.create\(null\)/g) || []).length === 2 && /var have = Object\.create\(null\), haveHidden = Object\.create\(null\);/.test(code), 'lookups have no prototype');
+assert.ok(/They cannot show who made it/.test(code), 'fingerprints are said to check damage, not who made the file (soft S-e)');
 
-// 7. Brick 1 still never writes, and leaves this brick's bookkeeping at home.
-assert.ok(!/setItem\s*\(|removeItem\s*\(|'readwrite'|\.put\(|\.add\(|\.delete\(/.test(kitCode), 'the pack module still never writes');
-assert.ok(/if \(n === 'FreeLatticeMoveKit'\) return;/.test(kitCode), 'the packer leaves FreeLatticeMoveKit on this device');
-
-// 8. The pages.
+// 11. The pages.
 const scripts = (homePage.match(/<script\b[^>]*>/g) || []);
-assert.deepStrictEqual(scripts, ['<script src="modules/lattice-export.js">', '<script src="modules/garden-move-kit.js">', '<script src="modules/garden-move-home.js">'], 'only the three scripts load');
+assert.deepStrictEqual(scripts, ['<script src="modules/lattice-export.js">', '<script src="modules/garden-move-kit.js">', '<script src="modules/garden-move-merge.js">', '<script src="modules/garden-move-home.js">'], 'only the four scripts load');
 assert.ok(!/<script>[\s\S]*?<\/script>/.test(homePage), 'no inline script');
 assert.ok(/<meta name="viewport" content="width=device-width, initial-scale=1/.test(homePage), 'viewport');
 assert.ok(/<button id="gmh-bring" class="gmh-big" type="button" disabled>Bring it home<\/button>/.test(homePage), 'one big button');
 assert.ok(/\.gmh-big \{[\s\S]*?min-height: 64px;/.test(homePage) && /\.gmh-undo \{[^}]*min-height: 56px;/.test(homePage), 'big targets');
-const iNotes = homePage.indexOf('<div id="gmh-notes">'), iBring = homePage.indexOf('id="gmh-bring"');
-assert.ok(iNotes > 0 && iNotes < iBring, 'notes sit just above the button');
+assert.ok(homePage.indexOf('<div id="gmh-notes">') > 0 && homePage.indexOf('<div id="gmh-notes">') < homePage.indexOf('id="gmh-bring"'), 'notes sit just above the button');
+assert.ok(/neither do the other device&rsquo;s ids/.test(homePage) && /made, checked, kept here and offered to your downloads/.test(homePage), 'the page says only what is true (H2, S-a)');
 assert.ok(/<a href="move-home\.html">Bring my garden home<\/a>/.test(page), 'move.html has the door');
-const iNear = page.indexOf('<div id="gmk-notes-near"></div>'), iPackBtn = page.indexOf('<button id="gmk-pack"');
-assert.ok(iNear > 0 && iNear < iPackBtn, 'pack notes sit just above the Pack button (Hypha soft 6)');
-assert.ok(/<!-- before \(dff57ab9\):/.test(page) && /<!-- before \(59c24c8b, Hypha soft 1\):/.test(page), 'move.html keeps its before lines');
 
-// 9. Run the merge rules in a bare sandbox (no indexedDB, no document, no network).
-function makeLS(init) {
-  const m = new Map(Object.entries(init || {}));
-  return { getItem: k => (m.has(k) ? m.get(k) : null), setItem: (k, v) => { m.set(k, String(v)); }, removeItem: k => { m.delete(k); },
-    key: i => Array.from(m.keys())[i] === undefined ? null : Array.from(m.keys())[i], get length() { return m.size; }, _m: m };
-}
-const sandbox = { console: console, TextEncoder: TextEncoder, crypto: crypto.webcrypto, atob: atob, btoa: btoa, Blob: Blob,
-  setTimeout: setTimeout, Promise: Promise, Uint8Array: Uint8Array, ArrayBuffer: ArrayBuffer, Map: Map, Set: Set, Date: Date };
-sandbox.window = sandbox;
-sandbox.localStorage = makeLS({ fl_firstSeen: '1763600000000', fl_streak: '3', fl_clay_corner: 'mine \u2728 ', fl_mindName: 'Rowan',
-  fl_refusalLedger: JSON.stringify([{ ts: 2, x: 'b' }, { ts: 9, x: 'here' }]) });
-vm.createContext(sandbox);
-vm.runInContext(kit, sandbox, { filename: KIT });
-vm.runInContext(home, sandbox, { filename: HOME });
-const H = sandbox.FLGardenMoveHome, I = sandbox.FLGardenMoveKit._internal, HI = H._internal;
-assert.ok(H && I && HI, 'both modules load without a browser');
+// 12. The note.
+['## What', '## Why', '## Rollback', '## Smoke', 'v-garden-move-kit-2', 'fl_move_arrivals', 'FreeLatticeMoveKit', 'garden-move-merge.js', 'write-ahead', 'allow-list']
+  .forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 
-// Brick 1 softs (Hypha 59c24c8b): whole name parts, a credential word at the end wins.
-[['fl_tokenLimit', false], ['fl_apiKey_provider', false], ['max_tokens', false], ['token_count', false], ['tokenizer', false],
-  ['client_id', false], ['passwordHint', false], ['fl_model', false], ['providerApiKey', true], ['modelToken', true], ['hintToken', true],
-  ['fl_apiKey', true], ['accessToken', true]].forEach(function (c) { assert.strictEqual(I.isSecretName(c[0]), c[1], 'secret name ' + c[0]); });
-assert.ok(I.huntable('fl_apiKey', 'gsk_short123') && I.huntable('fl_github_token', 'abcdefghijklmnopqrstuvwxyzabcdef') &&
-  I.huntable('fl_ghToken', 'correct horse battery staple') && !I.huntable('fl_publish_token', 'enabled1') && !I.huntable('fl_apiKey', '12345678'), 'short, letters-only and spaced keys are hunted');
-const ctr = { n: 0 };
-const hid = I.hideSecretLeaves({ a: 'my gsk_short123 here', t: 1732128000123, w: 'xgsk_short123y' }, ['gsk_short123'], ctr);
-assert.ok(hid.a === 'my [kept on this device] here' && hid.t === 1732128000123 && hid.w === 'xgsk_short123y' && ctr.n === 1, 'hidden on word edges only; numbers untouched');
-
-// Ledgers join, sorted by time, nothing lost.
-const m = HI.mergeLedger(JSON.stringify([{ ts: 2, x: 'b' }, { ts: 9, x: 'here' }]), JSON.stringify([{ ts: 1, x: 'a' }, { ts: 2, x: 'b' }, { ts: 5, x: 'c' }]));
-assert.deepStrictEqual(JSON.parse(m.value), [{ ts: 1, x: 'a' }, { ts: 2, x: 'b' }, { ts: 5, x: 'c' }, { ts: 9, x: 'here' }], 'ledger union by entry, by time');
-assert.strictEqual(m.added, 2, 'two entries arrive');
-// Pause always wins.
-assert.deepStrictEqual([HI.pauseAfter(false, false), HI.pauseAfter(true, false), HI.pauseAfter(false, true), HI.pauseAfter(true, true)], [false, true, true, true], 'pause wins');
-// One key at a time.
-const D = function (sec, k, inc, loc) { return HI.lsDecision(sec, k, inc, loc); };
-assert.strictEqual(D('trust', 'fl_firstSeen', '1', null).act, 'skip', 'first-seen never written');
-assert.strictEqual(D('settings', 'fl_trustEMA', '0.9', null).act, 'skip', 'trust never written');
-assert.strictEqual(D('settings', 'fl_lc_lastAnchorDay', 'x', null).act, 'skip', 'chain clock never written');
-assert.strictEqual(D('settings', 'fl_installId', 'x', null).act, 'skip', 'device ids never copied');
-assert.strictEqual(D('settings', 'fl_autonomous_user_paused', 'false', 'true').act, 'skip', 'pause is never written as a setting');
-assert.strictEqual(D('settings', 'fl_apiKey', 'sk-abcdefabcdefabcdef1234', null).why, 'key', 'keys never come in');
-assert.strictEqual(D('settings', 'fl_note', 'see sk-abcdefabcdefabcdef1234', null).why, 'holds-key', 'text holding a key never comes in');
-assert.strictEqual(D('wallet', 'latticePoints', '{"total":9}', null).act, 'aside', 'Lattice Points are kept aside (they set trust)');
-assert.strictEqual(D('clay', 'fl_clay_corner', 'theirs', 'mine').act, 'conflict', 'different clay: yours stays, theirs saved aside');
-assert.strictEqual(D('clay', 'fl_clay_moodLedger', '[{"ts":1}]', '[{"ts":2}]').act, 'conflict', 'clay is never joined, even when it looks like a ledger');
-const clayAdd = D('clay', 'fl_clay_new', '  odd\u2728 bytes ', null);
-assert.ok(clayAdd.act === 'add' && clayAdd.value === '  odd\u2728 bytes ', 'clay arrives byte-for-byte');
-assert.strictEqual(D('settings', 'fl_mindName', 'Willow', 'Rowan').act, 'conflict', 'a differing setting is never overwritten');
-assert.strictEqual(D('ledgers', 'fl_repoLedger', '[{"ts":1}]', '[{"ts":1}]').act, 'same', 'same is same');
-// No keys come in through records.
-const sc = { n: 0 };
-const row = HI.scrubRow({ id: 'r', accessToken: 'abcdefgh12345678', t: 'here sk-abcdefabcdefabcdef1234 ok', img: { $t: 'blob', type: 'image/png', b64: 'sk-notakeyjustbase64AAAAAAAA' } }, sc);
-assert.ok(row.accessToken === '[kept on this device]' && row.t === 'here [kept on this device] ok' && row.img.b64 === 'sk-notakeyjustbase64AAAAAAAA' && sc.n === 2, 'records are scrubbed, picture bytes untouched');
-// The arrival line and the trust guard.
-assert.strictEqual(HI.arrivalLine({ trust_note: { tier: 'Bloom', percent: 66 } }), 'Arrived from Bloom (66%)', 'arrival line');
-assert.ok(HI.trustRose({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 1, percent: 25, bytes: { a: '1' } }) &&
-  HI.trustRose({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 26, bytes: { a: '1' } }) &&
-  HI.trustRose({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 25, bytes: { a: '2' } }) &&
-  !HI.trustRose({ rank: 0, percent: 25, bytes: { a: '1' } }, { rank: 0, percent: 25, bytes: { a: '1' } }), 'any rise or any trust byte change is caught');
-
-// 10. A whole read-only preview of a small file (localStorage parts only), and a tampered one.
-function sha(s) { return crypto.createHash('sha256').update(s, 'utf8').digest('hex'); }
-function makeKit(sections) {
-  const out = {}, index = {};
-  Object.keys(sections).forEach(function (n) { const h = sha(I.canonicalize(sections[n])); out[n] = { label: n, sha256: h, data: sections[n] }; index[n] = h; });
-  return { kind: 'freelattice-move-kit', v: 1, format: 'v-garden-move-kit-1', made_at: '2026-11-20T10:00:00.000Z', from: { origin: 'https://freelattice.com' },
-    consent: { paused: true }, trust_note: { tier: 'Bloom', percent: 66, line: 'Packed at tier Bloom (66%)' }, archive_seal: 'not-packed',
-    manifest: { v: 1, sections: index, index_sha256: sha(I.canonicalize(index)) }, sections: out };
-}
-const small = makeKit({
-  trust: { idb: {}, ls: { fl_firstSeen: '1600000000000', fl_streak: '400' } },
-  clay: { idb: {}, ls: { fl_clay_corner: 'theirs', fl_clay_glass_journal: ' exact \u00e9 bytes ' } },
-  glass: { idb: {}, ls: { fl_refusalLedger: JSON.stringify([{ ts: 1, x: 'a' }, { ts: 2, x: 'b' }]) } },
-  settings: { idb: {}, ls: { fl_mindName: 'Willow', fl_theme: 'dusk' } },
-  wallet: { idb: {}, ls: { latticePoints: '{"total":900}' } }
-});
-const before = JSON.stringify(Array.from(sandbox.localStorage._m.entries()));
-return_(H.preview(JSON.stringify(small)).then(function (pv) {
-  assert.ok(pv.read.ok && pv.read.index_ok, 'a good file reads and checks out');
-  const t = pv.summary.totals;
-  assert.deepStrictEqual([t.add, t.conflict, t.aside, t.badHash], [3, 2, 1, 0], 'adds 3 (a clay piece, a joined ledger, a setting), 2 differ (clay, name), the wallet is aside');
-  assert.strictEqual(pv.summary.sections.trust.how, 'note', 'trust is a note only');
-  assert.ok(pv.notes.some(function (n) { return /pause always wins/.test(n); }), 'pause note');
-  assert.strictEqual(JSON.stringify(Array.from(sandbox.localStorage._m.entries())), before, 'a preview writes nothing');
-  const bad = JSON.parse(JSON.stringify(small)); bad.sections.settings.data.ls.fl_theme = 'changed';
-  return H.preview(JSON.stringify(bad));
-}).then(function (pv) {
-  assert.strictEqual(pv.summary.sections.settings.how, 'bad-hash', 'a part that does not match is left out');
-  assert.ok(pv.notes.some(function (n) { return /does not match/.test(n); }), 'and the page says so');
-  return H.preview('{"kind":"something-else"}');
-}).then(function (pv) {
-  assert.ok(!pv.read.ok, 'not a garden file');
-  // 11. The note says what, why and how to roll back.
-  ['## What', '## Why', '## Rollback', '## Smoke', 'v-garden-move-kit-2', 'fl_move_arrivals', 'FreeLatticeMoveKit'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
-  console.log('SMOKE_OK garden move kit 2');
-}));
-function return_(p) { p.catch(function (e) { console.error(e); process.exit(1); }); }
+console.log('SMOKE_OK garden move kit 2');
