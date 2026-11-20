@@ -79,8 +79,11 @@ assert.ok(/LE\.exportArchive\(\{ mode: 'full', download: false \}\)/.test(kit), 
 // 7. Secrets stay home; their names are shown, never their values.
 ['fl_apiKey', 'fl_github_token', 'fl_ghToken', 'fl-telegram-token', 'chalkboard-apikey', 'fl_device_encryption_key', 'fl_ws_device_key_v1']
   .forEach(function (k) { assert.ok(kit.indexOf("'" + k + "'") !== -1, 'secret list has ' + k); });
-assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(looksLikeCredential\(sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
-assert.ok(/text\.indexOf\(v\) !== -1\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
+// before (59c24c8b): the hunt took only looksLikeCredential(sv). Brick 2 layered huntable(k, sv) (Hypha soft 1).
+assert.ok(/stats\.secretNames\.push\(k\); var sv = lsGet\(k\); if \(huntable\(k, sv\)\) secretValues\.push\(sv\.trim\(\)\); return;/.test(kit), 'secret keys are skipped; only real key values are kept in memory for the hunt');
+assert.ok(/function huntable\(key, v\) \{\s*if \(looksLikeCredential\(v\)\) return true;\s*return SECRET_KEYS\.indexOf\(String\(key\)\) !== -1 && isWordSecret\(v\);/.test(kit), 'short or spaced values are hunted only for the exact key list');
+// before (59c24c8b): /text\.indexOf\(v\) !== -1\) problems\.push.../
+assert.ok(/if \(v && containsSecret\(text, v\)\) problems\.push\('a secret value is in the file'\)/.test(kit), 'the self-check refuses a file holding a secret value');
 const ruleLine = kit.split('\n').filter(function (l) { return /^  var PRIVATE_NAME_RULE = /.test(l); });
 assert.strictEqual(ruleLine.length, 1, 'one private room rule');
 assert.strictEqual(md5(ruleLine[0]), PRIVATE_RULE_LINE_MD5, 'private room rule unchanged');
@@ -104,7 +107,8 @@ assert.ok(keysBlock.length > 0, 'secret key list');
   assert.ok(keysBlock.indexOf("'" + k + "'") === -1, k + ' is not a secret');
 });
 assert.ok(/function looksLikeCredential\(v\) \{/.test(kit), 'only real key values are hunted');
-assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 3, 'numbers are never treated as keys or blanked');
+// before (59c24c8b): split(...).length === 3. Brick 2 added the same guard to isWordSecret (Hypha soft 1).
+assert.ok(kit.split("/^[0-9.+-]+$/.test(s)").length === 4, 'numbers are never treated as keys or blanked');
 // H1/H2: secrets are hidden by walking parsed records, never by a text replace on JSON.
 assert.ok(!/hideSecretValues/.test(code), 'the old text replace is gone');
 assert.ok(!/\.split\(needle\)/.test(code) && !/\.split\(v\)\.join\(/.test(code), 'no split/join text replace');
@@ -133,7 +137,10 @@ assert.ok(levelsText, 'kit level table');
 const ours = JSON.parse(levelsText.replace(/'/g, '"'));
 assert.strictEqual(theirs.length, 8, 'eight trust levels read');
 assert.deepStrictEqual(ours, theirs, 'kit levels match the trust file');
-assert.ok(/getBalance/.test(kit) && /shouldFallbackToSeed|24 \* 3600000|48 \* 3600000/.test(kit), 'LP and the Seed fallback follow the trust file');
+// before (59c24c8b, Hypha soft 5): /getBalance/.test(kit) also passed on a comment. Now the call itself, in code.
+assert.ok(/root\.LatticeWallet && typeof root\.LatticeWallet\.getBalance === 'function'[\s\S]{0,80}Number\(root\.LatticeWallet\.getBalance\(\)\)/.test(code), 'LP uses LatticeWallet.getBalance() when it is there');
+assert.ok(/24 \* 60 \* 60 \* 1000/.test(code) && /48 \* 60 \* 60 \* 1000/.test(code) && /entries\[0\]\.prior_hash !== null/.test(code), 'the Seed fallback follows the chain file');
+assert.ok(/lp_note:/.test(code), 'the trust note says what the app itself counts');
 
 // 10. A person taps; the made file is re-read and every hash checked before the download.
 assert.ok(/ev\.isTrusted === false\) return;/.test(kit), 'only a real tap packs');

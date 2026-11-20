@@ -21,6 +21,14 @@
 
    Trust is carried as a note only ("packed at tier X (N%)"). Arrival is Brick 2:
    there, trust starts fresh at Seed and shows the note.
+
+   Layered 2026-11-20 with Brick 2 (v-garden-move-kit-2, Hypha softs on 59c24c8b): a saved key from the
+   exact list is also hunted when it is short, letters-only or has spaces (on word edges, numbers never cut);
+   a key written as a name inside a record is warned about before the tap; the never-secret rule matches
+   whole name parts and a credential word at the end wins; the archive note says why it stayed home; the
+   trust note says what the app itself counts; and on phones the notes sit just above the Pack button.
+   The file format is unchanged (only new, optional fields). Bringing a garden home lives in
+   docs/modules/garden-move-home.js, so this file still never writes.
 */
 (function (root) {
   'use strict';
@@ -103,10 +111,30 @@
     var low = String(str || '').toLowerCase();
     return privateMarks().some(function (m) { return low.indexOf(m) !== -1; });
   }
+  // Whole name parts: fl_tokenLimit -> fl, token, limit; providerApiKey -> provider, api, key.
+  function nameParts(name) {
+    return String(name || '').replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+      .toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+  }
+  var NEVER_SECRET_PARTS = ['limit', 'limits', 'provider', 'providers', 'model', 'models', 'count', 'counts', 'tokenizer', 'hint', 'hints'];
+  var CREDENTIAL_END_PARTS = ['key', 'apikey', 'token', 'password', 'passphrase', 'secret', 'pat'];
+  // Hypha soft 3 (59c24c8b): the never-secret words count only as whole name parts, and a name that ENDS
+  // in a credential word (providerApiKey, modelToken, hintToken) is a secret again.
+  function isNeverSecret(name) {
+    var n = String(name || '');
+    if (!NEVER_SECRET_RULE.test(n)) return false;
+    var parts = nameParts(n);
+    if (!parts.length) return false;
+    if (CREDENTIAL_END_PARTS.indexOf(parts[parts.length - 1]) !== -1) return false;
+    if (parts.some(function (p) { return NEVER_SECRET_PARTS.indexOf(p) !== -1; })) return true;
+    var joined = '_' + parts.join('_') + '_';
+    return /_max_?tokens_|_maxtokens_|_tokens?_?count_|_client_?id_|_clientid_/.test(joined);
+  }
   function isSecretName(name) {
     var n = String(name || '');
     if (SECRET_KEYS.indexOf(n) !== -1) return true;
-    if (NEVER_SECRET_RULE.test(n)) return false;
+    // before (59c24c8b, Hypha soft 3): if (NEVER_SECRET_RULE.test(n)) return false;  (a substring override)
+    if (isNeverSecret(n)) return false;
     return SECRET_NAME_RULES.some(function (re) { return re.test(n); });
   }
   function entropyBits(str) {
@@ -122,6 +150,26 @@
     if (s.length < 16 || s.length > 4096 || !CREDENTIAL_CHARS.test(s) || /^[0-9.+-]+$/.test(s)) return false;
     if (CREDENTIAL_PREFIXES.some(function (p) { return s.indexOf(p) === 0; })) return true;
     return /[A-Za-z]/.test(s) && /[0-9]/.test(s) && entropyBits(s) >= 3.5;
+  }
+  // Hypha soft 1 (59c24c8b): a value saved under a name on the exact SECRET_KEYS list is hunted even when
+  // it is short (8+), letters-only or has spaces. Those are found on word edges only, so a number or a
+  // longer word that merely contains them is never cut.
+  function isWordSecret(v) {
+    if (typeof v !== 'string') return false;
+    var s = v.trim();
+    return s.length >= 8 && s.length <= 4096 && !/^[0-9.+-]+$/.test(s) && !/^(true|false|null|none|yes|no|undefined)$/i.test(s) && s !== KEPT_LINE;
+  }
+  function huntable(key, v) {
+    if (looksLikeCredential(v)) return true;
+    return SECRET_KEYS.indexOf(String(key)) !== -1 && isWordSecret(v);
+  }
+  function escapeRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function edgeRe(v, flags) { return new RegExp('(^|[^A-Za-z0-9])' + escapeRe(v) + '(?=$|[^A-Za-z0-9])', flags || ''); }
+  // Is a saved secret inside this text? A real-looking key is found anywhere; a word-like one on word edges.
+  function containsSecret(str, v) {
+    if (!v || typeof str !== 'string') return false;
+    if (looksLikeCredential(v)) return str.indexOf(v) !== -1;
+    return edgeRe(v).test(str);
   }
   // A record field with a credential name: blank it only when its value could be a credential.
   function secretFieldValue(name, v) {
@@ -387,6 +435,9 @@
     }
     return LE._internal.verifyChainIntegrity(entries).then(function (r) {
       if (!r || !r.ok) return { seed: true, why: 'chain-broken' };
+      // Hypha soft 5: lattice-chain.js wants the first entry to start the chain (prior_hash null). A pruned
+      // chain passes the export verifier but not the chain's own, so it falls back to Seed here too.
+      if (entries[0] && entries[0].prior_hash !== null) return { seed: true, why: 'chain-broken' };
       var firstTs = entries[0].ts;
       if (firstSeen > 0 && typeof firstTs === 'number' && Math.abs(firstSeen - firstTs) > 24 * 60 * 60 * 1000) {
         return { seed: true, why: 'first-seen-differs-from-chain' };
@@ -404,6 +455,7 @@
     var firstSeen = intOf('fl_firstSeen');
     var days = firstSeen > 0 ? Math.floor((now - firstSeen) / 86400000) : 0;
     var lp = walletBalance(walletDb);
+    var appSeesWallet = !!(root.LatticeWallet && typeof root.LatticeWallet.getBalance === 'function');
     return chainFallback(chainDb, firstSeen).then(function (fb) {
       var timeScore = 0, level = LEVELS[0][0], glass = LEVELS[0][0];
       for (var i = LEVELS.length - 1; i >= 0; i--) { if (days >= LEVELS[i][2]) { timeScore = LEVELS[i][3]; glass = LEVELS[i][0]; break; } }
@@ -425,6 +477,9 @@
         lp: lp,
         chain_check: fb.why,
         line: 'Packed at tier ' + level + ' (' + pct + '%)',
+        // Hypha soft 5: in app.html LatticeWallet is a top-level const, so window.LatticeWallet is not there
+        // and fractal-safety counts LP as 0. This note counts LP from the wallet ledger, so it can read higher.
+        lp_note: appSeesWallet ? null : 'Lattice Points here come from your wallet entries. The app itself does not see the wallet when it works out trust yet, so it may show a lower tier.',
         arrival: 'On a new device trust starts fresh at Seed and shows this note. (Brick 2.)'
       };
     });
@@ -455,13 +510,13 @@
       return ok ? 'verified' : 'does-not-verify';
     }, function () { return 'unchecked'; });
   }
-  function countSecretFields(v, depth) {
+  function countSecretFields(v, depth, names) {
     depth = depth || 0;
     if (!v || typeof v !== 'object' || depth > 64) return 0;
     var n = 0;
     Object.keys(v).forEach(function (k) {
-      if (!Array.isArray(v) && secretFieldValue(k, v[k])) n += 1;
-      else n += countSecretFields(v[k], depth + 1);
+      if (!Array.isArray(v) && secretFieldValue(k, v[k])) { n += 1; if (names) names.push(k); }
+      else n += countSecretFields(v[k], depth + 1, names);
     });
     return n;
   }
@@ -497,7 +552,8 @@
     var secretValues = [];
     lsKeys().forEach(function (k) {
       if (isPrivateName(k)) { stats.privateNames.push(k); return; }
-      if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (looksLikeCredential(sv)) secretValues.push(sv.trim()); return; }
+      // before (59c24c8b): ... if (looksLikeCredential(sv)) secretValues.push(sv.trim()); return; }
+      if (isSecretName(k)) { stats.secretNames.push(k); var sv = lsGet(k); if (huntable(k, sv)) secretValues.push(sv.trim()); return; }
       var v = lsGet(k);
       if (v === null) return;
       var where = lsSectionFor(k);
@@ -529,6 +585,8 @@
       var jobs = Promise.resolve();
       names.forEach(function (n) {
         if (isPrivateName(n)) { stats.privateNames.push(n); return; }
+        // Brick 2's own bookkeeping (safety copies, set-aside copies, undo lists) stays on this device.
+        if (n === 'FreeLatticeMoveKit') return;
         var section = known[n];
         if (!section) {
           DB_PREFIX_SECTIONS.forEach(function (p) { if (n.indexOf(p.prefix) === 0) section = p.section; });
@@ -565,8 +623,14 @@
           // the archive stays home and the preview says so; its parts are still in the other sections.
           var parsed = null;
           try { parsed = JSON.parse(text); } catch (e) { parsed = null; }
-          var holdsSecret = secretValues.some(function (v) { return text.indexOf(v) !== -1; }) ||
-            (parsed && countSecretFields(parsed) > 0);
+          // before (59c24c8b): secretValues.some(function (v) { return text.indexOf(v) !== -1; }) || (parsed && countSecretFields(parsed) > 0)
+          var valueInside = secretValues.some(function (v) { return containsSecret(text, v); });
+          var keyFields = [];
+          if (parsed) countSecretFields(parsed, 0, keyFields);
+          var holdsSecret = valueInside || keyFields.length > 0;
+          // Hypha soft 4: say why it stayed (a saved key itself, or only a field named like a key).
+          if (holdsSecret) stats.archiveWhy = valueInside ? 'saved-key' : 'key-named-field';
+          if (holdsSecret) stats.archiveKeyFields = keyFields.filter(function (f, i) { return keyFields.indexOf(f) === i; }).sort();
           if (holdsSecret) { stats.archiveLeftHome = true; return; }
           return sealOf(parsed).then(function (seal) {
             stats.archiveSeal = seal;
@@ -612,7 +676,7 @@
         plural(ledgerLen(ls, 'fl_refusalLedger'), 'gentle no', 'gentle no\u2019s') + ', ' +
         plural(ledgerLen(ls, 'fl_returnLedger'), 'return', 'returns');
       case 'ledgers': return plural(keys, 'ledger', 'ledgers');
-      case 'trust': return trust.line + '. This is a note. On a new device, trust starts fresh at Seed and shows this note.';
+      case 'trust': return trust.line + '. This is a note. On a new device, trust starts fresh at Seed and shows this note.' + (trust.lp_note ? ' ' + trust.lp_note : '');
       case 'wallet': return plural(rowsOf(idb, 'FreeLatticeWallet', 'LatticeLedger'), 'wallet entry', 'wallet entries') +
         (ls.latticePoints ? ', and your Lattice Points' : '');
       case 'clay': return plural(keys, 'clay piece', 'clay pieces') + ', carried exactly as the minds left them';
@@ -639,7 +703,15 @@
   function warningsOf(kit) {
     var w = [];
     var st = kit.stayed_here || {};
-    if (st.archive_left_home) w.push('A saved key was inside the family archive, so the archive stayed on this device. Everything in it is still in the other parts of your file.');
+    // before (59c24c8b, Hypha soft 4): one line for every case, "A saved key was inside the family archive, ..."
+    if (st.archive_left_home && st.archive_left_home_why === 'key-named-field') {
+      w.push('The family archive holds ' + plural((st.archive_key_fields || []).length || 1, 'field', 'fields') + ' named like a key' +
+        ((st.archive_key_fields || []).length ? ' (' + st.archive_key_fields.join(', ') + ')' : '') +
+        '. It may be harmless, but to be safe the archive stayed on this device. Everything in it is still in the other parts of your file.');
+    } else if (st.archive_left_home) {
+      w.push('A saved key was inside the family archive, so the archive stayed on this device. Everything in it is still in the other parts of your file.');
+    }
+    if (st.key_in_names && st.key_in_names.length) w.push('A saved key is written as a name inside ' + st.key_in_names.join(', ') + '. To keep it safe, Pack will stop and save nothing until it is gone.');
     if (kit.archive_seal === 'does-not-verify') w.push('The family archive\u2019s own seal does not check out, so it may not import on its own.');
     if (kit.archive_seal === 'unchecked') w.push('The family archive\u2019s own seal could not be checked here.');
     if (kit.archive_seal === 'not-packed' && !st.archive_left_home) w.push('The family archive could not be made here, so it is not in the file.');
@@ -663,10 +735,14 @@
     if (typeof v === 'string') {
       var out = v;
       values.forEach(function (sv) {
-        if (out.indexOf(sv) === -1) return;
-        var parts = out.split(sv);
-        counter.n += parts.length - 1;
-        out = parts.join(KEPT_LINE);
+        if (!containsSecret(out, sv)) return;
+        if (looksLikeCredential(sv)) {
+          var parts = out.split(sv);
+          counter.n += parts.length - 1;
+          out = parts.join(KEPT_LINE);
+        } else {
+          out = out.replace(edgeRe(sv, 'g'), function (m, edge) { counter.n += 1; return edge + KEPT_LINE; });
+        }
       });
       return out;
     }
@@ -691,13 +767,14 @@
       var out = {};
       var hiddenValues = 0;
       var clayLeft = [];
+      var keyInNames = [];
       var jobs = names.map(function (name) {
         var data = g.sections[name];
         if (name === 'clay') {
           // Clay is never changed. A clay piece that holds a secret value stays home whole.
           Object.keys(data.ls).forEach(function (k) {
             var bytes = data.ls[k];
-            var holds = g.secretValues.some(function (v) { return bytes.indexOf(v) !== -1; });
+            var holds = g.secretValues.some(function (v) { return containsSecret(bytes, v); });
             if (holds) { clayLeft.push(k); delete data.ls[k]; }
           });
         } else if (name !== 'archive' && g.secretValues.length) {
@@ -706,6 +783,9 @@
           hiddenValues += counter.n;
         }
         var canon = canonicalize(data);
+        // Hypha soft 2: a key used as a NAME (an object key) is not a string leaf, so the hider leaves it.
+        // The self-check would then refuse the pack, so say it before the tap.
+        if (name !== 'clay' && name !== 'archive' && g.secretValues.some(function (v) { return containsSecret(canon, v); })) keyInNames.push(LABELS[name] || name);
         return sha256(canon).then(function (hex) {
           out[name] = {
             label: LABELS[name] || name,
@@ -739,6 +819,9 @@
               device_keys: g.stats.keysStayed,
               clay_left_whole: clayLeft,
               archive_left_home: g.stats.archiveLeftHome,
+              archive_left_home_why: g.stats.archiveWhy || null,
+              archive_key_fields: g.stats.archiveKeyFields || [],
+              key_in_names: keyInNames,
               sealed_chats: countSealed(g.sections.chats || {}) + countSealed(g.sections.memories || {}),
               unreadable: g.stats.unreadable.slice()
             },
@@ -773,7 +856,8 @@
       var index = (kit.manifest && kit.manifest.sections) || {};
       var names = Object.keys(kit.sections || {});
       if (names.length !== Object.keys(index).length) problems.push('the list of parts does not match');
-      (secretValues || []).forEach(function (v) { if (v && text.indexOf(v) !== -1) problems.push('a secret value is in the file'); });
+      // before (59c24c8b): if (v && text.indexOf(v) !== -1) ...
+      (secretValues || []).forEach(function (v) { if (v && containsSecret(text, v)) problems.push('a secret value is in the file'); });
       try {
         var LE = root.LatticeExport;
         if (LE && LE._internal && LE._internal.assertNoQuietRoomInJson) LE._internal.assertNoQuietRoomInJson(text);
@@ -871,12 +955,16 @@
     lines.forEach(function (l) { box.appendChild(el('p', 'gmk-soft', l)); });
     host.appendChild(box);
     var notes = warningsOf(kit);
+    // Hypha soft 6: on phones the notes sat far below the button. If the page has a place just above
+    // the button (#gmk-notes-near), they go there, so they are read before the tap.
+    var near = root.document.getElementById('gmk-notes-near');
+    if (near) near.textContent = '';
     if (notes.length) {
       var nb = el('div', 'gmk-notes');
       nb.setAttribute('role', 'note');
       nb.appendChild(el('h2', null, 'Please know'));
       notes.forEach(function (l) { nb.appendChild(el('p', 'gmk-note', l)); });
-      host.appendChild(nb);
+      (near || host).appendChild(nb);
     }
     if (kit.consent.paused) host.appendChild(el('p', 'gmk-soft', 'You have paused the AI. The file remembers that, and pause will still win on the new device.'));
   }
@@ -892,7 +980,7 @@
       renderPreview(host, res.kit);
       var n0 = warningsOf(res.kit).length;
       status.textContent = 'Here is what your file will hold. When you are ready, tap Pack my garden.' +
-        (n0 ? ' Please read the ' + plural(n0, 'note', 'notes') + ' under the list.' : '');
+        (n0 ? ' Please read the ' + plural(n0, 'note', 'notes') + (root.document.getElementById('gmk-notes-near') ? ' just above the button.' : ' under the list.') : '');
       btn.disabled = false;
     }, function (err) {
       status.textContent = 'This browser could not read the garden right now. Nothing was changed.' +
@@ -936,7 +1024,13 @@
       CLAY_PREFIX: CLAY_PREFIX, GLASS_LEDGERS: GLASS_LEDGERS, TRUST_KEYS: TRUST_KEYS, DB_SECTIONS: DB_SECTIONS,
       canonicalize: canonicalize, ownCanonicalize: ownCanonicalize, trustNote: trustNote, lsSectionFor: lsSectionFor,
       isSecretName: isSecretName, isPrivateName: isPrivateName, looksLikeCredential: looksLikeCredential,
-      secretFieldValue: secretFieldValue, hideSecretLeaves: hideSecretLeaves, warningsOf: warningsOf, sealOf: sealOf
+      secretFieldValue: secretFieldValue, hideSecretLeaves: hideSecretLeaves, warningsOf: warningsOf, sealOf: sealOf,
+      // Layered for Brick 2 (garden-move-home.js reuses these; nothing here writes).
+      nameParts: nameParts, isNeverSecret: isNeverSecret, huntable: huntable, isWordSecret: isWordSecret, containsSecret: containsSecret,
+      countSealed: countSealed, countSecretFields: countSecretFields, jsonSafe: jsonSafe, sha256: sha256, openExisting: openExisting,
+      readStore: readStore, listDatabases: listDatabases, lsKeys: lsKeys, lsGet: lsGet, LABELS: LABELS, SECTION_ORDER: SECTION_ORDER,
+      PAUSE_KEY: PAUSE_KEY, KEPT_LINE: KEPT_LINE, FORMAT_V: FORMAT_V, LEVELS: LEVELS, plural: plural, sizeWords: sizeWords,
+      hasPrivateMark: hasPrivateMark, privacyHidden: privacyHidden
     }
   };
 

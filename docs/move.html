@@ -78,6 +78,8 @@
   .gmk-notes h2 { color: var(--gold); }
   .gmk-note { margin: 0.2rem 0 0.5rem; color: var(--text); }
   .gmk-with-notes { color: var(--text); }
+  #gmk-notes-near .gmk-notes { margin: 0 0 1rem; }
+  .gmk-soft a { color: var(--gold); }
   .doors { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.4rem; }
   .doors a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 1rem; border-radius: 12px;
     border: 1px solid var(--border); background: var(--glass); color: var(--text); text-decoration: none; }
@@ -91,8 +93,12 @@
   <p class="lede">Your garden lives in this browser. One tap keeps all of it in a single file you can hold, so it is never lost when you try a new device.</p>
 
   <div class="card">
-    <p style="margin:0">Nothing in your garden is changed, and nothing is sent anywhere. Keys and passwords stay here. Clay stays exactly as the minds left it.</p>
+    <!-- before (59c24c8b, Hypha soft 1): ... nothing is sent anywhere. Keys and passwords stay here. Clay stays ... -->
+    <p style="margin:0">Nothing in your garden is changed, and nothing is sent anywhere. Your saved keys and passwords stay here, and any copy of one we find in your chats or notes is hidden. Clay stays exactly as the minds left it.</p>
   </div>
+
+  <!-- v-garden-move-kit-2 (Hypha soft 6): the notes sit here, just above the button, so they are read before the tap. -->
+  <div id="gmk-notes-near"></div>
 
   <button id="gmk-pack" type="button" disabled>Pack my garden</button>
   <p id="gmk-status" class="gmk-status" role="status" aria-live="polite">Getting ready&hellip;</p>
@@ -102,10 +108,12 @@
     <div id="gmk-preview"></div>
   </section>
 
-  <p class="gmk-soft">Bringing a garden home on a new device comes next. Keep your file safe until then. Trust starts fresh at Seed there, with a note of where it was.</p>
+  <!-- before (dff57ab9): <p class="gmk-soft">Bringing a garden home on a new device comes next. Keep your file safe until then. Trust starts fresh at Seed there, with a note of where it was.</p> -->
+  <p class="gmk-soft">On the new device, open <a href="move-home.html">Bring my garden home</a> and pick this file. Trust starts fresh at Seed there, with a note of where it was.</p>
 
   <nav class="doors" aria-label="More doors">
     <a href="app.html">Back to the garden</a>
+    <a href="move-home.html">Bring my garden home</a>
     <a href="audit.html">Your records</a>
   </nav>
 </main>
