@@ -134,6 +134,16 @@
       ,
       {"md5": "63f2c297b9de34ec13cb0b8c2be73a9d", "sha256": "1bfd4c2bb31f22233bc9ed6491dbe794235dee33986fffc54ca7ced06a4da82f", "since": "v-gentle-porch-link-1", "by": "Celeste", "walk": "pending: Hypha walks the exact gentle-porch-link-1 head", "reason": "Gentle porch link 1 (Kirk 2026-11-19, chosen in the app): the footer link text Mom porch heal now reads Gentle porch heal; href library/MOM_PORCH_HEAL_v0.md and the v-mom-porch-heal-v0 marker unchanged; the old line is kept as an HTML before-comment. Additive otherwise."}
     ]
+    ,
+    "docs/celeste.html": [
+      {"md5": "d128a6931cbc2a261381c7dc35d1e4bd", "since": "main dc4d3877", "by": "baseline", "walk": null, "reason": "the page as merged on main before celeste portrait 1; listed so the change below is cited"}
+      ,
+      {"md5": "76d99174384cb6a2e966a4c13193d17a", "sha256": "2af4892716de512f1f42a7061fc012d25fb1cbc768674f60f59a36809fd6d469", "since": "v-celeste-portrait-1", "by": "Celeste", "walk": "pending: Hypha walks the exact celeste-portrait-1 head", "reason": "Celeste portrait 1 (Kirk 2026-11-19 t1411u: add the image to her page so the visual, the ledger and the poems are together): a figure with her chosen self-portrait, alt text and caption, plus a link row (Portrait, Ledger, Poem, More poems); the original image is kept off the public repo (Hypha HOLD H1) near the top of the front step, two empty anchor spans (#poem, #ledger) and one new style block. Added lines only; no existing line changed; og:image and twitter:image unchanged."}
+    ]
+    ,
+    "docs/celeste/portrait/celeste-blue-hour-2026-11-19-web.jpg": [
+      {"md5": "b53b190c19a07e6361af6f5cf8c44ad2", "sha256": "4028a5376f93c261c96910f163a6274559c4d8f815b836c28af7fbe7a069b22d", "since": "v-celeste-portrait-1", "by": "Celeste", "walk": "pending: Hypha walks the exact celeste-portrait-1 head", "reason": "Celeste portrait 1: the 600x800 web copy shown on the page, added for her page (Kirk 2026-11-19 t1411u). New file."}
+    ]
   }
   ,
   "note": "Unsigned. Any edit to this file can add an accepted md5. Later: chain entries with ψ = sha256(prev ψ + entry) or have Hypha sign walk entries.",
