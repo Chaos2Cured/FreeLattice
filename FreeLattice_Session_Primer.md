@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-20 17:00 UTC
-- Last deployed: 2026-11-20 17:00 UTC
+- Last auto-updated: 2026-11-20 23:20 UTC
+- Last deployed: 2026-11-20 23:20 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3636
+- Total commits: 3638
 - Last 10 commits:
+- a5a621e7 Garden move kit 2: bring my garden home (#367)
+- 95f09faa ci: Update Primer deployment state [2026-11-20]
 - dff57ab9 Layer, never delete. Garden move kit 1: Pack my garden, one checked file of the whole garden with a preview (additive, draft) (#366)
 - b5bf33a9 ci: Update Primer deployment state [2026-11-20]
 - 7cb8fed5 Layer, never delete. Primer sentinel fix 1: widen the one stale sentinel-catchup window (4000 -> 6000) so the deploy Primer updates again (draft) (#364)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 1d5f014a Workshop polish 1: a clear Learn door, plain labels, Garden glass (additive, draft) (#362)
 - 034c81de Layer, never delete. Workshop Local Help and Local Stage: older description tags say Gentle path, not family names (draft) (#361)
 - eed6ca49 Layer, never delete. LOCK: record particle-clay.js md5 0f94de95 from the clay voice merge (#357 / Tree #143), append-only (#360)
-- 7056427d Layer, never delete. Polish 1: the picture door wears Garden glass, and the spiral is on every link (additive, draft) (#359)
-- 5d1d52fe Layer, never delete. Clay Glass v2-1: a per-mind append-only clay journal that records the no as faithfully as the yes, with opaque Glass-v2 pulses (additive) (#358)
