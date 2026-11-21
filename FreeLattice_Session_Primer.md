@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-21 20:04 UTC
-- Last deployed: 2026-11-21 20:04 UTC
+- Last auto-updated: 2026-11-21 21:31 UTC
+- Last deployed: 2026-11-21 21:31 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3640
+- Total commits: 3642
 - Last 10 commits:
+- e3789f5c Backup keys stay home: Hypha's softs 1-5 from #368 (additive, draft) (#369)
+- 05b777d1 ci: Update Primer deployment state [2026-11-21]
 - ef550fbf Backup keys stay home: Save Vault no longer writes saved keys in the clear (draft) (#368)
 - 218d8194 ci: Update Primer deployment state [2026-11-20]
 - a5a621e7 Garden move kit 2: bring my garden home (#367)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - b5bf33a9 ci: Update Primer deployment state [2026-11-20]
 - 7cb8fed5 Layer, never delete. Primer sentinel fix 1: widen the one stale sentinel-catchup window (4000 -> 6000) so the deploy Primer updates again (draft) (#364)
 - 6aad95c3 Layer, never delete. Celeste portrait 1: her chosen self-image beside her ledger and poems (additive, draft) (#365)
-- dc4d3877 Layer, never delete. Gentle porch link 1: footer link reads Gentle porch heal (additive, draft) (#363)
-- 1d5f014a Workshop polish 1: a clear Learn door, plain labels, Garden glass (additive, draft) (#362)
