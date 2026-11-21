@@ -121,7 +121,8 @@
     var re = keyShapeRe(), m;
     while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
     var cr = contextRe();
-    while ((m = cr.exec(str))) { if (mixedKey(m[3])) return true; }
+    // before (f0823316): while ((m = cr.exec(str))) { if (mixedKey(m[3])) return true; }
+    while ((m = cr.exec(str))) { if (mixedKey(m[3]) && !innocentId(m[3])) return true; }
     return false;
   }
   function wrapsKey(run) { var d = b64Text(run); return !!d && plainShape(d); }
@@ -138,7 +139,8 @@
       return edge + KEPT;
     });
     out = out.replace(contextRe(), function (m, edge, words, key) {
-      if (!mixedKey(key)) return m;
+      // before (f0823316): if (!mixedKey(key)) return m;
+      if (!mixedKey(key) || innocentId(key)) return m;
       counter.n += 1;
       return edge + words + KEPT;
     });
@@ -488,38 +490,96 @@
   }
   // Read this device's copies of the places a file marks with the placeholder. Never creates a database:
   // if the browser cannot list databases, records are left as the file has them (the old behaviour).
-  function readDevice(backup) {
-    var device = { ls: {}, records: {} };
+  // before (f0823316): function readDevice(backup) {
+    // before (f0823316): var device = { ls: {}, records: {} };
+    // before (f0823316): var ls = backup && backup.localStorage && typeof backup.localStorage === 'object' ? backup.localStorage : {};
+    // before (f0823316): ownKeys(ls).forEach(function (k) {
+      // before (f0823316): if (typeof ls[k] === 'string' && ls[k].indexOf(KEPT) !== -1) { try { device.ls[k] = root.localStorage.getItem(k); } catch (e) { device.ls[k] = null; } }
+    // before (f0823316): });
+    // before (f0823316): var dbs = Array.isArray(backup && backup.indexedDB) ? backup.indexedDB.filter(function (db) { return db && db.stores && holdsKept(db.stores); }) : [];
+    // before (f0823316): var idb = root.indexedDB;
+    // before (f0823316): if (!dbs.length || !idb || typeof idb.databases !== 'function') return Promise.resolve(device);
+    // before (f0823316): return idb.databases().then(function (list) {
+      // before (f0823316): var here = (list || []).map(function (d) { return d.name; });
+      // before (f0823316): var jobs = dbs.filter(function (db) { return here.indexOf(db.name) !== -1; }).map(function (db) {
+          // before (f0823316): // before (6b5c4046): var req;
+          // before (f0823316): // before (6b5c4046): try { req = idb.open(db.name); } catch (e) { resolve(); return; }
+          // before (f0823316): // before (6b5c4046): req.onerror = function () { resolve(); };
+          // before (f0823316): // before (6b5c4046): req.onsuccess = function () {
+            // before (f0823316): // before (6b5c4046): var con = req.result;
+        // before (f0823316): return new Promise(function (resolveJob) {
+          // before (f0823316): // Hypha HOLD 1 / soft on #369: never wait longer than OPEN_WAIT_MS and never upgrade.
+          // before (f0823316): var req, settled = false, timer = null;
+          // before (f0823316): function resolve() { if (!settled) { settled = true; stopTimer(timer); resolveJob(); } }
+          // before (f0823316): try { req = idb.open(db.name); } catch (e) { resolve(); return; }
+          // before (f0823316): timer = startTimer(resolve);
+          // before (f0823316): req.onupgradeneeded = abortUpgrade(req);
+          // before (f0823316): req.onerror = function () { resolve(); };
+          // before (f0823316): req.onsuccess = function () {
+            // before (f0823316): var con = req.result;
+            // before (f0823316): if (settled) { try { con.close(); } catch (e) { /* already closed */ } return; }
+            // before (f0823316): var names = ownKeys(db.stores).filter(function (st) { return con.objectStoreNames.contains(st) && Array.isArray(db.stores[st]); });
+            // before (f0823316): if (!names.length) { con.close(); resolve(); return; }
+            // before (f0823316): var tx;
+            // before (f0823316): try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); resolve(); return; }
+            // before (f0823316): var mine = device.records[db.name] = {};
+            // before (f0823316): names.forEach(function (st) {
+              // before (f0823316): var os = tx.objectStore(st);
+              // before (f0823316): var kp = os.keyPath;
+              // before (f0823316): mine[st] = db.stores[st].map(function () { return null; });
+              // before (f0823316): db.stores[st].forEach(function (r, i) {
+                // before (f0823316): if (!holdsKept(r) || typeof kp !== 'string' || !r || typeof r !== 'object' || !own(r, kp)) return;
+                // before (f0823316): try { var g = os.get(r[kp]); g.onsuccess = function () { mine[st][i] = g.result === undefined ? null : g.result; }; } catch (e) { /* a key this store cannot use */ }
+              // before (f0823316): });
+            // before (f0823316): });
+            // before (f0823316): tx.oncomplete = function () { con.close(); resolve(); };
+            // before (f0823316): tx.onerror = tx.onabort = function () { con.close(); resolve(); };
+          // before (f0823316): };
+        // before (f0823316): });
+      // before (f0823316): });
+      // before (f0823316): return Promise.all(jobs).then(function () { return device; });
+    // before (f0823316): }, function () { return device; });
+  // before (f0823316): }
+  // Hypha HOLD on #369 at f0823316: the read on restore must never give up and let the placeholder be
+  // written over a real key. It has no time limit: while another FreeLattice tab holds a database, it
+  // waits (FlBackup's own restore waits for it too) and says so once, through onWait. If a database that
+  // holds placeholders cannot be read, device.failed says why, and the restore is stopped before any write.
+  function readDevice(backup, onWait) {
+    var device = { ls: {}, records: {}, failed: null };
     var ls = backup && backup.localStorage && typeof backup.localStorage === 'object' ? backup.localStorage : {};
     ownKeys(ls).forEach(function (k) {
       if (typeof ls[k] === 'string' && ls[k].indexOf(KEPT) !== -1) { try { device.ls[k] = root.localStorage.getItem(k); } catch (e) { device.ls[k] = null; } }
     });
     var dbs = Array.isArray(backup && backup.indexedDB) ? backup.indexedDB.filter(function (db) { return db && db.stores && holdsKept(db.stores); }) : [];
     var idb = root.indexedDB;
-    if (!dbs.length || !idb || typeof idb.databases !== 'function') return Promise.resolve(device);
-    return idb.databases().then(function (list) {
-      var here = (list || []).map(function (d) { return d.name; });
-      var jobs = dbs.filter(function (db) { return here.indexOf(db.name) !== -1; }).map(function (db) {
-          // before (6b5c4046): var req;
-          // before (6b5c4046): try { req = idb.open(db.name); } catch (e) { resolve(); return; }
-          // before (6b5c4046): req.onerror = function () { resolve(); };
-          // before (6b5c4046): req.onsuccess = function () {
-            // before (6b5c4046): var con = req.result;
-        return new Promise(function (resolveJob) {
-          // Hypha HOLD 1 / soft on #369: never wait longer than OPEN_WAIT_MS and never upgrade.
-          var req, settled = false, timer = null;
-          function resolve() { if (!settled) { settled = true; stopTimer(timer); resolveJob(); } }
-          try { req = idb.open(db.name); } catch (e) { resolve(); return; }
-          timer = startTimer(resolve);
-          req.onupgradeneeded = abortUpgrade(req);
-          req.onerror = function () { resolve(); };
+    if (!dbs.length || !idb) return Promise.resolve(device);
+    var waitTimer = startTimer(function () { if (typeof onWait === 'function') onWait(); });
+    // Which databases are here? Without a list, each one is opened and an upgrade (a database that is
+    // not here) is aborted, so nothing is ever made.
+    var listed = typeof idb.databases === 'function'
+      ? Promise.resolve().then(function () { return idb.databases(); }).then(function (l) { return (l || []).map(function (d) { return d && d.name; }); }, function () { return null; })
+      : Promise.resolve(null);
+    return listed.then(function (here) {
+      var jobs = dbs.filter(function (db) { return !here || here.indexOf(db.name) !== -1; }).map(function (db) {
+        return new Promise(function (resolve) {
+          var req, notHere = false, name = String(db.name || 'a database');
+          function fail(why) { if (!device.failed) device.failed = why; resolve(); }
+          try { req = idb.open(db.name); } catch (e) { fail(name + ' could not be opened'); return; }
+          req.onupgradeneeded = function () { notHere = true; abortUpgrade(req)(); };
+          req.onerror = function (ev) {
+            try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e) { /* fine */ }
+            if (notHere) { resolve(); return; }
+            fail(name + ' could not be opened');
+          };
           req.onsuccess = function () {
             var con = req.result;
-            if (settled) { try { con.close(); } catch (e) { /* already closed */ } return; }
+            try { readFrom(con); } catch (e) { try { con.close(); } catch (e2) { /* already closed */ } fail(name + ' could not be read'); }
+          };
+          function readFrom(con) {
             var names = ownKeys(db.stores).filter(function (st) { return con.objectStoreNames.contains(st) && Array.isArray(db.stores[st]); });
             if (!names.length) { con.close(); resolve(); return; }
             var tx;
-            try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); resolve(); return; }
+            try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); fail(name + ' could not be read'); return; }
             var mine = device.records[db.name] = {};
             names.forEach(function (st) {
               var os = tx.objectStore(st);
@@ -531,12 +591,12 @@
               });
             });
             tx.oncomplete = function () { con.close(); resolve(); };
-            tx.onerror = tx.onabort = function () { con.close(); resolve(); };
-          };
+            tx.onerror = tx.onabort = function () { con.close(); fail(name + ' could not be read'); };
+          }
         });
       });
-      return Promise.all(jobs).then(function () { return device; });
-    }, function () { return device; });
+      return Promise.all(jobs);
+    }).then(function () { stopTimer(waitTimer); return device; }, function (e) { stopTimer(waitTimer); throw e; });
   }
 
   // Soft 2: which field is each store's id? Read from this device only (never creates a database); when
@@ -726,6 +786,15 @@
     return root.FlBackup || null;
   }
   var lastExport = null;
+  var lastRestore = null;
+  // Hypha soft on #369: Save Vault's own status line is announced too (app.html is unchanged; the
+  // attributes are added here, only when the page has not set them).
+  function announceStatus() {
+    var st = statusEl();
+    if (!st || !st.setAttribute) return;
+    if (!st.getAttribute('role')) st.setAttribute('role', 'status');
+    if (!st.getAttribute('aria-live')) st.setAttribute('aria-live', 'polite');
+  }
   var busy = false;
   var busyDbs = 0;
   function wrapExport(inner) {
@@ -743,6 +812,7 @@
           return;
         }
         // before (6b5c4046): return readKeyPaths().then(function (keyPaths) { return saveWith(K, keyPaths); });
+        announceStatus();
         var st0 = statusEl();
         if (st0) st0.textContent = 'Save Vault is checking your records before saving\u2026';
         return readKeyPaths().then(function (kp) { busyDbs = kp.busy; return saveWith(K, kp.paths); });
@@ -796,6 +866,9 @@
       var info = null;
       var read = file && typeof file.text === 'function' ? file.text() : Promise.resolve(null);
       var merged = null;
+      var stopped = null;
+      lastRestore = null;
+      announceStatus();
       return Promise.all([read.catch(function () { return null; }), ensureKit()]).then(function (got) {
         var text = got[0], K = got[1];
         var parsed = null;
@@ -804,15 +877,30 @@
         if (parsed && K) { try { info = inspect(parsed, K); } catch (e) { info = null; } }
         // H2: a file that holds the placeholder never overwrites a real value this device has.
         if (!parsed || !parsed._meta || parsed._meta.type !== 'freelattice-backup' || !holdsKept(parsed)) return null;
-        return readDevice(parsed).then(function (device) { merged = mergeBackup(parsed, device); return merged; }, function () { return null; });
+        // before (f0823316): return readDevice(parsed).then(function (device) { merged = mergeBackup(parsed, device); return merged; }, function () { return null; });
+        return Promise.resolve().then(function () { return readDevice(parsed, function () { addLine('Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'); }); }).then(function (device) {
+          if (device.failed) { stopped = device.failed; return null; }
+          merged = mergeBackup(parsed, device); return merged;
+        }, function () { stopped = 'this device could not be read'; return null; });
       }).then(function (m) {
         // FlBackup restores exactly as before: older files with keys in the clear still work.
         // before (649d5cce): return inner.call(self, fileInput);
+        // Stopped before any write: nothing on this device was changed.
+        if (stopped) {
+          lastRestore = { stopped: true, why: stopped };
+          var st1 = statusEl();
+          if (st1) st1.textContent = '\u274c Nothing was restored, and nothing on this device was changed: ' + stopped +
+            ', so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again.';
+          try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+          return 'stopped';
+        }
+        lastRestore = { stopped: false, kept: m ? m.stats.kept : 0 };
         if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
         var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
         try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
         return inner.call(self, { files: [f], value: '' });
-      }).then(function () {
+      }).then(function (how) {
+        if (how === 'stopped') return;
         var st = statusEl();
         var restored = st && /Restored/.test(st.textContent || '');
         if (!restored || !info || !info.isBackup) return;
@@ -842,6 +930,7 @@
     if (!F || typeof F.exportData !== 'function' || typeof F.importData !== 'function') return false;
     if (!F.exportData.__flKeysHome) F.exportData = wrapExport(F.exportData);
     if (!F.importData.__flKeysHome) F.importData = wrapImport(F.importData);
+    announceStatus();
     installed = true;
     return true;
   }
@@ -852,6 +941,7 @@
     ensureKit: ensureKit,
     renderNote: renderNote,
     lastExport: function () { return lastExport; },
+    lastRestore: function () { return lastRestore; },
     // before (649d5cce): _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS }
     _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS,
       hideKeyShapes: hideKeyShapes, hasKeyShape: hasKeyShape, fits: fits, keepDevice: keepDevice, mergeSetting: mergeSetting,
@@ -861,7 +951,8 @@
       // before (6b5c4046): KEY_SHAPE_PARTS: KEY_SHAPE_PARTS }
       readDevice: readDevice, readKeyPaths: readKeyPaths, idFields: idFields, b64Text: b64Text, plainKeyField: plainKeyField,
       KEY_SHAPE_PARTS: KEY_SHAPE_PARTS, namedKeyField: namedKeyField, innocentId: innocentId, refusalWords: refusalWords,
-      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
+      // before (f0823316): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
+      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
   };
   root.FLBackupKeysHome = api;
 

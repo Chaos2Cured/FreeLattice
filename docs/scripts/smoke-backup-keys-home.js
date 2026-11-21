@@ -365,7 +365,15 @@ assert.ok(/st0\.textContent = 'Save Vault is checking your records before saving
 assert.ok(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/.test(code) && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
 assert.ok(/else root\.document\.body\.insertBefore\(box, root\.document\.body\.firstChild\);/.test(code), 'the card comes early in the focus order');
 // before (6b5c4046): assert.ok(!/onupgradeneeded|createObjectStore/.test(code) && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database');
-assert.ok(!/createObjectStore|deleteObjectStore/.test(code) && (code.match(/req\.onupgradeneeded = abortUpgrade\(req\);/g) || []).length === 2 && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database: an upgrade is aborted');
+const busyFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: {},
+  indexedDB: [{ name: 'FreeLatticeCore', stores: { settings: [{ id: 'k1', config: { apiKey: P, telegram: P } }] } }] };
+// before (f0823316): assert.ok(!/createObjectStore|deleteObjectStore/.test(code) && (code.match(/req\.onupgradeneeded = abortUpgrade\(req\);/g) || []).length === 2 && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database: an upgrade is aborted');
+assert.ok(!/createObjectStore|deleteObjectStore/.test(code) && (code.match(/req\.onupgradeneeded = abortUpgrade\(req\);/g) || []).length === 1 &&
+  /req\.onupgradeneeded = function \(\) \{ notHere = true; abortUpgrade\(req\)\(\); \};/.test(code) && /return !here \|\| here\.indexOf\(db\.name\) !== -1;/.test(code), 'reading this device never creates a database: an upgrade is aborted');
+assert.ok(/readDevice\(parsed, function \(\) \{ addLine\('Waiting for another FreeLattice tab to let go\\u2026 Your restore will go on by itself\.'\); \}\)/.test(code) &&
+  /Nothing was restored, and nothing on this device was changed: ' \+ stopped \+/.test(code) && /Close other FreeLattice tabs and try again\./.test(code), 'NEW HOLD: the wait is announced, and a stop says plainly that nothing was changed');
+assert.ok(/if \(!st\.getAttribute\('role'\)\) st\.setAttribute\('role', 'status'\);/.test(code) && /if \(!st\.getAttribute\('aria-live'\)\) st\.setAttribute\('aria-live', 'polite'\);/.test(code) &&
+  (code.match(/announceStatus\(\);/g) || []).length >= 3, 'soft: Save Vault\u2019s own status line is announced');
 assert.ok(/if \(!m \|\| !m\.stats\.kept \|\| typeof root\.File !== 'function'\) return inner\.call\(self, fileInput\);/.test(code) && /return inner\.call\(self, \{ files: \[f\], value: '' \}\);/.test(code), 'restore is FlBackup\u2019s own, given a copy that keeps this device\u2019s keys');
 assert.ok(/return inner\.call\(self, fileInput\);/.test(code) && !/fileInput\.files\[0\] =|backup\.localStorage\[[^\]]+\] =/.test(code), 'restore is passed through untouched when nothing here needs keeping');
 assert.ok(/if \(installed\) return true;/.test(code) && /safe\.__flKeysHome = VERSION;/.test(code), 'it wraps once');
@@ -375,7 +383,8 @@ assert.ok(/so anyone holding that file could read them\. Everything was restored
 assert.ok(/s\.src = 'modules\/garden-move-kit\.js';/.test(code) && /root\.FLGardenMoveKit && root\.FLGardenMoveKit\._internal/.test(code), 'it uses the pack module\u2019s rules');
 assert.ok(/s\.src = 'modules\/backup-keys-home\.js';/.test(cer) && /function hookFlBackup\(\) \{\s*if \(typeof FlBackup === 'undefined'\) return;/.test(cer) && /hookFlBackup\(\);/.test(cer), 'soul-ceremony loads it and keeps its own hook');
 // before (6b5c4046): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
-['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+// before (f0823316): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds', '### Heal after #369 at f0823316', 'has no time limit', 'the restore stops before anything is written', 'Close other FreeLattice tabs and try again', 'The kept count is the truth', 'only capitals and digits'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 
 // The checks below were reworded by the heal; the earlier wording is kept here.
 // before (649d5cce): assert.ok(/Save Vault is waiting for its key check to load\. Nothing was saved\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules');
@@ -397,25 +406,35 @@ vm.runInContext(`
         var d0 = dbs[name];
         if (d0 && d0.stuck) return r;
         if (d0 && d0.slow) { d0.release = function () { r.result = { objectStoreNames: Object.assign([], { contains: function () { return false; } }), close: function () { log.push({ close: name }); } }; if (r.onsuccess) r.onsuccess(); }; return r; }
-        if (d0 && d0.ghost) {
+        // before (f0823316): if (d0 && d0.ghost) {
+        if (!d0 || d0.ghost) {
           later(function () { var aborted = false; r.transaction = { abort: function () { aborted = true; log.push({ abort: name }); } };
             if (r.onupgradeneeded) r.onupgradeneeded({}); if (!aborted) log.push({ created: name }); if (r.onerror) r.onerror({ preventDefault: function () {} }); });
           return r;
         }
-        later(function () {
-          if (!dbs[name] || arguments.length > 1) { if (r.onerror) r.onerror(); return; }
+          // before (f0823316): if (!dbs[name] || arguments.length > 1) { if (r.onerror) r.onerror(); return; }
+        if (d0 && d0.throws) throw new Error('blocked');
+        if (d0 && d0.error) { later(function () { if (r.onerror) r.onerror({ preventDefault: function () { log.push({ prevented: name }); } }); }); return r; }
+        var run = function () {
+          if (!dbs[name]) { if (r.onerror) r.onerror(); return; }
           var d = dbs[name], names = Object.keys(d.stores);
-          names.contains = function (s) { return !!d.stores[s]; };
+          // before (f0823316): names.contains = function (s) { return !!d.stores[s]; };
+          names.contains = function (s) { if (d.badcon) throw new Error('a broken connection'); return !!d.stores[s]; };
           r.result = { objectStoreNames: names, close: function () { log.push({ close: name }); },
             transaction: function (list, mode) {
               log.push({ tx: name, mode: mode });
-              var tx = { pending: 0, fired: false, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
+              // before (f0823316): var tx = { pending: 0, fired: false, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
+              if (d.txfail) throw new Error('cannot read now');
+              if (d.txabort) later(function () { if (TXA && TXA.onabort) TXA.onabort(); });
+              var tx = TXA = { pending: 0, fired: !!d.txabort, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
                 objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, get: function (k) { var g = {}; tx.pending += 1;
                   later(function () { g.result = S.rows.filter(function (x) { return x[S.keyPath] === k; })[0]; if (g.onsuccess) g.onsuccess(); tx.pending -= 1; tx.done(); }); return g; } }; } };
               later(function () { later(function () { tx.done(); }); });
               return tx; } };
           if (r.onsuccess) r.onsuccess();
-        });
+        };
+        if (d0 && d0.slowFull) { d0.release = function () { later(run); }; return r; }
+        later(run);
         return r;
       } };
   }
@@ -461,15 +480,140 @@ flush(20).then(function () {
   assert.ok(!log.some(function (x) { return x.open === 'StuckDB'; }), 'HOLD 1: a database Save Vault does not save is never opened');
   assert.ok(log.some(function (x) { return x.abort === 'FreeLatticeGone'; }) && !log.some(function (x) { return x.created; }), 'soft: a database that is gone is never made again (its upgrade is aborted)');
   assert.ok(log.filter(function (x) { return x.open; }).every(function (x) { return x.args === 1; }), 'every open has no version');
-  // The read on restore follows the same rules.
-  const stuckFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: {}, indexedDB: [{ name: 'FreeLatticeStuck', stores: { s: [{ id: 'z', t: P }] } }] };
-  inside('TIMERS = []; FLBackupKeysHome._internal.readDevice(JSON.parse(' + JSON.stringify(JSON.stringify(stuckFile)) + ')).then(function (d) { RD = JSON.stringify(d); }); ""');
+// before (f0823316):   // The read on restore follows the same rules.
+// before (f0823316):   const stuckFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: {}, indexedDB: [{ name: 'FreeLatticeStuck', stores: { s: [{ id: 'z', t: P }] } }] };
+// before (f0823316):   inside('TIMERS = []; FLBackupKeysHome._internal.readDevice(JSON.parse(' + JSON.stringify(JSON.stringify(stuckFile)) + ')).then(function (d) { RD = JSON.stringify(d); }); ""');
+// before (f0823316):   return flush(20).then(function () {
+// before (f0823316):     assert.strictEqual(inside('String(RD)'), 'null', 'the restore read waits for a moment too');
+// before (f0823316):     inside('runTimers(); ""');
+// before (f0823316):     return flush(20);
+// before (f0823316):   }).then(function () {
+// before (f0823316):     assert.deepStrictEqual(JSON.parse(inside('String(RD)')), { ls: {}, records: {} }, 'HOLD 1: on restore a busy database is left as the file has it, and the restore goes on');
+// before (f0823316):   });
+  // Hypha HOLD on #369 at f0823316: on restore a busy database is waited for, never given up on.
+  inside('BUSY = { FreeLatticeCore: { slowFull: true, stores: { settings: { keyPath: "id", rows: [{ id: "k1", config: { apiKey: "core-api-key-abcdef12", telegram: "tg-real-1" } }] } } } }; indexedDB = FakeIDB(BUSY); TIMERS = []; RD = null; WAITED = 0; ""');
+  inside('FLBackupKeysHome._internal.readDevice(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '), function () { WAITED += 1; }).then(function (d) { RD = JSON.stringify(d); }); ""');
   return flush(20).then(function () {
-    assert.strictEqual(inside('String(RD)'), 'null', 'the restore read waits for a moment too');
+    assert.strictEqual(inside('String(RD)'), 'null', 'the restore read waits while another tab holds the database');
     inside('runTimers(); ""');
     return flush(20);
   }).then(function () {
-    assert.deepStrictEqual(JSON.parse(inside('String(RD)')), { ls: {}, records: {} }, 'HOLD 1: on restore a busy database is left as the file has it, and the restore goes on');
+    assert.strictEqual(inside('String(RD)'), 'null', 'NEW HOLD: after the wait it still does not give up (no time limit on restore)');
+    assert.strictEqual(inside('String(WAITED)'), '1', 'and it says once that it is waiting for another tab');
+    inside('BUSY.FreeLatticeCore.release(); ""');
+    return flush(20);
+  }).then(function () {
+    const rdb = JSON.parse(inside('String(RD)'));
+    assert.deepStrictEqual([rdb.failed, rdb.records.FreeLatticeCore.settings[0].config], [null, { apiKey: 'core-api-key-abcdef12', telegram: 'tg-real-1' }], 'once the other tab lets go, this device\u2019s keys are read');
+    const mb2 = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.mergeBackup(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '), JSON.parse(RD)))'));
+    assert.deepStrictEqual([mb2.backup.indexedDB[0].stores.settings[0].config, mb2.stats], [{ apiKey: 'core-api-key-abcdef12', telegram: 'tg-real-1' }, { kept: 2, left: 0 }], 'and kept: the placeholder never replaces them');
+    assert.ok(JSON.parse(inside('JSON.stringify(indexedDB.log)')).some(function (x) { return x.close === 'FreeLatticeCore'; }), 'the connection is closed');
+  });
+}).then(function () {
+  // The whole restore, through the wrap, with a stand-in FlBackup restore: a busy database is waited for and
+  // the keys are kept; an unreadable one stops the restore before anything is written.
+  vm.runInContext(`
+    TXA = null;
+    STATUS = { textContent: '', a: {}, lines: [], getAttribute: function (k) { return this.a[k] || null; }, setAttribute: function (k, v) { this.a[k] = v; }, appendChild: function (n) { this.lines.push(n.textContent); } };
+    FAKEDOC = { getElementById: function (id) { return id === 'flBackupStatus' ? STATUS : null; }, createElement: function () { return { style: {}, setAttribute: function () {} }; } };
+    File = function (parts, name) { this.parts = parts; this.name = name; };
+    FLGardenMoveKit = { _internal: STUB };
+    INNER = [];
+    RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { INNER.push(input && input.files && input.files[0] && input.files[0].parts ? JSON.parse(input.files[0].parts[0]) : 'original'); return Promise.resolve(); });
+    function fileOf(obj) { var t = JSON.stringify(obj); return { files: [{ name: 'b.json', text: function () { return Promise.resolve(t); } }], value: 'b.json' }; }
+  `, ctx, { timeout: 2000 });
+  inside('BUSY = { FreeLatticeCore: { slowFull: true, stores: { settings: { keyPath: "id", rows: [{ id: "k1", config: { apiKey: "core-api-key-abcdef12", telegram: "tg-real-1" } }] } } } }; indexedDB = FakeIDB(BUSY); TIMERS = []; DONE = 0; ""');
+  inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+  return flush(20).then(function () { inside('runTimers(); ""'); return flush(20); }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)')], ['0', '0'], 'NEW HOLD: nothing is written while the other tab holds the database');
+    inside('BUSY.FreeLatticeCore.release(); ""');
+    return flush(30);
+  }).then(function () {
+    const got = JSON.parse(inside('JSON.stringify(INNER)'));
+    assert.strictEqual(got.length, 1, 'then FlBackup restores once');
+    assert.deepStrictEqual(got[0].indexedDB[0].stores.settings[0].config, { apiKey: 'core-api-key-abcdef12', telegram: 'tg-real-1' }, 'NEW HOLD: a busy restore keeps this device\u2019s real keys');
+    assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())')), { stopped: false, kept: 2 }, 'and the kept count is the truth');
+    inside('indexedDB = FakeIDB({ FreeLatticeCore: { error: true } }); INNER = []; TIMERS = []; DONE = 0; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+    return flush(30);
+  }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)')], ['0', '1'], 'NEW HOLD: when a database that holds placeholders cannot be opened, nothing is restored');
+    const lr = JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())'));
+    assert.deepStrictEqual(lr, { stopped: true, why: 'FreeLatticeCore could not be opened' }, 'and it says why');
+    assert.ok(JSON.parse(inside('JSON.stringify(indexedDB.log)')).some(function (x) { return x.prevented === 'FreeLatticeCore'; }), 'the open error is handled (preventDefault)');
+    inside('indexedDB = FakeIDB({ FreeLatticeCore: { txfail: true, stores: { settings: { keyPath: "id", rows: [] } } } }); INNER = []; TIMERS = []; DONE = 0; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+    return flush(30);
+  }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)'), JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())')).why], ['0', '1', 'FreeLatticeCore could not be read'], 'NEW HOLD: when it cannot be read, nothing is restored either');
+    const lg = JSON.parse(inside('JSON.stringify(indexedDB.log)'));
+    assert.strictEqual(lg.filter(function (x) { return x.open; }).length, lg.filter(function (x) { return x.close; }).length, 'and the connection is closed');
+    // A database that is not on this device: written as the file has it (a new device), never made by the read.
+    inside('indexedDB = FakeIDB({}); indexedDB.databases = undefined; INNER = []; TIMERS = []; DONE = 0; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+    return flush(30);
+  }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('JSON.stringify(FLBackupKeysHome.lastRestore())')], ['1', JSON.stringify({ stopped: false, kept: 0 })], 'a new device restores as before');
+    // The page's own status line: the wait is announced there, and so is a stop.
+    inside('document = FAKEDOC; STATUS.lines = []; STATUS.a = {}; BUSY = { FreeLatticeCore: { slowFull: true, stores: { settings: { keyPath: "id", rows: [{ id: "k1", config: { apiKey: "core-api-key-abcdef12", telegram: "tg-real-1" } }] } } } }; indexedDB = FakeIDB(BUSY); INNER = []; TIMERS = []; DONE = 0; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+    return flush(20);
+  }).then(function () {
+    inside('runTimers(); ""');
+    return flush(20);
+  }).then(function () {
+    assert.deepStrictEqual(JSON.parse(inside('JSON.stringify([STATUS.a, STATUS.lines, INNER.length])')), [{ role: 'status', 'aria-live': 'polite' }, ['Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'], 0], 'NEW HOLD: the wait is said on the announced status line');
+    inside('BUSY.FreeLatticeCore.release(); ""');
+    return flush(30);
+  }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)')], ['1', '1'], 'and the restore goes on by itself');
+    const stops = [
+      [{ FreeLatticeCore: { throws: true } }, 'FreeLatticeCore could not be opened'],
+      [{ FreeLatticeCore: { txabort: true, stores: { settings: { keyPath: 'id', rows: [{ id: 'k1', config: {} }] } } } }, 'FreeLatticeCore could not be read'],
+      [{ FreeLatticeCore: { badcon: true, stores: { settings: { keyPath: 'id', rows: [] } } } }, 'FreeLatticeCore could not be read']
+    ];
+    let chain = Promise.resolve();
+    stops.forEach(function (c) {
+      chain = chain.then(function () {
+        inside('indexedDB = FakeIDB(' + JSON.stringify(c[0]) + '); STATUS.textContent = ""; INNER = []; TIMERS = []; DONE = 0; ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+        return flush(30);
+      }).then(function () {
+        assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)'), JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())'))], ['0', '1', { stopped: true, why: c[1] }], 'NEW HOLD: stopped before any write: ' + c[1]);
+        assert.strictEqual(inside('STATUS.textContent'), '\u274c Nothing was restored, and nothing on this device was changed: ' + c[1] + ', so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again.', 'and the page says so plainly');
+      });
+    });
+    return chain;
+  }).then(function () {
+    // If this device cannot be read at all, the restore stops too.
+    inside('Object.defineProperty(globalThis, "indexedDB", { configurable: true, get: function () { throw new Error("no"); } }); INNER = []; DONE = 0; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))).then(function () { DONE += 1; }); ""');
+    return flush(30);
+  }).then(function () {
+    assert.deepStrictEqual([inside('String(INNER.length)'), inside('String(DONE)'), JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())')).why], ['0', '1', 'this device could not be read'], 'NEW HOLD: a device that cannot be read is never written over');
+    inside('Object.defineProperty(globalThis, "indexedDB", { configurable: true, writable: true, value: FakeIDB({}) }); document = undefined; ""');
+  });
+}).then(function () {
+  // Hypha's survivors on #369 at f0823316, each with a real test.
+  const I = function (expr) { return inside('JSON.stringify(' + expr + ')'); };
+  assert.deepStrictEqual(JSON.parse(I('[FLBackupKeysHome._internal.innocentId("123e4567-e89b-12d3-a456-426614174000"), FLBackupKeysHome._internal.innocentId("123E4567-E89B-12D3-A456-426614174000"), FLBackupKeysHome._internal.innocentId("123e4567e89b12d3a456426614174000zz")]')), [true, true, false], 'H14: a UUID, either case, reads as an innocent id');
+  assert.deepStrictEqual(JSON.parse(I('[FLBackupKeysHome._internal.namedKeyField("cache_key", "DeadBeef0123456789AbCdEfDeadBeef"), FLBackupKeysHome._internal.hasKeyShape("cache_key: DeadBeef0123456789AbCdEfDeadBeef"), FLBackupKeysHome._internal.hasKeyShape("cache_key: DeadBeef0123456789AbCdEfDeadBeefQ")]')), [false, false, true], 'H22: a hex hash under a key-ish name is innocent, in the field rule and in the file check alike');
+  assert.deepStrictEqual(JSON.parse(I('[FLBackupKeysHome._internal.hideKeyShapes("note cache_key: DeadBeef0123456789AbCdEfDeadBeef ok", {n:0}), FLBackupKeysHome._internal.hideKeyShapes("token: abcdefghij0123456789abcdefghij0123", {n:0}), FLBackupKeysHome._internal.hasKeyShape("token: abcdefghij0123456789abcdefghij0123"), FLBackupKeysHome._internal.hasKeyShape("token: ABCDEFGHIJ0123456789ABCDEFGHIJ0123")]')), ['note cache_key: DeadBeef0123456789AbCdEfDeadBeef ok', 'token: abcdefghij0123456789abcdefghij0123', false, false], 'the context rule hides only mixed-case runs, never a hash: single-case values stay (noted as not caught)');
+  inside('TIMERS = []; KP = null; indexedDB = FakeIDB({ FreeLatticeCore: { stores: { s: { keyPath: "id", rows: [] } } } }); indexedDB.databases = function () { return new Promise(function () {}); }; FLBackupKeysHome._internal.readKeyPaths().then(function (k) { KP = JSON.stringify(k); }); ""');
+  return flush(20).then(function () {
+    assert.strictEqual(inside('String(KP)'), 'null', 'the list of databases is waited for a moment');
+    inside('runTimers(); ""');
+    return flush(20);
+  }).then(function () {
+    assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { paths: {}, busy: 1 }, 'H12: a list that never comes is given up on after its wait, and counted as busy');
+    inside('KP = null; indexedDB = FakeIDB({ freelatticeextra: { stores: { s: { keyPath: "k", rows: [] } } }, FreeLatticeErr: { error: true }, FreeLatticeCore: { stores: { s: { keyPath: "id", rows: [] } } } }); FLBackupKeysHome._internal.readKeyPaths().then(function (k) { KP = JSON.stringify(k); }); ""');
+    return flush(30);
+  }).then(function () {
+    const lg = JSON.parse(inside('JSON.stringify(indexedDB.log)'));
+    assert.ok(!lg.some(function (x) { return x.open === 'freelatticeextra'; }), 'H24: only databases named exactly FreeLattice\u2026 are opened');
+    assert.ok(lg.some(function (x) { return x.prevented === 'FreeLatticeErr'; }), 'H25: an open error is handled with preventDefault');
+    assert.deepStrictEqual(JSON.parse(inside('String(KP)')).paths, { FreeLatticeCore: { s: 'id' } }, 'and the other databases are still read');
+    assert.strictEqual(lg.filter(function (x) { return x.open; }).length - 1, lg.filter(function (x) { return x.close; }).length, 'H11: every connection that opened is closed');
   });
 }).then(function () {
   // A slow open that finally answers after its wait is closed, never kept open.
