@@ -544,7 +544,8 @@
   // written over a real key. It has no time limit: while another FreeLattice tab holds a database, it
   // waits (FlBackup's own restore waits for it too) and says so once, through onWait. If a database that
   // holds placeholders cannot be read, device.failed says why, and the restore is stopped before any write.
-  function readDevice(backup, onWait) {
+  // before (dec6128a): function readDevice(backup, onWait) {
+  function readDevice(backup, onWait, ctl) {
     var device = { ls: {}, records: {}, failed: null };
     var ls = backup && backup.localStorage && typeof backup.localStorage === 'object' ? backup.localStorage : {};
     ownKeys(ls).forEach(function (k) {
@@ -573,6 +574,8 @@
           };
           req.onsuccess = function () {
             var con = req.result;
+            // A restore that was cancelled while this open waited: the late connection is closed at once.
+            if (ctl && ctl.cancelled) { try { con.close(); } catch (e) { /* already closed */ } resolve(); return; }
             try { readFrom(con); } catch (e) { try { con.close(); } catch (e2) { /* already closed */ } fail(name + ' could not be read'); }
           };
           function readFrom(con) {
@@ -859,26 +862,56 @@
     safe.__flKeysHome = VERSION;
     return safe;
   }
+  // The waiting line gets a Cancel button: nothing is written, and a late connection is closed.
+  function waitLine(line, cancelNow) {
+    if (!line || !root.document || typeof root.document.createElement !== 'function') return;
+    var b = root.document.createElement('button');
+    b.type = 'button';
+    b.textContent = 'Cancel restore';
+    b.setAttribute('aria-label', 'Cancel restore');
+    b.style.cssText = 'margin-left:8px;min-height:44px;padding:6px 14px;border-radius:8px;border:1px solid var(--border, #555);background:transparent;color:inherit;font:inherit;cursor:pointer;';
+    b.onclick = function () { b.disabled = true; cancelNow(); };
+    if (typeof line.appendChild === 'function') line.appendChild(b);
+  }
+  var restoring = false;
   function wrapImport(inner) {
     var safe = function (fileInput) {
       var self = this;
       var file = fileInput && fileInput.files && fileInput.files[0];
+      // Hypha soft on #369: a second pick while a restore is on its way never queues a second restore.
+      if (restoring) {
+        addLine('A restore is already on its way. Wait for it, or cancel it first.', 'warn');
+        try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+        return Promise.resolve('busy');
+      }
+      if (!file) return inner.call(self, fileInput);
+      restoring = true;
       var info = null;
+      var parsedFile = null;
+      var ctl = { cancelled: false };
+      var cancelNow = null;
+      var cancelled = new Promise(function (res) { cancelNow = function () { if (ctl.cancelled) return; ctl.cancelled = true; res({ cancelledByYou: true }); }; });
       var read = file && typeof file.text === 'function' ? file.text() : Promise.resolve(null);
       var merged = null;
       var stopped = null;
       lastRestore = null;
       announceStatus();
+      // Hypha soft on #369: the old "Exported" line goes, and the reading line shows at once.
+      var st0 = statusEl();
+      if (st0) st0.textContent = '\u23f3 Reading backup file...';
       return Promise.all([read.catch(function () { return null; }), ensureKit()]).then(function (got) {
         var text = got[0], K = got[1];
         var parsed = null;
         if (text) { try { parsed = JSON.parse(text); } catch (e) { parsed = null; } }
         // before (649d5cce): if (text && K) { try { info = inspect(JSON.parse(text), K); } catch (e) { info = null; } }
         if (parsed && K) { try { info = inspect(parsed, K); } catch (e) { info = null; } }
+        parsedFile = parsed;
         // H2: a file that holds the placeholder never overwrites a real value this device has.
         if (!parsed || !parsed._meta || parsed._meta.type !== 'freelattice-backup' || !holdsKept(parsed)) return null;
         // before (f0823316): return readDevice(parsed).then(function (device) { merged = mergeBackup(parsed, device); return merged; }, function () { return null; });
-        return Promise.resolve().then(function () { return readDevice(parsed, function () { addLine('Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'); }); }).then(function (device) {
+        // before (dec6128a): return Promise.resolve().then(function () { return readDevice(parsed, function () { addLine('Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'); }); }).then(function (device) {
+        return Promise.race([cancelled, Promise.resolve().then(function () { return readDevice(parsed, function () { waitLine(addLine('Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'), cancelNow); }, ctl); })]).then(function (device) {
+          if (device && device.cancelledByYou) { stopped = 'you cancelled it'; return null; }
           if (device.failed) { stopped = device.failed; return null; }
           merged = mergeBackup(parsed, device); return merged;
         }, function () { stopped = 'this device could not be read'; return null; });
@@ -889,17 +922,26 @@
         if (stopped) {
           lastRestore = { stopped: true, why: stopped };
           var st1 = statusEl();
-          if (st1) st1.textContent = '\u274c Nothing was restored, and nothing on this device was changed: ' + stopped +
+          // before (dec6128a): if (st1) st1.textContent = '\u274c Nothing was restored, and nothing on this device was changed: ' + stopped +
+          // before (dec6128a):   ', so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again.';
+          if (st1 && ctl.cancelled) st1.textContent = 'Restore cancelled. Nothing was restored, and nothing on this device was changed.';
+          else if (st1) st1.textContent = '\u274c Nothing was restored, and nothing on this device was changed: ' + stopped +
             ', so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again.';
           try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
           return 'stopped';
         }
         lastRestore = { stopped: false, kept: m ? m.stats.kept : 0 };
-        if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
-        var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
-        try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
-        return inner.call(self, { files: [f], value: '' });
-      }).then(function (how) {
+        // before (dec6128a): if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
+        // before (dec6128a): var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+        // before (dec6128a): try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+        // before (dec6128a): return inner.call(self, { files: [f], value: '' });
+        return appSchemaFirst(parsedFile).then(function () {
+          if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
+          var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+          try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+          return inner.call(self, { files: [f], value: '' });
+        });
+      }).then(function (v) { restoring = false; return v; }, function (e) { restoring = false; throw e; }).then(function (how) {
         if (how === 'stopped') return;
         var st = statusEl();
         var restored = st && /Restored/.test(st.textContent || '');
@@ -921,6 +963,22 @@
     };
     safe.__flKeysHome = VERSION;
     return safe;
+  }
+  // New-device restore (Hypha, #369 walk): on a device with no FreeLatticeDB, FlBackup's restore made it from
+  // the file with guessed stores and no indexes (meta lost its keyPath, messages its autoIncrement), and the
+  // app's own open then found nothing to upgrade. Now the app's own openDB() opens FreeLatticeDB first, so its
+  // stores and indexes always come from the app. On a device that has it already, this changes nothing.
+  var APP_DB = 'FreeLatticeDB';
+  function appSchemaFirst(backup) {
+    var dbs = backup && Array.isArray(backup.indexedDB) ? backup.indexedDB : [];
+    var wants = dbs.some(function (db) { return db && db.name === APP_DB && db.stores && typeof db.stores === 'object' && ownKeys(db.stores).length > 0; });
+    var open = root.openDB;
+    if (!wants || typeof open !== 'function') return Promise.resolve(false);
+    return Promise.resolve().then(function () { return open(); }).then(function (con) {
+      var ok = !!con && con.name === APP_DB;
+      try { if (con && typeof con.close === 'function') con.close(); } catch (e) { /* already closed */ }
+      return ok;
+    }, function () { return false; });
   }
   // Wrap once. soul-ceremony.js may wrap again on top of this (it calls what it found), which keeps both.
   var installed = false;
@@ -952,7 +1010,8 @@
       readDevice: readDevice, readKeyPaths: readKeyPaths, idFields: idFields, b64Text: b64Text, plainKeyField: plainKeyField,
       KEY_SHAPE_PARTS: KEY_SHAPE_PARTS, namedKeyField: namedKeyField, innocentId: innocentId, refusalWords: refusalWords,
       // before (f0823316): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
-      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
+      // before (dec6128a): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
+      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst }
   };
   root.FLBackupKeysHome = api;
 

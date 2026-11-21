@@ -62,6 +62,13 @@ Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so
 - Save Vault's own status line is now announced too (`role="status"`, `aria-live="polite"`, added only where the page has not set them).
 - A hex hash, UUID or time is never treated as a key because of its field name, in the field rule and in the file check alike.
 
+### New-device restore, and the restore softs (after #369)
+- **A new device gets the app's own chat database.** On a device with no `FreeLatticeDB`, FlBackup's restore used to make it from the file: stores without indexes, `meta` without its `key` keyPath and `messages` without autoIncrement. The app's own open then found nothing to upgrade, and opening a chat failed with "The specified index was not found." Now, just before FlBackup restores a file that holds `FreeLatticeDB`, the app's own `openDB()` opens it first, so its stores and indexes always come from the app. On a device that has it already (the usual case, since the app opens it when the page loads), nothing changes. If the app cannot open it, FlBackup restores as before. `app.html` is not changed.
+- **The waiting line has a Cancel button.** Cancel stops the restore before anything is written ("Restore cancelled. Nothing was restored, and nothing on this device was changed."). A connection that answers later is closed without being read.
+- **One restore at a time.** Picking a file again while a restore is on its way says "A restore is already on its way. Wait for it, or cancel it first." and starts nothing.
+- **The reading line shows at once,** and the old "Exported" line goes.
+- Still not done here: a device whose `FreeLatticeDB` was already made without indexes is not mended (that needs a new version in the app's own open, in `app.html`).
+
 ### Screen readers
 The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
 
