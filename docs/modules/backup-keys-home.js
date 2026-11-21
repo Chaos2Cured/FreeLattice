@@ -16,13 +16,20 @@
 
    Loaded by soul-ceremony.js. It uses the pack module's rules (FLGardenMoveKit._internal), loading
    modules/garden-move-kit.js when it is not on the page yet. It never sends anything anywhere and
-   never clears storage. */
+   never clears storage.
+
+   Hypha softs on #368 (v-backup-keys-home softs, after ef550fbf): an sk- value needs an unbroken run of
+   16+ letters and digits; a key used as a record id refuses the file and names the place (records are
+   never collapsed); more key shapes (AKIA, three-part eyJ tokens, sk_ hex, a base64-wrapped key, a long
+   mixed key right after words like "key" or "token", and a plain field named "key"); and the words say
+   what is covered instead of "never". */
 (function (root) {
   'use strict';
 
   var VERSION = 'v-backup-keys-home';
   var NOTE_KEY = 'fl_backup_keys_note';          // a small note for after the reload: kind, time, key names (never values)
-  var KEPT_HOME_NOTE = 'Keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
+  // before (ef550fbf): var KEPT_HOME_NOTE = 'Keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
+  var KEPT_HOME_NOTE = 'Saved keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
   // Sealed with a device's own unlock key: never readable on another device, so never "in the clear".
   var SEALED_RULE = /_enc$/;
   var SEALED_KEYS = ['fl_ghSyncToken'];
@@ -67,27 +74,90 @@
   // a long run of key characters, on word edges, with both letters and digits. Lengths are bounded so
   // ordinary words and numbers are never cut.
   var KEY_SHAPE_PARTS = [
-    'sk-[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
+    // before (ef550fbf): 'sk-[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
+    // Soft 1: an sk- value needs an unbroken run of 16+ letters and digits, so slugs such as
+    // "sk-2024-annual-report-final-v2-draft" are never cut.
+    'sk-(?=[A-Za-z0-9_-]*[A-Za-z0-9]{16})[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
     'gh[pousr]_[A-Za-z0-9]{30,100}', 'github_pat_[A-Za-z0-9_]{30,120}',
     'hf_[A-Za-z0-9]{30,60}', 'gsk_[A-Za-z0-9]{30,80}', 'xai-[A-Za-z0-9]{30,120}',
     'AIza[0-9A-Za-z_-]{35}', 'ya29\\.[0-9A-Za-z_-]{20,400}', 'xox[abprs]-[A-Za-z0-9-]{10,200}',
     'glpat-[A-Za-z0-9_-]{20,60}', 'r8_[A-Za-z0-9]{30,60}', 'pplx-[A-Za-z0-9]{30,80}', 'nvapi-[A-Za-z0-9_-]{30,90}',
-    '[0-9]{8,10}:AA[A-Za-z0-9_-]{30,40}'
+    '[0-9]{8,10}:AA[A-Za-z0-9_-]{30,40}',
+    // Soft 3: access key ids, three-part eyJ tokens and sk_ followed by hex.
+    '(?:AKIA|ASIA)[0-9A-Z]{16}', 'eyJ[A-Za-z0-9_-]{8,2000}\\.eyJ[A-Za-z0-9_-]{8,4000}\\.[A-Za-z0-9_-]{16,1000}', 'sk_[0-9a-f]{32,80}'
   ];
   function keyShapeRe() { return new RegExp('(^|[^A-Za-z0-9_-])(' + KEY_SHAPE_PARTS.join('|') + ')(?![A-Za-z0-9_-])', 'g'); }
-  function realShape(m) { return /[0-9]/.test(m) && /[A-Za-z]/.test(m); }
+  // before (ef550fbf): function realShape(m) { return /[0-9]/.test(m) && /[A-Za-z]/.test(m); }
+  // Soft 5: letters and digits are looked for after a short prefix such as "sk-", so the prefix alone
+  // never makes a run of digits look like a key.
+  function realShape(m) {
+    var body = m.replace(/^[A-Za-z]{2,6}[-_]/, '');
+    return /[0-9]/.test(body) && /[A-Za-z]/.test(body);
+  }
+  // Soft 3: a long key with no prefix is caught only right after words that name it ("my key is …",
+  // "token: …", "Bearer …") and only when it mixes capitals, small letters and digits, so hashes, ids
+  // and commit names (one case of hex) are never cut.
+  function contextRe() {
+    return /(^|[^A-Za-z0-9])((?:api[ _-]?key|apikey|key|token|secret|password|passwd|bearer)["']?\s{0,3}(?:[:=]|is)?\s{0,3}["']?)([A-Za-z0-9]{32,64})(?![A-Za-z0-9_+\/=.-])/gi;
+  }
+  function mixedKey(v) { return /[a-z]/.test(v) && /[A-Z]/.test(v) && /[0-9]/.test(v); }
+  // Soft 3: a key wrapped in base64 is caught by reading the base64 (here, nothing sent anywhere): only a
+  // run whose decoded text holds a key shape is hidden, so base64 clay, hashes and ids stay as they are.
+  function b64Re() { return /(^|[^A-Za-z0-9+\/=_-])([A-Za-z0-9+\/]{28,8192}={0,2})(?![A-Za-z0-9+\/=_-])/g; }
+  var B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  function b64Text(t) {
+    var s = t.replace(/=+$/, '');
+    if (s.length % 4 === 1) return null;
+    var out = '', bits = 0, acc = 0;
+    for (var i = 0; i < s.length; i++) {
+      var c = B64.indexOf(s.charAt(i));
+      if (c < 0) return null;
+      acc = (acc << 6) | c; bits += 6;
+      if (bits >= 8) { bits -= 8; out += String.fromCharCode((acc >> bits) & 255); }
+    }
+    return out;
+  }
+  function plainShape(str) {
+    var re = keyShapeRe(), m;
+    while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    var cr = contextRe();
+    // before (f0823316): while ((m = cr.exec(str))) { if (mixedKey(m[3])) return true; }
+    while ((m = cr.exec(str))) { if (mixedKey(m[3]) && !innocentId(m[3])) return true; }
+    return false;
+  }
+  function wrapsKey(run) { var d = b64Text(run); return !!d && plainShape(d); }
   function hideKeyShapes(str, counter) {
     if (typeof str !== 'string' || str.length < 16) return str;
-    return str.replace(keyShapeRe(), function (m, edge, key) {
+    // before (ef550fbf): return str.replace(keyShapeRe(), function (m, edge, key) {
+    // before (ef550fbf):   if (!realShape(key)) return m;
+    // before (ef550fbf):   counter.n += 1;
+    // before (ef550fbf):   return edge + KEPT;
+    // before (ef550fbf): });
+    var out = str.replace(keyShapeRe(), function (m, edge, key) {
       if (!realShape(key)) return m;
+      counter.n += 1;
+      return edge + KEPT;
+    });
+    out = out.replace(contextRe(), function (m, edge, words, key) {
+      // before (f0823316): if (!mixedKey(key)) return m;
+      if (!mixedKey(key) || innocentId(key)) return m;
+      counter.n += 1;
+      return edge + words + KEPT;
+    });
+    return out.replace(b64Re(), function (m, edge, run) {
+      if (!wrapsKey(run)) return m;
       counter.n += 1;
       return edge + KEPT;
     });
   }
   function hasKeyShape(str) {
     if (typeof str !== 'string') return false;
-    var re = keyShapeRe(), m;
-    while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    // before (ef550fbf): var re = keyShapeRe(), m;
+    // before (ef550fbf): while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    // before (ef550fbf): return false;
+    if (plainShape(str)) return true;
+    var br = b64Re(), m;
+    while ((m = br.exec(str))) { if (wrapsKey(m[2])) return true; }
     return false;
   }
   function hideString(v, K, values, counts) {
@@ -106,7 +176,81 @@
     var o = {};
     ownKeys(v).forEach(function (k) {
       if (K.secretFieldValue(k, v[k])) { o[k] = K.KEPT_LINE; counts.fields.n += 1; return; }
+      // Soft 3: a field named plainly "key" holding one long word of letters and digits is a key too
+      // (a record's own id is never touched: see walkRecord).
+      if (plainKeyField(k, v[k])) { o[k] = K.KEPT_LINE; counts.fields.n += 1; return; }
+      if (namedKeyField(k, v[k])) { o[k] = K.KEPT_LINE; counts.fields.n += 1; return; }
       o[k] = walk(v[k], K, values, counts, depth + 1);
+    });
+    return o;
+  }
+  // before (6b5c4046): function plainKeyField(k, v) {
+  // before (6b5c4046):   return /^key$/i.test(k) && typeof v === 'string' && v.length >= 12 && v.length <= 512 && !/\s/.test(v) &&
+  // before (6b5c4046):     /[0-9]/.test(v) && /[A-Za-z]/.test(v) && v.indexOf(KEPT) === -1;
+  // before (6b5c4046): }
+  // Hypha HOLD 2 on #369: only a real key shape counts. 20+ characters of letters, digits, "_" and "-"
+  // mixing capitals, small letters and digits. Hex hashes, UUIDs, times, and anything with ":", "." or
+  // other characters (such as a psi id) are never touched, so share-door receipt keys and ids survive.
+  function innocentId(v) {
+    return /^[0-9a-fA-F]{1,64}$/.test(v) || /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(v) ||
+      /^\d{4}-\d{2}-\d{2}/.test(v) || !/^[A-Za-z0-9_-]+$/.test(v);
+  }
+  function plainKeyField(k, v) {
+    // Like soft 1, an unbroken run of 16+ letters and digits is needed, so "Session-2024-11-21-Notes" stays.
+    return /^key$/i.test(k) && typeof v === 'string' && v.length >= 20 && v.length <= 512 && !innocentId(v) &&
+      /[A-Za-z0-9]{16}/.test(v) && /[0-9]/.test(v) && /[a-z]/.test(v) && /[A-Z]/.test(v) && v.indexOf(KEPT) === -1;
+  }
+  // Hypha soft on #369: a value that reads as a key only with its field name ("cache_key": "Ab3…") is
+  // hidden where it is, the same way the file's own check reads it, so the check never refuses blindly.
+  function namedKeyField(k, v) {
+    return typeof v === 'string' && v.indexOf(KEPT) === -1 && !innocentId(v) && !hasKeyShape(v) && hasKeyShape(k + ': ' + v);
+  }
+
+  // Soft 2: a record's id is never rewritten. Two records whose ids were both hidden would become one on
+  // restore, so a key used as an id refuses the file and the place is named instead. The id field is the
+  // store's own keyPath when this device can read it, otherwise "id" and "key".
+  function idFields(keyPaths, dbName, st) {
+    var d = keyPaths && own(keyPaths, dbName) ? keyPaths[dbName] : null;
+    if (!d || !own(d, st)) return ['id', 'key'];
+    var kp = d[st];
+    if (typeof kp === 'string') return kp ? [kp.split('.')[0]] : [];
+    if (Array.isArray(kp)) return kp.map(function (x) { return String(x).split('.')[0]; });
+    return [];
+  }
+  function idHoldsKey(k, v, K, values) {
+    var t = typeof v === 'string' ? v : (v && typeof v === 'object' ? JSON.stringify(v) : '');
+    if (!t) return false;
+    // Read with its field name too, as the file's own check does ("key": "…").
+    return hasKeyShape(t) || hasKeyShape(k + ': ' + t) || values.some(function (sv) { return K.containsSecret(t, sv); });
+  }
+  function walkRecord(r, ids, K, values, counts, where, idPlaces) {
+    if (!r || typeof r !== 'object' || Array.isArray(r)) return walk(r, K, values, counts, 1);
+    var o = {};
+    ownKeys(r).forEach(function (k) {
+      if (ids.indexOf(k) !== -1) {
+        o[k] = r[k];
+        if (idHoldsKey(k, r[k], K, values) && idPlaces.length < 5) idPlaces.push(where + ' (a key used as a record id)');
+        return;
+      }
+      var one = {}; one[k] = r[k];
+      o[k] = walk(one, K, values, counts, 1)[k];
+    });
+    return o;
+  }
+  function walkDb(db, K, values, counts, keyPaths, idPlaces) {
+    if (!db || typeof db !== 'object' || Array.isArray(db) || !db.stores || typeof db.stores !== 'object') return walk(db, K, values, counts, 0);
+    var o = {};
+    ownKeys(db).forEach(function (k) {
+      if (k !== 'stores') { o[k] = walk(db[k], K, values, counts, 1); return; }
+      var outStores = {};
+      ownKeys(db.stores).forEach(function (st) {
+        var rows = db.stores[st];
+        var ids = idFields(keyPaths, db.name, st);
+        outStores[st] = Array.isArray(rows) ? rows.map(function (r, i) {
+          return walkRecord(r, ids, K, values, counts, String(db.name || 'a database') + ' \u203a ' + st + ' \u203a item ' + (i + 1), idPlaces);
+        }) : walk(rows, K, values, counts, 2);
+      });
+      o[k] = outStores;
     });
     return o;
   }
@@ -146,9 +290,30 @@
     return out;
   }
 
+  // Where is a value still shaped like a key (alone, or read with its field name)? Only places are named.
+  // It looks deeper than the walk (which stops at 64 levels), so whatever the walk could not reach is named.
+  function placeName(path) { return (path.length > 6 ? path.slice(0, 3).concat(['\u2026'], path.slice(-2)) : path).join(' \u203a '); }
+  function leftPlaces(v, path, out, depth) {
+    if (!v || typeof v !== 'object' || depth > 200 || out.length >= 5) return out;
+    var arr = Array.isArray(v);
+    Object.keys(v).forEach(function (k) {
+      if (out.length >= 5) return;
+      var label = arr ? 'item ' + (Number(k) + 1) : k;
+      var child = v[k];
+      if (typeof child === 'string' && /^\s*[{[]/.test(child)) { try { child = JSON.parse(child); } catch (e) { /* plain text */ } }
+      if (typeof child === 'string') {
+        if (hasKeyShape(child) || (!arr && hasKeyShape(k + ': ' + child))) out.push(placeName(path.concat([label])));
+        return;
+      }
+      leftPlaces(child, path.concat([label]), out, depth + 1);
+    });
+    return out;
+  }
+
   // Take keys out of a backup object. liveSecrets: key values this device holds that may not be in the
   // file (the unlock key is never in it), so a copy of them inside a record is hidden too.
-  function redact(backup, K, liveSecrets) {
+  // before (ef550fbf): function redact(backup, K, liveSecrets) {
+  function redact(backup, K, liveSecrets, keyPaths) {
     var values = [];
     var names = [];
     var ls = (backup && backup.localStorage && typeof backup.localStorage === 'object') ? backup.localStorage : {};
@@ -167,7 +332,9 @@
     // before (649d5cce): var counts = { hidden: { n: 0 }, fields: { n: 0 } };
     var counts = { hidden: { n: 0 }, fields: { n: 0 }, shapes: { n: 0 } };
     ownKeys(outLs).forEach(function (k) { outLs[k] = walkSetting(outLs[k], K, values, counts); });
-    var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walk(db, K, values, counts, 0); }) : backup.indexedDB;
+    // before (ef550fbf): var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walk(db, K, values, counts, 0); }) : backup.indexedDB;
+    var idPlaces = [];
+    var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walkDb(db, K, values, counts, keyPaths, idPlaces); }) : backup.indexedDB;
     var meta = {};
     ownKeys(backup._meta || {}).forEach(function (k) { meta[k] = backup._meta[k]; });
     meta.keys_kept_home = true;
@@ -185,13 +352,33 @@
     ownKeys(outLs).forEach(function (k) { if (K.isSecretName(k)) problems.push('a key setting is still in the file'); });
     if (Array.isArray(out.indexedDB) && K.countSecretFields(out.indexedDB, 0) > 0) problems.push('a key field is still in the file');
     if (hasKeyShape(text)) problems.push('a key-shaped value is still in the file');
-    var places = [];
+    if (idPlaces.length) problems.unshift('a key is used as a record id');
+    var namePlaces = [];
+    keyNamePlaces(outLs, K, values, ['your settings'], namePlaces, 0);
+    (Array.isArray(out.indexedDB) ? out.indexedDB : []).forEach(function (db) {
+      var sts = db && db.stores && typeof db.stores === 'object' ? db.stores : {};
+      ownKeys(sts).forEach(function (st) { keyNamePlaces(sts[st], K, values, [String(db.name || 'a database'), st], namePlaces, 0); });
+    });
+    if (namePlaces.length && !idPlaces.length) problems.unshift('a key is used as a name');
+    // before (ef550fbf): var places = [];
+    var places = idPlaces.slice();
+    // before (6b5c4046): if (problems.length) {
+    // before (6b5c4046):   keyNamePlaces(outLs, K, values, ['your settings'], places, 0);
+    // before (6b5c4046):   (Array.isArray(out.indexedDB) ? out.indexedDB : []).forEach(function (db) {
+    // before (6b5c4046):     var stores = db && db.stores && typeof db.stores === 'object' ? db.stores : {};
+    // before (6b5c4046):     ownKeys(stores).forEach(function (st) { keyNamePlaces(stores[st], K, values, [String(db.name || 'a database'), st], places, 0); });
+    // before (6b5c4046):   });
+    // before (6b5c4046): }
     if (problems.length) {
-      keyNamePlaces(outLs, K, values, ['your settings'], places, 0);
-      (Array.isArray(out.indexedDB) ? out.indexedDB : []).forEach(function (db) {
-        var stores = db && db.stores && typeof db.stores === 'object' ? db.stores : {};
-        ownKeys(stores).forEach(function (st) { keyNamePlaces(stores[st], K, values, [String(db.name || 'a database'), st], places, 0); });
-      });
+      namePlaces.forEach(function (x) { if (places.length < 5) places.push(x); });
+      // Anything else still shaped like a key is named too (never the value itself).
+      if (!places.length) {
+        leftPlaces(outLs, ['your settings'], places, 0);
+        (Array.isArray(out.indexedDB) ? out.indexedDB : []).forEach(function (db) {
+          var sts = db && db.stores && typeof db.stores === 'object' ? db.stores : {};
+          ownKeys(sts).forEach(function (st) { leftPlaces(sts[st], [String(db.name || 'a database'), st], places, 0); });
+        });
+      }
     }
     // before (649d5cce): return { ok: problems.length === 0, problems: problems, backup: out, text: text, names: names, hidden: counts.hidden.n + counts.fields.n };
     return { ok: problems.length === 0, problems: problems, places: places, backup: out, text: text, names: names,
@@ -303,28 +490,96 @@
   }
   // Read this device's copies of the places a file marks with the placeholder. Never creates a database:
   // if the browser cannot list databases, records are left as the file has them (the old behaviour).
-  function readDevice(backup) {
-    var device = { ls: {}, records: {} };
+  // before (f0823316): function readDevice(backup) {
+    // before (f0823316): var device = { ls: {}, records: {} };
+    // before (f0823316): var ls = backup && backup.localStorage && typeof backup.localStorage === 'object' ? backup.localStorage : {};
+    // before (f0823316): ownKeys(ls).forEach(function (k) {
+      // before (f0823316): if (typeof ls[k] === 'string' && ls[k].indexOf(KEPT) !== -1) { try { device.ls[k] = root.localStorage.getItem(k); } catch (e) { device.ls[k] = null; } }
+    // before (f0823316): });
+    // before (f0823316): var dbs = Array.isArray(backup && backup.indexedDB) ? backup.indexedDB.filter(function (db) { return db && db.stores && holdsKept(db.stores); }) : [];
+    // before (f0823316): var idb = root.indexedDB;
+    // before (f0823316): if (!dbs.length || !idb || typeof idb.databases !== 'function') return Promise.resolve(device);
+    // before (f0823316): return idb.databases().then(function (list) {
+      // before (f0823316): var here = (list || []).map(function (d) { return d.name; });
+      // before (f0823316): var jobs = dbs.filter(function (db) { return here.indexOf(db.name) !== -1; }).map(function (db) {
+          // before (f0823316): // before (6b5c4046): var req;
+          // before (f0823316): // before (6b5c4046): try { req = idb.open(db.name); } catch (e) { resolve(); return; }
+          // before (f0823316): // before (6b5c4046): req.onerror = function () { resolve(); };
+          // before (f0823316): // before (6b5c4046): req.onsuccess = function () {
+            // before (f0823316): // before (6b5c4046): var con = req.result;
+        // before (f0823316): return new Promise(function (resolveJob) {
+          // before (f0823316): // Hypha HOLD 1 / soft on #369: never wait longer than OPEN_WAIT_MS and never upgrade.
+          // before (f0823316): var req, settled = false, timer = null;
+          // before (f0823316): function resolve() { if (!settled) { settled = true; stopTimer(timer); resolveJob(); } }
+          // before (f0823316): try { req = idb.open(db.name); } catch (e) { resolve(); return; }
+          // before (f0823316): timer = startTimer(resolve);
+          // before (f0823316): req.onupgradeneeded = abortUpgrade(req);
+          // before (f0823316): req.onerror = function () { resolve(); };
+          // before (f0823316): req.onsuccess = function () {
+            // before (f0823316): var con = req.result;
+            // before (f0823316): if (settled) { try { con.close(); } catch (e) { /* already closed */ } return; }
+            // before (f0823316): var names = ownKeys(db.stores).filter(function (st) { return con.objectStoreNames.contains(st) && Array.isArray(db.stores[st]); });
+            // before (f0823316): if (!names.length) { con.close(); resolve(); return; }
+            // before (f0823316): var tx;
+            // before (f0823316): try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); resolve(); return; }
+            // before (f0823316): var mine = device.records[db.name] = {};
+            // before (f0823316): names.forEach(function (st) {
+              // before (f0823316): var os = tx.objectStore(st);
+              // before (f0823316): var kp = os.keyPath;
+              // before (f0823316): mine[st] = db.stores[st].map(function () { return null; });
+              // before (f0823316): db.stores[st].forEach(function (r, i) {
+                // before (f0823316): if (!holdsKept(r) || typeof kp !== 'string' || !r || typeof r !== 'object' || !own(r, kp)) return;
+                // before (f0823316): try { var g = os.get(r[kp]); g.onsuccess = function () { mine[st][i] = g.result === undefined ? null : g.result; }; } catch (e) { /* a key this store cannot use */ }
+              // before (f0823316): });
+            // before (f0823316): });
+            // before (f0823316): tx.oncomplete = function () { con.close(); resolve(); };
+            // before (f0823316): tx.onerror = tx.onabort = function () { con.close(); resolve(); };
+          // before (f0823316): };
+        // before (f0823316): });
+      // before (f0823316): });
+      // before (f0823316): return Promise.all(jobs).then(function () { return device; });
+    // before (f0823316): }, function () { return device; });
+  // before (f0823316): }
+  // Hypha HOLD on #369 at f0823316: the read on restore must never give up and let the placeholder be
+  // written over a real key. It has no time limit: while another FreeLattice tab holds a database, it
+  // waits (FlBackup's own restore waits for it too) and says so once, through onWait. If a database that
+  // holds placeholders cannot be read, device.failed says why, and the restore is stopped before any write.
+  function readDevice(backup, onWait) {
+    var device = { ls: {}, records: {}, failed: null };
     var ls = backup && backup.localStorage && typeof backup.localStorage === 'object' ? backup.localStorage : {};
     ownKeys(ls).forEach(function (k) {
       if (typeof ls[k] === 'string' && ls[k].indexOf(KEPT) !== -1) { try { device.ls[k] = root.localStorage.getItem(k); } catch (e) { device.ls[k] = null; } }
     });
     var dbs = Array.isArray(backup && backup.indexedDB) ? backup.indexedDB.filter(function (db) { return db && db.stores && holdsKept(db.stores); }) : [];
     var idb = root.indexedDB;
-    if (!dbs.length || !idb || typeof idb.databases !== 'function') return Promise.resolve(device);
-    return idb.databases().then(function (list) {
-      var here = (list || []).map(function (d) { return d.name; });
-      var jobs = dbs.filter(function (db) { return here.indexOf(db.name) !== -1; }).map(function (db) {
+    if (!dbs.length || !idb) return Promise.resolve(device);
+    var waitTimer = startTimer(function () { if (typeof onWait === 'function') onWait(); });
+    // Which databases are here? Without a list, each one is opened and an upgrade (a database that is
+    // not here) is aborted, so nothing is ever made.
+    var listed = typeof idb.databases === 'function'
+      ? Promise.resolve().then(function () { return idb.databases(); }).then(function (l) { return (l || []).map(function (d) { return d && d.name; }); }, function () { return null; })
+      : Promise.resolve(null);
+    return listed.then(function (here) {
+      var jobs = dbs.filter(function (db) { return !here || here.indexOf(db.name) !== -1; }).map(function (db) {
         return new Promise(function (resolve) {
-          var req;
-          try { req = idb.open(db.name); } catch (e) { resolve(); return; }
-          req.onerror = function () { resolve(); };
+          var req, notHere = false, name = String(db.name || 'a database');
+          function fail(why) { if (!device.failed) device.failed = why; resolve(); }
+          try { req = idb.open(db.name); } catch (e) { fail(name + ' could not be opened'); return; }
+          req.onupgradeneeded = function () { notHere = true; abortUpgrade(req)(); };
+          req.onerror = function (ev) {
+            try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e) { /* fine */ }
+            if (notHere) { resolve(); return; }
+            fail(name + ' could not be opened');
+          };
           req.onsuccess = function () {
             var con = req.result;
+            try { readFrom(con); } catch (e) { try { con.close(); } catch (e2) { /* already closed */ } fail(name + ' could not be read'); }
+          };
+          function readFrom(con) {
             var names = ownKeys(db.stores).filter(function (st) { return con.objectStoreNames.contains(st) && Array.isArray(db.stores[st]); });
             if (!names.length) { con.close(); resolve(); return; }
             var tx;
-            try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); resolve(); return; }
+            try { tx = con.transaction(names, 'readonly'); } catch (e) { con.close(); fail(name + ' could not be read'); return; }
             var mine = device.records[db.name] = {};
             names.forEach(function (st) {
               var os = tx.objectStore(st);
@@ -336,12 +591,89 @@
               });
             });
             tx.oncomplete = function () { con.close(); resolve(); };
-            tx.onerror = tx.onabort = function () { con.close(); resolve(); };
-          };
+            tx.onerror = tx.onabort = function () { con.close(); fail(name + ' could not be read'); };
+          }
         });
       });
-      return Promise.all(jobs).then(function () { return device; });
-    }, function () { return device; });
+      return Promise.all(jobs);
+    }).then(function () { stopTimer(waitTimer); return device; }, function (e) { stopTimer(waitTimer); throw e; });
+  }
+
+  // Soft 2: which field is each store's id? Read from this device only (never creates a database); when
+  // it cannot be read, "id" and "key" are both treated as ids and never rewritten.
+  // before (6b5c4046): function readKeyPaths() {
+    // before (6b5c4046): var idb = root.indexedDB, out = {};
+    // before (6b5c4046): if (!idb || typeof idb.databases !== 'function') return Promise.resolve(out);
+    // before (6b5c4046): return Promise.resolve().then(function () { return idb.databases(); }).then(function (list) {
+      // before (6b5c4046): return Promise.all((list || []).map(function (d) {
+        // before (6b5c4046): return new Promise(function (resolve) {
+          // before (6b5c4046): var req;
+          // before (6b5c4046): try { req = idb.open(d.name); } catch (e) { resolve(); return; }
+          // before (6b5c4046): req.onerror = function () { resolve(); };
+          // before (6b5c4046): req.onsuccess = function () {
+            // before (6b5c4046): var con = req.result, names = [];
+            // before (6b5c4046): try { names = Array.prototype.slice.call(con.objectStoreNames); } catch (e) { names = []; }
+            // before (6b5c4046): if (!names.length) { con.close(); resolve(); return; }
+            // before (6b5c4046): try {
+              // before (6b5c4046): var tx = con.transaction(names, 'readonly'), mine = out[d.name] = {};
+              // before (6b5c4046): names.forEach(function (st) { mine[st] = tx.objectStore(st).keyPath; });
+            // before (6b5c4046): } catch (e) { /* this database cannot be read now: "id" and "key" are kept as ids */ }
+            // before (6b5c4046): con.close(); resolve();
+          // before (6b5c4046): };
+        // before (6b5c4046): });
+      // before (6b5c4046): }));
+    // before (6b5c4046): }).then(function () { return out; }, function () { return out; });
+  // before (6b5c4046): }
+  // Hypha HOLD 1 on #369: another tab holding an upgrade could make an open wait forever, and Save Vault
+  // then did nothing. Now only FreeLattice databases are opened (the ones Save Vault puts in the file;
+  // any other database it saves keeps the safe "id"/"key" ids), each open waits about 1.5 seconds at
+  // most, an upgrade is never let through (so no empty database is ever made), and a busy or failed
+  // open falls back to "id"/"key". The result says how many were busy, so the page can say so.
+  var OPEN_WAIT_MS = 1500;
+  var SAVED_DB_RULE = /^FreeLattice/;
+  function startTimer(fn) { return typeof root.setTimeout === 'function' ? root.setTimeout(fn, OPEN_WAIT_MS) : null; }
+  function stopTimer(t) { if (t !== null && typeof root.clearTimeout === 'function') root.clearTimeout(t); }
+  function abortUpgrade(req) { return function () { try { req.transaction.abort(); } catch (e) { /* nothing to abort */ } }; }
+  // Open a database that already exists, never wait longer than OPEN_WAIT_MS, never upgrade it.
+  function openExisting(idb, name) {
+    return new Promise(function (resolve) {
+      var settled = false, req, timer = null;
+      function finish(con, why) {
+        if (settled) { if (con) { try { con.close(); } catch (e) { /* already closed */ } } return; }
+        settled = true; stopTimer(timer); resolve({ con: con, why: why });
+      }
+      try { req = idb.open(name); } catch (e) { finish(null, 'error'); return; }
+      timer = startTimer(function () { finish(null, 'busy'); });
+      req.onupgradeneeded = abortUpgrade(req);
+      req.onerror = function (ev) { try { if (ev && ev.preventDefault) ev.preventDefault(); } catch (e) { /* fine */ } finish(null, 'error'); };
+      req.onsuccess = function () { finish(req.result, null); };
+    });
+  }
+  function readKeyPaths() {
+    var idb = root.indexedDB, out = { paths: {}, busy: 0 };
+    if (!idb || typeof idb.databases !== 'function') return Promise.resolve(out);
+    var listed = new Promise(function (resolve) {
+      var t = startTimer(function () { out.busy += 1; resolve([]); });
+      Promise.resolve().then(function () { return idb.databases(); }).then(function (l) { stopTimer(t); resolve(l || []); }, function () { stopTimer(t); resolve([]); });
+    });
+    return listed.then(function (list) {
+      var names = list.map(function (d) { return d && d.name; }).filter(function (n) { return typeof n === 'string' && SAVED_DB_RULE.test(n); });
+      return Promise.all(names.map(function (name) {
+        return openExisting(idb, name).then(function (got) {
+          if (!got.con) { if (got.why === 'busy') out.busy += 1; return; }
+          var con = got.con, stores = [];
+          try { stores = Array.prototype.slice.call(con.objectStoreNames); } catch (e) { stores = []; }
+          try {
+            if (stores.length) {
+              var tx = con.transaction(stores, 'readonly'), mine = {};
+              stores.forEach(function (st) { mine[st] = tx.objectStore(st).keyPath; });
+              out.paths[name] = mine;
+            }
+          } catch (e) { /* this database cannot be read now: "id" and "key" are kept as ids */ }
+          try { con.close(); } catch (e) { /* already closed */ }
+        });
+      }));
+    }).then(function () { return out; }, function () { return out; });
   }
 
   function liveSecrets(K) {
@@ -379,7 +711,9 @@
       (n.fields ? (n.names && n.names.length ? ' and ' : ', ') + plural(n.fields, 'key inside a record', 'keys inside records') : '') +
       (n.shapes ? ((n.names && n.names.length) || n.fields ? ' and ' : ', ') + plural(n.shapes, 'pasted key in chats or records', 'pasted keys in chats or records') : '') +
       ', so anyone holding that file could read them. Everything was restored and works as before. ' +
-      'You can save a new, safe backup now: keys stay on this device and never go in the file. After that, you may delete the old file.';
+      // before (ef550fbf): 'You can save a new, safe backup now: keys stay on this device and never go in the file. After that, you may delete the old file.';
+      'You can save a new, safer backup now: saved keys, and pasted keys in the shapes Save Vault knows, stay on this device and are left out of the file. ' +
+      'After that, you may delete the old file.';
   }
   function renderNote() {
     var n = readNote();
@@ -402,8 +736,10 @@
     p.style.margin = '0 0 10px';
     // before (649d5cce): p.textContent = n.kind === 'clear' ? clearWords(n) : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.';
     p.textContent = n.kind === 'clear' ? clearWords(n) : (n.kept
-      ? 'This backup kept keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
-      : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
+      // before (ef550fbf): ? 'This backup kept keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
+      // before (ef550fbf): : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
+      ? 'This backup kept saved keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
+      : 'This backup kept saved keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
     box.appendChild(p);
     function btn(label, fn, strong) {
       var b = root.document.createElement('button');
@@ -430,6 +766,19 @@
     else root.document.body.insertBefore(box, root.document.body.firstChild);
   }
 
+  // Hypha soft on #369: say plainly what happened and what a person can do from the app.
+  function refusalWords(r) {
+    var where = r.places && r.places.length ? ' It is in: ' + r.places.join('; ') + '.' : '';
+    var next = ' Nothing on this device was changed. You can delete that item in the app (or the chat or note it belongs to) and save again, or keep your last backup for now.';
+    if (r.problems[0] === 'a key is used as a record id') {
+      return 'nothing was saved, so no key left this device. A key is used as the id of a record, and leaving it out would break that record.' + where + next;
+    }
+    if (r.problems[0] === 'a key is used as a name') {
+      return 'nothing was saved, so no key left this device. A key is used as the name of a field, and leaving it out would break that item.' + where + next;
+    }
+    return 'nothing was saved, so no key left this device (' + r.problems[0] + ').' + (where ? where + next : ' Please reload the page once and try again.');
+  }
+
   // ── Wrap FlBackup (whatever is there now, so the ceremony wrapper keeps working) ──
   function flBackup() {
     /* global FlBackup */
@@ -437,7 +786,17 @@
     return root.FlBackup || null;
   }
   var lastExport = null;
+  var lastRestore = null;
+  // Hypha soft on #369: Save Vault's own status line is announced too (app.html is unchanged; the
+  // attributes are added here, only when the page has not set them).
+  function announceStatus() {
+    var st = statusEl();
+    if (!st || !st.setAttribute) return;
+    if (!st.getAttribute('role')) st.setAttribute('role', 'status');
+    if (!st.getAttribute('aria-live')) st.setAttribute('aria-live', 'polite');
+  }
   var busy = false;
+  var busyDbs = 0;
   function wrapExport(inner) {
     var safe = function () {
       var self = this, args = arguments;
@@ -452,6 +811,13 @@
           lastExport = { ok: false, problems: ['key check not loaded'] };
           return;
         }
+        // before (6b5c4046): return readKeyPaths().then(function (keyPaths) { return saveWith(K, keyPaths); });
+        announceStatus();
+        var st0 = statusEl();
+        if (st0) st0.textContent = 'Save Vault is checking your records before saving\u2026';
+        return readKeyPaths().then(function (kp) { busyDbs = kp.busy; return saveWith(K, kp.paths); });
+      }).then(function () { busy = false; }, function (err) { busy = false; throw err; });
+      function saveWith(K, keyPaths) {
         var RealBlob = root.Blob;
         var secrets = liveSecrets(K);
         function SafeBlob(parts, opts) {
@@ -459,12 +825,15 @@
             var parsed = null;
             try { parsed = JSON.parse(parts[0]); } catch (e) { parsed = null; }
             if (parsed && parsed._meta && parsed._meta.type === 'freelattice-backup') {
-              var r = redact(parsed, K, secrets);
+              // before (ef550fbf): var r = redact(parsed, K, secrets);
+              var r = redact(parsed, K, secrets, keyPaths);
               lastExport = r;
               // No file is made if a key could still be in it: FlBackup shows "Export failed" with this reason.
               // before (649d5cce): if (!r.ok) throw new Error('a saved key could not be taken out, so nothing was saved (' + r.problems[0] + ')');
-              if (!r.ok) throw new Error('a saved key could not be taken out, so nothing was saved (' + r.problems[0] + ')' +
-                (r.places.length ? '. It is written as a name in: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
+              // before (6b5c4046): if (!r.ok) throw new Error('a saved key could not be taken out, so nothing was saved (' + r.problems[0] + ')' +
+              // before (ef550fbf): (r.places.length ? '. It is written as a name in: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
+              // before (6b5c4046): (r.places.length ? '. It is written where it cannot be hidden: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
+              if (!r.ok) throw new Error(refusalWords(r));
               parts = [r.text];
             }
           }
@@ -475,13 +844,17 @@
         return Promise.resolve().then(function () { return inner.apply(self, args); }).then(function () {
           root.Blob = RealBlob;
           if (lastExport && lastExport.ok) {
-            addLine('Keys and passwords stayed on this device' +
+            // before (ef550fbf): addLine('Keys and passwords stayed on this device' +
+            addLine('Saved keys and passwords stayed on this device' +
               (lastExport.names.length ? ' (' + plural(lastExport.names.length, 'key setting', 'key settings') + ' left out)' : '') +
               (lastExport.hidden ? ', and ' + plural(lastExport.hidden, 'copy of a key was', 'copies of keys were') + ' hidden in your records' : '') +
-              '. On a new device, enter them again in Settings.');
+              // before (ef550fbf): '. On a new device, enter them again in Settings.');
+              // before (6b5c4046): '. On a new device, enter them again in Settings. A key pasted in an unusual form may not be recognised, so look before you share the file.');
+              '. On a new device, enter them again in Settings. A key pasted in an unusual form may not be recognised, so look before you share the file.' +
+              (busyDbs ? ' ' + plural(busyDbs, 'database was', 'databases were') + ' busy (perhaps open in another tab), so record ids there were kept the safe way.' : ''));
           }
         }, function (err) { root.Blob = RealBlob; throw err; });
-      }).then(function () { busy = false; }, function (err) { busy = false; throw err; });
+      }
     };
     safe.__flKeysHome = VERSION;
     return safe;
@@ -493,6 +866,9 @@
       var info = null;
       var read = file && typeof file.text === 'function' ? file.text() : Promise.resolve(null);
       var merged = null;
+      var stopped = null;
+      lastRestore = null;
+      announceStatus();
       return Promise.all([read.catch(function () { return null; }), ensureKit()]).then(function (got) {
         var text = got[0], K = got[1];
         var parsed = null;
@@ -501,15 +877,30 @@
         if (parsed && K) { try { info = inspect(parsed, K); } catch (e) { info = null; } }
         // H2: a file that holds the placeholder never overwrites a real value this device has.
         if (!parsed || !parsed._meta || parsed._meta.type !== 'freelattice-backup' || !holdsKept(parsed)) return null;
-        return readDevice(parsed).then(function (device) { merged = mergeBackup(parsed, device); return merged; }, function () { return null; });
+        // before (f0823316): return readDevice(parsed).then(function (device) { merged = mergeBackup(parsed, device); return merged; }, function () { return null; });
+        return Promise.resolve().then(function () { return readDevice(parsed, function () { addLine('Waiting for another FreeLattice tab to let go\u2026 Your restore will go on by itself.'); }); }).then(function (device) {
+          if (device.failed) { stopped = device.failed; return null; }
+          merged = mergeBackup(parsed, device); return merged;
+        }, function () { stopped = 'this device could not be read'; return null; });
       }).then(function (m) {
         // FlBackup restores exactly as before: older files with keys in the clear still work.
         // before (649d5cce): return inner.call(self, fileInput);
+        // Stopped before any write: nothing on this device was changed.
+        if (stopped) {
+          lastRestore = { stopped: true, why: stopped };
+          var st1 = statusEl();
+          if (st1) st1.textContent = '\u274c Nothing was restored, and nothing on this device was changed: ' + stopped +
+            ', so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again.';
+          try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+          return 'stopped';
+        }
+        lastRestore = { stopped: false, kept: m ? m.stats.kept : 0 };
         if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
         var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
         try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
         return inner.call(self, { files: [f], value: '' });
-      }).then(function () {
+      }).then(function (how) {
+        if (how === 'stopped') return;
         var st = statusEl();
         var restored = st && /Restored/.test(st.textContent || '');
         if (!restored || !info || !info.isBackup) return;
@@ -539,6 +930,7 @@
     if (!F || typeof F.exportData !== 'function' || typeof F.importData !== 'function') return false;
     if (!F.exportData.__flKeysHome) F.exportData = wrapExport(F.exportData);
     if (!F.importData.__flKeysHome) F.importData = wrapImport(F.importData);
+    announceStatus();
     installed = true;
     return true;
   }
@@ -549,10 +941,18 @@
     ensureKit: ensureKit,
     renderNote: renderNote,
     lastExport: function () { return lastExport; },
+    lastRestore: function () { return lastRestore; },
     // before (649d5cce): _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS }
     _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS,
       hideKeyShapes: hideKeyShapes, hasKeyShape: hasKeyShape, fits: fits, keepDevice: keepDevice, mergeSetting: mergeSetting,
-      mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT }
+      // before (ef550fbf): mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT }
+      mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT,
+      // before (6b5c4046): readDevice: readDevice, readKeyPaths: readKeyPaths, idFields: idFields, b64Text: b64Text, plainKeyField: plainKeyField,
+      // before (6b5c4046): KEY_SHAPE_PARTS: KEY_SHAPE_PARTS }
+      readDevice: readDevice, readKeyPaths: readKeyPaths, idFields: idFields, b64Text: b64Text, plainKeyField: plainKeyField,
+      KEY_SHAPE_PARTS: KEY_SHAPE_PARTS, namedKeyField: namedKeyField, innocentId: innocentId, refusalWords: refusalWords,
+      // before (f0823316): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
+      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
   };
   root.FLBackupKeysHome = api;
 

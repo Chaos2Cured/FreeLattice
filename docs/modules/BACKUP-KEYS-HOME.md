@@ -17,7 +17,7 @@ The new module `docs/modules/backup-keys-home.js` (`window.FLBackupKeysHome`) la
   - **Pasted keys this device never held (heal 1).** A key pasted into a chat, a memory or a record may come from somewhere else, so this device does not know its value. The module also looks for the common shapes of keys and tokens (a short known prefix followed by a long run of letters and digits, within sensible lengths, holding at least one letter and one digit). Each one found anywhere in the file becomes `[kept on this device]`. Ordinary words, short codes, ids and numbers do not match. **Save a safe backup now** goes through the same path, so it drops them too.
 - **The result is checked.** If any saved key value, key setting or key field is still in the file, no file is made and FlBackup's own "Export failed" line says why.
 - The file gains `_meta.keys_kept_home: true`, `keys_note`, `keys_left_out`, `keys_hidden_in_records` and `keys_layer`.
-- The page adds one plain line: "Keys and passwords stayed on this device… On a new device, enter them again in Settings."
+- The page adds one plain line: "Keys and passwords stayed on this device… On a new device, enter them again in Settings." (Since the softs brick it reads "Saved keys and passwords stayed on this device… A key pasted in an unusual form may not be recognised, so look before you share the file.")
 - If the rules cannot load, nothing is saved, and the page says to try again in a moment. A file with keys in it is never made silently.
   - (heal) The module checks every rule it uses from the kit, not only one. If the page holds an older copy of the kit, nothing is saved and the page says plainly: "Please reload the page once and try again."
   - (heal) When a key is used as the name of a field or an id, it cannot be hidden without changing the record, so the file is refused. The message now says where it sits (for example "your settings › fl_map", or a database › store › item), without showing the key.
@@ -33,11 +33,45 @@ Nothing is sent anywhere and nothing is cleared. The only key this module remove
 ### SoulFile store names
 Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so the fix is not tiny.
 
+### Softs after #368 (Hypha's re-walk at 34b0db36)
+1. **Slugs are not keys.** An `sk-` value is hidden only when it holds an unbroken run of 16 or more letters and digits, so names such as `sk-2024-annual-report-final-v2-draft` come back as they are.
+2. **Record ids are never rewritten.** Before saving, the module reads which field is each store's id on this device (read only; it never creates a database, since #369 by aborting any upgrade). If it cannot tell, both `id` and `key` count as ids. An id that looks like a key is never hidden, because two such records would become one on a new device. Instead, nothing is saved and the page names each place, for example "FreeLatticeDB › chats › item 1 (a key used as a record id)", without showing the key.
+3. **More shapes.** These are now caught as well:
+   - access key ids (`AKIA…`)
+   - three-part tokens that start with `eyJ`
+   - `sk_` followed by hex
+   - a key wrapped in base64. The base64 is read on the device, and only a run whose text holds a key shape is hidden, so base64 clay, hashes and ids stay.
+   - a long key that mixes capitals, small letters and digits, when it comes right after words such as "key", "token", "secret", "password" or "Bearer"
+   - a field named plainly `key` that holds one long word with letters and digits (not when it is the record's id)
+4. **Honest words.** The page no longer says keys "never go in the file". It says that saved keys, and pasted keys in the shapes Save Vault knows, are left out, and it asks you to look before you share the file.
+5. **A stronger smoke.** There is one sample per shape at its shortest length, with a one-character-shorter twin that must stay. Look-alikes must come back byte for byte. Every kit rule is checked one at a time, and the placeholder words are compared. A stand-in database inside the vm shows that this device's records are read, opened with no version, read only and closed. Hypha's 21 mutations from her re-walk are all caught (3 of them adapted, where the line they target was replaced).
+
+### Heal after #369 (Hypha's walk at 6b5c4046)
+<!-- before (f0823316): - **Save never waits silently.** The record-id read before saving opens only FreeLattice databases, the ones Save Vault puts in the file. Any other database it saves keeps the safe `id`/`key` ids. Each open waits about 1.5 seconds at most, so a database held by another tab (for example one waiting for an upgrade) can no longer stall Save Vault. On a wait or an error, `id` and `key` are kept as ids. The page says "Save Vault is checking your records before saving…" while it reads, and afterwards says how many databases were busy. The read on restore follows the same rules: a busy database is left as the file has it. -->
+- **Save never waits silently.** The record-id read before saving opens only FreeLattice databases, the ones Save Vault puts in the file. Any other database it saves keeps the safe `id`/`key` ids. Each open waits about 1.5 seconds at most, so a database held by another tab (for example one waiting for an upgrade) can no longer stall Save Vault. On a wait or an error, `id` and `key` are kept as ids. The page says "Save Vault is checking your records before saving…" while it reads, and afterwards says how many databases were busy. The read on restore is different; see the next heal.<!-- before (f0823316): The read on restore follows the same rules: a busy database is left as the file has it. -->
+- **No empty database is ever made.** If a database is gone by the time it is opened, its upgrade is aborted, so neither read creates one.
+- **A plain `key` field is hidden only when it holds a real key shape.** That means 20+ characters of letters, digits, `_` and `-`, with an unbroken run of 16 letters and digits, mixing capitals, small letters and digits. Hex hashes, UUIDs, times, and values with `:`, `.` or other characters (such as a ψ id) are never touched, so share-door receipt keys, `chat_2024_11_21`, `rowkey-000123`, `sort.2024.11` and the like come back on a new device.
+- **A value that reads as a key only with its field name** (for example `"cache_key": "…"`) is hidden where it is. If it is a record id, the save is refused and the place is named. Anything else left shaped like a key is named by place too.
+- **Plain refusal words.** "Nothing was saved, so no key left this device. A key is used as the id of a record, and leaving it out would break that record. It is in: … Nothing on this device was changed. You can delete that item in the app (or the chat or note it belongs to) and save again, or keep your last backup for now."
+
+### Heal after #369 at f0823316 (Hypha's busy-restore walk)
+- **A restore never gives up on this device's keys.** The read on restore has no time limit. If another FreeLattice tab holds a database the file has placeholders for, the page says "Waiting for another FreeLattice tab to let go… Your restore will go on by itself." and waits, just as FlBackup's own restore waits. Nothing is written while it waits. When the other tab lets go, this device's keys are read and kept.
+- **If a database that holds placeholders cannot be opened or read, the restore stops before anything is written.** The page says: "Nothing was restored, and nothing on this device was changed: … could not be opened, so the keys it already has could not be kept safe. Close other FreeLattice tabs and try again."
+- **The kept count is the truth.** It counts only keys that were read from this device and kept. A database that is not on this device (a new device) is restored as the file has it, and nothing is made by the read.
+- **Save stays as it was:** its record-id read still waits about 1.5 seconds per database, then keeps the safe `id`/`key` ids.
+- Save Vault's own status line is now announced too (`role="status"`, `aria-live="polite"`, added only where the page has not set them).
+- A hex hash, UUID or time is never treated as a key because of its field name, in the field rule and in the file check alike.
+
 ### Screen readers
 The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
 
 ### Not covered yet
 This layer covers Save Vault (`FlBackup`) only. These exports are not covered yet and are left for their own bricks: the memory vault export (MemoryIndex vault export), `.lattice` files, the wallet export, `lattice-export`, and SoulFile. Settings whose names do not look like keys and whose values have no known key shape are also not caught.
+Since the softs brick, these are still not caught, on purpose, because catching them would also cut hashes, ids or clay:
+- a long key with no prefix and no naming words near it (for example a bare 32-character key on its own)
+- a base64 run longer than 8192 characters
+- a key split across lines or hidden inside other encodings
+- under a `key` field, a value that has only small letters and digits, or only capitals and digits (for example `abcdef0123456789ghijk`): it is kept, because ids and slugs look the same
 
 ### Follow-up (waiting on Kirk's OK for lock moves)
 The service worker serves `soul-ceremony.js` cache-first, so installed gardens only get this after a `CACHE_NAME` bump in `sw.js`. That bump is paired with a guard for the short window before this layer loads. Both need lock moves, so they are not in this brick. Pins to update with them: the LOCK rows for `sw.js` and `docs/sw.js`; `smoke-garden-move-kit-1`, `smoke-chat-bottom-clarity-v0.1`, `smoke-snowflake-cache-strategy-v0.1` (cache name) and `smoke-menu-contrast-more-cards` (edit the pin only); the HEARTH_CODE doc; and `GARDEN-MOVE-KIT-2.md`.
@@ -64,4 +98,6 @@ Delete `docs/modules/backup-keys-home.js`, this note and `docs/scripts/smoke-bac
   - The loader is in `soul-ceremony.js`, with the ceremony hook intact.
   - This note is complete.
 - (heal) It also checks: pasted keys of many shapes in chats, JSON settings and records are hidden while plain words stay; a key used as a name is refused and its place is named; an older kit is refused with the plain reload message; a same-device restore keeps nested, auth, core-setting and chat-record values and never writes the placeholder over a real one; a line that does not fit is not replaced; a new device restores as before; the device read never creates a database; the merged copy is what FlBackup restores; and the lines are announced.
-- It fails on base because the module is missing.
+- On main before the softs brick, the module is there, so it is the newer checks that fail there. (Earlier wording, for #368: "It fails on base because the module is missing.")
+<!-- before (6b5c4046): 2. **Record ids are never rewritten.** Before saving, the module reads which field is each store's id on this device (read only; it never creates a database). If it cannot tell, both `id` and `key` count as ids. An id that looks like a key is never hidden, because two such records would become one on a new device. Instead, nothing is saved and the page names each place, for example "FreeLatticeDB › chats › item 1 (a key used as a record id)", without showing the key. -->
+<!-- before (6b5c4046): - It fails on base because the module is missing. -->
