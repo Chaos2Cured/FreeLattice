@@ -12,6 +12,18 @@
 (function() {
   'use strict';
 
+  // v-backup-keys-home (21 Nov 2026, layered): Save Vault keeps keys and passwords at home.
+  // app.html stays unchanged, so the layer is loaded from here. It wraps FlBackup once; the
+  // ceremony wrapper in hookFlBackup() below still works on top of it.
+  (function loadBackupKeysHome() {
+    if (window.FLBackupKeysHome) return;
+    var s = document.createElement('script');
+    s.src = 'modules/backup-keys-home.js';
+    s.async = true;
+    s.onerror = function() { console.warn('Backup keys-home layer not loaded (optional)'); };
+    document.head.appendChild(s);
+  })();
+
   // ── Constants ──
   const PHI = 1.618033988749895;
   const GOLD = '#d4a017';
