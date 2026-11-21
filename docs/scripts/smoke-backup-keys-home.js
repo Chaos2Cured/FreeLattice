@@ -25,7 +25,8 @@ function readAllowed(rel) {
 }
 function strip(src) { return src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, ''); }
 
-// 1. Files (this is what fails on base).
+// 1. Files. (On main before this brick the module is there, so the checks below are what fail there.)
+// before (6b5c4046): // 1. Files (this is what fails on base).
 const mod = readAllowed(MOD);
 const cer = readAllowed(CEREMONY);
 const note = readAllowed(NOTE);
@@ -136,6 +137,7 @@ const asName = JSON.parse(JSON.stringify(pasted)); asName.localStorage.fl_map = 
 const rn = call('redact', 'STUB', [asName, []]);
 assert.strictEqual(rn.ok, false, 'a key used as a name refuses the file');
 assert.ok(rn.places.length === 1 && /^your settings \u203a fl_map \(a key used as a name\)$/.test(rn.places[0]), 'and says where: ' + rn.places);
+assert.strictEqual(rn.problems[0], 'a key is used as a name', 'and says why, first');
 assert.ok(JSON.stringify(rn.places).indexOf(FOREIGN.k3) === -1, 'without showing the key');
 const oldPasted = call('inspect', 'STUB', [pasted]);
 assert.deepStrictEqual([oldPasted.carriedClear, oldPasted.clearShapes], [true, 12], 'an older file with pasted keys is recognised');
@@ -178,7 +180,8 @@ SAMPLES.forEach(function (pair, i) {
   assert.deepStrictEqual(hid('w ' + x), ['w ' + x, 0], 'a shape inside a longer word is left alone: ' + x.slice(0, 8));
 });
 // Soft 1: an sk- value needs an unbroken run of 16 letters and digits.
-['sk-ii-facial-treatment-essence-230ml-2024', 'sk-2024-annual-report-final-v2-draft', 'sk-learn-pipeline-transformer-step'].forEach(function (x) {
+// before (6b5c4046): ['sk-ii-facial-treatment-essence-230ml-2024', 'sk-2024-annual-report-final-v2-draft', 'sk-learn-pipeline-transformer-step'].forEach(function (x) {
+['sk-ii-facial-treatment-essence-230ml-2024', 'sk-2024-annual-report-final-v2-draft', 'sk-learn-pipeline-transformer-step', 'sk-Ab3dEf6hIj9lMn-Ab3dEf6h', 'sk-Ab3dEf6hIj9lMn2-Ab3dEf'].forEach(function (x) {
   assert.deepStrictEqual(hid('buy ' + x + ' now'), ['buy ' + x + ' now', 0], 'soft 1: a slug is never cut: ' + x);
 });
 assert.deepStrictEqual(hid('k sk-ab-' + a(18)), ['k [kept on this device]', 1], 'soft 1: a real sk- key with a 16-run is hidden');
@@ -209,13 +212,63 @@ const fieldFile = {
 const rf = call('redact', 'STUB', [fieldFile, []]);
 assert.strictEqual(rf.ok, true, 'a file with plain key fields is allowed');
 const grid = JSON.parse(rf.backup.localStorage.fl_companions)[0].grid[0];
-assert.deepStrictEqual(grid.map(function (g) { return g.key; }), ['[kept on this device]', 'theme', 'short12', 'letters-only-value-here'], 'soft 3: a field named "key" with a long letters-and-digits value is hidden; words stay');
+// before (6b5c4046): assert.deepStrictEqual(grid.map(function (g) { return g.key; }), ['[kept on this device]', 'theme', 'short12', 'letters-only-value-here'], 'soft 3: a field named "key" with a long letters-and-digits value is hidden; words stay');
+// Hypha HOLD 2 on #369: only a real key shape in a plain "key" field is hidden.
+assert.deepStrictEqual(grid.map(function (g) { return g.key; }), ['grid-key-value-4444', 'theme', 'short12', 'letters-only-value-here'], 'HOLD 2: words and ids in a field named "key" stay');
 assert.strictEqual(rf.backup.localStorage.fl_clay, CLAY, 'base64 clay comes back byte for byte');
 assert.strictEqual(rf.backup.localStorage.fl_fp, fieldFile.localStorage.fl_fp, 'hashes and long words come back as they are');
-assert.deepStrictEqual([rf.backup.indexedDB[0].stores.meta[0].key, rf.backup.indexedDB[0].stores.notes[0].key], ['lastSync2024abc', 'abc123def456ghi789'], 'when the id field is not known, "id" and "key" are both kept as ids');
-const rk = call('redact', 'STUB', [fieldFile, [], { FreeLatticeDB: { meta: 'key', notes: 'id' } }]);
-assert.deepStrictEqual([rk.backup.indexedDB[0].stores.meta[0].key, rk.backup.indexedDB[0].stores.notes[0].key, rk.backup.indexedDB[0].stores.notes[0].id], ['lastSync2024abc', '[kept on this device]', 'n1'],
-  'with the store\u2019s id field known, only that field is kept as an id');
+// before (6b5c4046): assert.deepStrictEqual([rf.backup.indexedDB[0].stores.meta[0].key, rf.backup.indexedDB[0].stores.notes[0].key], ['lastSync2024abc', 'abc123def456ghi789'], 'when the id field is not known, "id" and "key" are both kept as ids');
+// before (6b5c4046): const rk = call('redact', 'STUB', [fieldFile, [], { FreeLatticeDB: { meta: 'key', notes: 'id' } }]);
+// before (6b5c4046): assert.deepStrictEqual([rk.backup.indexedDB[0].stores.meta[0].key, rk.backup.indexedDB[0].stores.notes[0].key, rk.backup.indexedDB[0].stores.notes[0].id], ['lastSync2024abc', '[kept on this device]', 'n1'],
+// before (6b5c4046):   'with the store\u2019s id field known, only that field is kept as an id');
+const MIXED20 = 'Gk7pQ2xLm9Rt4Vw8Yz3B';
+const kf = JSON.parse(JSON.stringify(fieldFile)); kf.indexedDB[0].stores.meta[0].key = MIXED20; kf.indexedDB[0].stores.notes[0].key = MIXED20;
+const rk0 = call('redact', 'STUB', [kf, []]);
+assert.deepStrictEqual([rk0.ok, rk0.backup.indexedDB[0].stores.notes[0].key], [true, MIXED20], 'when the id field is not known, "id" and "key" are both kept as ids');
+const rk = call('redact', 'STUB', [kf, [], { FreeLatticeDB: { meta: 'key', notes: 'id' } }]);
+assert.deepStrictEqual([rk.backup.indexedDB[0].stores.meta[0].key, rk.backup.indexedDB[0].stores.notes[0].key, rk.backup.indexedDB[0].stores.notes[0].id], [MIXED20, '[kept on this device]', 'n1'],
+  'with the store\u2019s id field known, only that field is kept as an id, and a real key shape in "key" is hidden');
+assert.deepStrictEqual(call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [{ name: 'D', stores: { s: [{ id: 'x', key: MIXED20.slice(0, 19) }] } }] }, [], { D: { s: 'id' } }]).backup.indexedDB[0].stores.s[0].key,
+  MIXED20.slice(0, 19), 'HOLD 2: under 20 characters is not a key shape');
+// Hypha's eight innocents, plus share-door receipt keys, survive a restore on a new device.
+const INNOCENT = ['2024-11-21T10:00:00Z', 'chat_2024_11_21', 'clay-7f3a9b2c-tile', 'sha256:' + SHA, '3f9a2c7e-41b8-4d2e-9a6f-0b1c2d3e4f50', '\u03c8-3f9a2c7e41b8-0007', 'rowkey-000123', 'sort.2024.11',
+  SHA.slice(0, 32), SHA.slice(0, 32).toUpperCase(), 'abc123def456ghi789', 'Session_2024_11_21_Morning_Notes'.replace(/_/g, '-')];
+const innFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true },
+  localStorage: { fl_share_door_receipts: JSON.stringify([{ key: SHA.slice(0, 32), count: 3 }, { key: SHA.slice(32), count: 1 }]), fl_grid: JSON.stringify(INNOCENT.map(function (v) { return { key: v }; })) },
+  indexedDB: [{ name: 'FreeLatticeDB', stores: { notes: INNOCENT.map(function (v, i) { return { id: 'n' + i, key: v }; }) } }] };
+[undefined, { FreeLatticeDB: { notes: 'id' } }].forEach(function (kp) {
+  const ri = call('redact', 'STUB', kp ? [innFile, [], kp] : [innFile, []]);
+  assert.strictEqual(ri.ok, true, 'HOLD 2: innocents are allowed');
+  const fresh2 = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.mergeBackup(JSON.parse(' + JSON.stringify(JSON.stringify(ri.backup)) + '), { ls: {}, records: {} }).backup)'));
+  assert.deepStrictEqual(JSON.parse(fresh2.localStorage.fl_grid).map(function (g) { return g.key; }), INNOCENT, 'HOLD 2: every innocent in a settings "key" field comes back on a new device');
+  assert.deepStrictEqual(fresh2.indexedDB[0].stores.notes.map(function (g) { return g.key; }), INNOCENT, 'HOLD 2: every innocent in a record "key" field comes back on a new device');
+  assert.strictEqual(fresh2.localStorage.fl_share_door_receipts, innFile.localStorage.fl_share_door_receipts, 'HOLD 2: share-door receipt keys (public-key hashes) come back as they are');
+});
+INNOCENT.forEach(function (v) { assert.strictEqual(inside('String(FLBackupKeysHome._internal.plainKeyField("key", ' + JSON.stringify(v) + '))'), 'false', 'not a key: ' + v); });
+// Each rule on its own: values that only one rule keeps.
+[['DeadBeef0123456789AbCdEf', 'mixed-case hex'], ['2024-11-21_SessionAbcDef123456789', 'a time at the start'], ['v2.Ab3dEf6hIj9lMn2pQr', 'a dot'], ['ns:Ab3dEf6hIj9lMn2pQr5', 'a colon'],
+  ['\u03c8-Ab3dEf6hIj9lMn2pQr5', 'a psi'], ['rowkey000123abcdefghijk', 'no capitals'], ['CamelCaseWordsOnlyHere', 'no digits'], ['Session-2024-11-21-Morning-Notes', 'no 16-run']].forEach(function (pair) {
+  assert.strictEqual(inside('String(FLBackupKeysHome._internal.plainKeyField("key", ' + JSON.stringify(pair[0]) + '))'), 'false', 'HOLD 2: kept, because of ' + pair[1] + ': ' + pair[0]);
+});
+assert.strictEqual(inside('String(FLBackupKeysHome._internal.plainKeyField("key", ' + JSON.stringify(MIXED20) + '))'), 'true', 'a real key shape in "key" is still hidden');
+// The file's own check is the last guard: what the walk cannot reach (deeper than 64 levels) refuses, and is named.
+let deep = { k: 'pasted ' + FOREIGN.k2 }; for (let i = 0; i < 70; i++) deep = { a: deep };
+const rd2 = call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: { fl_deep: JSON.stringify(deep) } }, []]);
+assert.deepStrictEqual([rd2.ok, rd2.problems.indexOf('a key-shaped value is still in the file') !== -1], [false, true], 'the file check refuses a key the walk could not reach');
+assert.deepStrictEqual(rd2.places, ['your settings \u203a fl_deep \u203a a \u203a \u2026 \u203a a \u203a k'], 'and names the place, shortly');
+// Hypha soft on #369: a value that reads as a key only with its field name is hidden where it is, or named.
+const ck = call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [{ name: 'FreeLatticeDB', stores: { cache: [{ id: 'r1', cache_key: a(36), size: 4 }] } }] }, []]);
+assert.deepStrictEqual([ck.ok, ck.backup.indexedDB[0].stores.cache[0].cache_key, ck.backup.indexedDB[0].stores.cache[0].size], [true, '[kept on this device]', 4], 'a cache_key-style value is hidden where it is, so the save is not refused blindly');
+const ck2 = call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [{ name: 'FreeLatticeDB', stores: { cache: [{ cache_key: a(36), size: 4 }] } }] }, [], { FreeLatticeDB: { cache: 'cache_key' } }]);
+assert.deepStrictEqual([ck2.ok, ck2.places], [false, ['FreeLatticeDB \u203a cache \u203a item 1 (a key used as a record id)']], 'as a record id it refuses and names the place');
+assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.leftPlaces({ fl_x: JSON.stringify({ cache_key: ' + JSON.stringify(a(36)) + ', ok: "fine" }), fl_y: "plain" }, ["your settings"], [], 0))')),
+  ['your settings \u203a fl_x \u203a cache_key'], 'anything left shaped like a key is named by place');
+// Hypha soft on #369: the refusal says what happened and what a person can do in the app.
+const rw = inside('FLBackupKeysHome._internal.refusalWords({ problems: ["a key is used as a record id"], places: ["FreeLatticeDB \u203a chats \u203a item 1 (a key used as a record id)"] })');
+assert.ok(/^nothing was saved, so no key left this device\. A key is used as the id of a record, and leaving it out would break that record\. It is in: FreeLatticeDB \u203a chats \u203a item 1/.test(rw) &&
+  /Nothing on this device was changed\. You can delete that item in the app \(or the chat or note it belongs to\) and save again, or keep your last backup for now\./.test(rw), 'the record-id refusal is plain and possible: ' + rw);
+assert.ok(/A key is used as the name of a field/.test(inside('FLBackupKeysHome._internal.refusalWords({ problems: ["a key is used as a name"], places: ["your settings"] })')), 'the name refusal is plain too');
+assert.ok(/Please reload the page once/.test(inside('FLBackupKeysHome._internal.refusalWords({ problems: ["a saved key is still in the file"], places: [] })')), 'with no place, it says what to try');
 assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(["a.b",["x","y.z"],null,undefined].map(function (kp, i) { var m = { D: {} }; if (i < 3) m.D.s = kp; return FLBackupKeysHome._internal.idFields(i < 3 ? m : null, "D", "s"); }))')),
   [['a'], ['x', 'y'], [], ['id', 'key']], 'id fields follow the store\u2019s keyPath');
 // Soft 2: a key used as a record id refuses the file, names the place, and never collapses records.
@@ -299,15 +352,20 @@ assert.strictEqual(call('inspect', 'STUB', [{ hello: 1 }]).isBackup, false, 'not
   .forEach(function (re) { assert.ok(!re.test(code), 'the module must not use ' + re); });
 assert.deepStrictEqual(code.match(/removeItem\([^)]*\)/g), ['removeItem(NOTE_KEY)'], 'only its own note is ever removed');
 assert.ok(/root\.Blob = SafeBlob;/.test(code) && (code.match(/root\.Blob = RealBlob;/g) || []).length === 2, 'the real Blob is put back on success and on failure');
-assert.ok(/if \(!r\.ok\) throw new Error\('a saved key could not be taken out, so nothing was saved/.test(code), 'no file is made when the check fails');
+// before (6b5c4046): assert.ok(/if \(!r\.ok\) throw new Error\('a saved key could not be taken out, so nothing was saved/.test(code), 'no file is made when the check fails');
+assert.ok(/if \(!r\.ok\) throw new Error\(refusalWords\(r\)\);/.test(code) && !/could not be taken out|Rename or remove it there/.test(code), 'no file is made when the check fails, and the words are plain');
 assert.ok(/Save Vault could not load its key check, so nothing was saved\. Please reload the page once and try again\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules, in plain words');
 // before (ef550fbf): assert.ok(/It is written as a name in: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
-assert.ok(/It is written where it cannot be hidden: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
+// before (6b5c4046): assert.ok(/It is written where it cannot be hidden: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
+assert.ok(/var where = r\.places && r\.places\.length \? ' It is in: ' \+ r\.places\.join\('; '\) \+ '\.' : '';/.test(code), 'a refusal says where');
 assert.ok(!/never go in the file/.test(code) && /pasted keys in the shapes Save Vault knows/.test(code) && /may not be recognised, so look before you share the file/.test(code), 'soft 4: the words say what is covered, not "never"');
-assert.ok(/return readKeyPaths\(\)\.then\(function \(keyPaths\) \{ return saveWith\(K, keyPaths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
+// before (6b5c4046): assert.ok(/return readKeyPaths\(\)\.then\(function \(keyPaths\) \{ return saveWith\(K, keyPaths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
+assert.ok(/return readKeyPaths\(\)\.then\(function \(kp\) \{ busyDbs = kp\.busy; return saveWith\(K, kp\.paths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
+assert.ok(/st0\.textContent = 'Save Vault is checking your records before saving\\u2026';/.test(code) && /busy \(perhaps open in another tab\), so record ids there were kept the safe way\./.test(code) && /\(busyDbs \? ' ' \+ plural\(busyDbs, /.test(code), 'HOLD 1: the save is never silent: it says it is checking, and says when a database was busy');
 assert.ok(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/.test(code) && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
 assert.ok(/else root\.document\.body\.insertBefore\(box, root\.document\.body\.firstChild\);/.test(code), 'the card comes early in the focus order');
-assert.ok(!/onupgradeneeded|createObjectStore/.test(code) && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database');
+// before (6b5c4046): assert.ok(!/onupgradeneeded|createObjectStore/.test(code) && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database');
+assert.ok(!/createObjectStore|deleteObjectStore/.test(code) && (code.match(/req\.onupgradeneeded = abortUpgrade\(req\);/g) || []).length === 2 && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database: an upgrade is aborted');
 assert.ok(/if \(!m \|\| !m\.stats\.kept \|\| typeof root\.File !== 'function'\) return inner\.call\(self, fileInput\);/.test(code) && /return inner\.call\(self, \{ files: \[f\], value: '' \}\);/.test(code), 'restore is FlBackup\u2019s own, given a copy that keeps this device\u2019s keys');
 assert.ok(/return inner\.call\(self, fileInput\);/.test(code) && !/fileInput\.files\[0\] =|backup\.localStorage\[[^\]]+\] =/.test(code), 'restore is passed through untouched when nothing here needs keeping');
 assert.ok(/if \(installed\) return true;/.test(code) && /safe\.__flKeysHome = VERSION;/.test(code), 'it wraps once');
@@ -316,7 +374,8 @@ assert.ok(/'Save a safe backup now'/.test(code) && /'Not now'/.test(code), 'it g
 assert.ok(/so anyone holding that file could read them\. Everything was restored and works as before\./.test(code), 'it says plainly what the old file carried');
 assert.ok(/s\.src = 'modules\/garden-move-kit\.js';/.test(code) && /root\.FLGardenMoveKit && root\.FLGardenMoveKit\._internal/.test(code), 'it uses the pack module\u2019s rules');
 assert.ok(/s\.src = 'modules\/backup-keys-home\.js';/.test(cer) && /function hookFlBackup\(\) \{\s*if \(typeof FlBackup === 'undefined'\) return;/.test(cer) && /hookFlBackup\(\);/.test(cer), 'soul-ceremony loads it and keeps its own hook');
-['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+// before (6b5c4046): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 
 // The checks below were reworded by the heal; the earlier wording is kept here.
 // before (649d5cce): assert.ok(/Save Vault is waiting for its key check to load\. Nothing was saved\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules');
@@ -335,6 +394,14 @@ vm.runInContext(`
       open: function (name) {
         log.push({ open: name, args: arguments.length });
         var r = {};
+        var d0 = dbs[name];
+        if (d0 && d0.stuck) return r;
+        if (d0 && d0.slow) { d0.release = function () { r.result = { objectStoreNames: Object.assign([], { contains: function () { return false; } }), close: function () { log.push({ close: name }); } }; if (r.onsuccess) r.onsuccess(); }; return r; }
+        if (d0 && d0.ghost) {
+          later(function () { var aborted = false; r.transaction = { abort: function () { aborted = true; log.push({ abort: name }); } };
+            if (r.onupgradeneeded) r.onupgradeneeded({}); if (!aborted) log.push({ created: name }); if (r.onerror) r.onerror({ preventDefault: function () {} }); });
+          return r;
+        }
         later(function () {
           if (!dbs[name] || arguments.length > 1) { if (r.onerror) r.onerror(); return; }
           var d = dbs[name], names = Object.keys(d.stores);
@@ -355,6 +422,10 @@ vm.runInContext(`
   localStorage = { getItem: function (k) { return k === 'fl_customAuth' ? 'Bearer real-token-777' : null; } };
   indexedDB = FakeIDB({ FreeLatticeCore: { stores: { settings: { keyPath: 'id', rows: [{ id: 'k1', config: { apiKey: 'real-core-key' } }, { id: 'k9', other: 1 }] }, meta: { keyPath: 'key', rows: [] } } } });
   RD = null; KP = null;
+  TIMERS = [];
+  setTimeout = function (f, ms) { TIMERS.push({ f: f, ms: ms, live: true }); return TIMERS.length - 1; };
+  clearTimeout = function (i) { if (TIMERS[i]) TIMERS[i].live = false; };
+  runTimers = function () { var n = 0; TIMERS.forEach(function (t) { if (t.live) { t.live = false; n += 1; t.f(); } }); return n; };
 `, ctx, { timeout: 2000 });
 const devFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: { fl_customAuth: 'Bearer ' + P, fl_theme: 'dusk' },
   indexedDB: [{ name: 'FreeLatticeCore', stores: { settings: [{ id: 'k1', config: { apiKey: P } }, { id: 'k2', note: 'no placeholder' }] } }, { name: 'NotOnThisDevice', stores: { s: [{ id: 'z', t: P }] } }] };
@@ -369,8 +440,49 @@ flush(20).then(function () {
   assert.ok(opens.length >= 2 && opens.every(function (x) { return x.args === 1 && x.open === 'FreeLatticeCore'; }), 'databases are opened with no version and only when this device has them: ' + JSON.stringify(opens));
   assert.ok(log.filter(function (x) { return x.tx; }).every(function (x) { return x.mode === 'readonly'; }), 'and read only');
   assert.strictEqual(log.filter(function (x) { return x.open; }).length, log.filter(function (x) { return x.close; }).length, 'every database opened is closed');
-  assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { FreeLatticeCore: { settings: 'id', meta: 'key' } }, 'soft 2: each store\u2019s id field is read from this device');
+  // before (6b5c4046): assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { FreeLatticeCore: { settings: 'id', meta: 'key' } }, 'soft 2: each store\u2019s id field is read from this device');
+  assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { paths: { FreeLatticeCore: { settings: 'id', meta: 'key' } }, busy: 0 }, 'soft 2: each store\u2019s id field is read from this device');
   const merged = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.mergeBackup(JSON.parse(' + JSON.stringify(JSON.stringify(devFile)) + '), JSON.parse(RD)))'));
   assert.deepStrictEqual([merged.backup.localStorage.fl_customAuth, merged.backup.indexedDB[0].stores.settings[0].config.apiKey, merged.stats], ['Bearer real-token-777', 'real-core-key', { kept: 2, left: 1 }], 'what was read is what is kept');
+  // HOLD 1 on #369: a database held by another tab never makes the save wait forever, only FreeLattice
+  // databases are opened, and a database that is gone is never made again.
+  inside('indexedDB = FakeIDB({ FreeLatticeCore: { stores: { settings: { keyPath: "id", rows: [] } } }, FreeLatticeStuck: { stuck: true }, FreeLatticeSlow: { slow: true }, StuckDB: { stuck: true }, FreeLatticeGone: { ghost: true } }); KP = null; RD = null; TIMERS = []; ""');
+  inside('FLBackupKeysHome._internal.readKeyPaths().then(function (k) { KP = JSON.stringify(k); }); ""');
+  return flush(20);
+}).then(function () {
+  assert.strictEqual(inside('String(KP)'), 'null', 'while a database is held, the read waits (for a moment only)');
+  const waits = JSON.parse(inside('JSON.stringify(TIMERS.filter(function (t) { return t.live; }).map(function (t) { return t.ms; }))'));
+  assert.ok(waits.length === 2 && waits.every(function (ms) { return ms === 1500; }), 'HOLD 1: each open waits about 1.5 seconds at most: ' + JSON.stringify(waits));
+  inside('runTimers(); ""');
+  return flush(20);
+}).then(function () {
+  assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { paths: { FreeLatticeCore: { settings: 'id' } }, busy: 2 }, 'HOLD 1: after the wait the save goes on, with "id"/"key" for the busy databases, and says how many were busy');
+  const log = JSON.parse(inside('JSON.stringify(indexedDB.log)'));
+  assert.ok(!log.some(function (x) { return x.open === 'StuckDB'; }), 'HOLD 1: a database Save Vault does not save is never opened');
+  assert.ok(log.some(function (x) { return x.abort === 'FreeLatticeGone'; }) && !log.some(function (x) { return x.created; }), 'soft: a database that is gone is never made again (its upgrade is aborted)');
+  assert.ok(log.filter(function (x) { return x.open; }).every(function (x) { return x.args === 1; }), 'every open has no version');
+  // The read on restore follows the same rules.
+  const stuckFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: {}, indexedDB: [{ name: 'FreeLatticeStuck', stores: { s: [{ id: 'z', t: P }] } }] };
+  inside('TIMERS = []; FLBackupKeysHome._internal.readDevice(JSON.parse(' + JSON.stringify(JSON.stringify(stuckFile)) + ')).then(function (d) { RD = JSON.stringify(d); }); ""');
+  return flush(20).then(function () {
+    assert.strictEqual(inside('String(RD)'), 'null', 'the restore read waits for a moment too');
+    inside('runTimers(); ""');
+    return flush(20);
+  }).then(function () {
+    assert.deepStrictEqual(JSON.parse(inside('String(RD)')), { ls: {}, records: {} }, 'HOLD 1: on restore a busy database is left as the file has it, and the restore goes on');
+  });
+}).then(function () {
+  // A slow open that finally answers after its wait is closed, never kept open.
+  inside('TIMERS = []; KP = null; ""');
+  inside('(function () { var d = { FreeLatticeSlow: { slow: true } }; indexedDB = FakeIDB(d); SLOWDB = d; FLBackupKeysHome._internal.readKeyPaths().then(function (k) { KP = JSON.stringify(k); }); })(); ""');
+  return flush(20).then(function () { inside('runTimers(); ""'); return flush(20); }).then(function () {
+    assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { paths: {}, busy: 1 }, 'a slow database counts as busy');
+    inside('SLOWDB.FreeLatticeSlow.release(); ""');
+    return flush(5);
+  }).then(function () {
+    const log = JSON.parse(inside('JSON.stringify(indexedDB.log)'));
+    assert.ok(log.some(function (x) { return x.close === 'FreeLatticeSlow'; }), 'a late answer is closed straight away');
+  });
+}).then(function () {
   console.log('SMOKE_OK backup keys home');
 }).catch(function (e) { console.error(e); process.exitCode = 1; });
