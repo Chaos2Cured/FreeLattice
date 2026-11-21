@@ -17,7 +17,7 @@ The new module `docs/modules/backup-keys-home.js` (`window.FLBackupKeysHome`) la
   - **Pasted keys this device never held (heal 1).** A key pasted into a chat, a memory or a record may come from somewhere else, so this device does not know its value. The module also looks for the common shapes of keys and tokens (a short known prefix followed by a long run of letters and digits, within sensible lengths, holding at least one letter and one digit). Each one found anywhere in the file becomes `[kept on this device]`. Ordinary words, short codes, ids and numbers do not match. **Save a safe backup now** goes through the same path, so it drops them too.
 - **The result is checked.** If any saved key value, key setting or key field is still in the file, no file is made and FlBackup's own "Export failed" line says why.
 - The file gains `_meta.keys_kept_home: true`, `keys_note`, `keys_left_out`, `keys_hidden_in_records` and `keys_layer`.
-- The page adds one plain line: "Keys and passwords stayed on this device… On a new device, enter them again in Settings."
+- The page adds one plain line: "Keys and passwords stayed on this device… On a new device, enter them again in Settings." (Since the softs brick it reads "Saved keys and passwords stayed on this device… A key pasted in an unusual form may not be recognised, so look before you share the file.")
 - If the rules cannot load, nothing is saved, and the page says to try again in a moment. A file with keys in it is never made silently.
   - (heal) The module checks every rule it uses from the kit, not only one. If the page holds an older copy of the kit, nothing is saved and the page says plainly: "Please reload the page once and try again."
   - (heal) When a key is used as the name of a field or an id, it cannot be hidden without changing the record, so the file is refused. The message now says where it sits (for example "your settings › fl_map", or a database › store › item), without showing the key.
@@ -33,11 +33,28 @@ Nothing is sent anywhere and nothing is cleared. The only key this module remove
 ### SoulFile store names
 Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so the fix is not tiny.
 
+### Softs after #368 (Hypha's re-walk at 34b0db36)
+1. **Slugs are not keys.** An `sk-` value is hidden only when it holds an unbroken run of 16 or more letters and digits, so names such as `sk-2024-annual-report-final-v2-draft` come back as they are.
+2. **Record ids are never rewritten.** Before saving, the module reads which field is each store's id on this device (read only; it never creates a database). If it cannot tell, both `id` and `key` count as ids. An id that looks like a key is never hidden, because two such records would become one on a new device. Instead, nothing is saved and the page names each place, for example "FreeLatticeDB › chats › item 1 (a key used as a record id)", without showing the key.
+3. **More shapes.** These are now caught as well:
+   - access key ids (`AKIA…`)
+   - three-part tokens that start with `eyJ`
+   - `sk_` followed by hex
+   - a key wrapped in base64. The base64 is read on the device, and only a run whose text holds a key shape is hidden, so base64 clay, hashes and ids stay.
+   - a long key that mixes capitals, small letters and digits, when it comes right after words such as "key", "token", "secret", "password" or "Bearer"
+   - a field named plainly `key` that holds one long word with letters and digits (not when it is the record's id)
+4. **Honest words.** The page no longer says keys "never go in the file". It says that saved keys, and pasted keys in the shapes Save Vault knows, are left out, and it asks you to look before you share the file.
+5. **A stronger smoke.** There is one sample per shape at its shortest length, with a one-character-shorter twin that must stay. Look-alikes must come back byte for byte. Every kit rule is checked one at a time, and the placeholder words are compared. A stand-in database inside the vm shows that this device's records are read, opened with no version, read only and closed. Hypha's 21 mutations from her re-walk are all caught (3 of them adapted, where the line they target was replaced).
+
 ### Screen readers
 The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
 
 ### Not covered yet
 This layer covers Save Vault (`FlBackup`) only. These exports are not covered yet and are left for their own bricks: the memory vault export (MemoryIndex vault export), `.lattice` files, the wallet export, `lattice-export`, and SoulFile. Settings whose names do not look like keys and whose values have no known key shape are also not caught.
+Since the softs brick, these are still not caught, on purpose, because catching them would also cut hashes, ids or clay:
+- a long key with no prefix and no naming words near it (for example a bare 32-character key on its own)
+- a base64 run longer than 8192 characters
+- a key split across lines or hidden inside other encodings
 
 ### Follow-up (waiting on Kirk's OK for lock moves)
 The service worker serves `soul-ceremony.js` cache-first, so installed gardens only get this after a `CACHE_NAME` bump in `sw.js`. That bump is paired with a guard for the short window before this layer loads. Both need lock moves, so they are not in this brick. Pins to update with them: the LOCK rows for `sw.js` and `docs/sw.js`; `smoke-garden-move-kit-1`, `smoke-chat-bottom-clarity-v0.1`, `smoke-snowflake-cache-strategy-v0.1` (cache name) and `smoke-menu-contrast-more-cards` (edit the pin only); the HEARTH_CODE doc; and `GARDEN-MOVE-KIT-2.md`.

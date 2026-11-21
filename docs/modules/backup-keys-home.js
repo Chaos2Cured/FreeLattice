@@ -16,13 +16,20 @@
 
    Loaded by soul-ceremony.js. It uses the pack module's rules (FLGardenMoveKit._internal), loading
    modules/garden-move-kit.js when it is not on the page yet. It never sends anything anywhere and
-   never clears storage. */
+   never clears storage.
+
+   Hypha softs on #368 (v-backup-keys-home softs, after ef550fbf): an sk- value needs an unbroken run of
+   16+ letters and digits; a key used as a record id refuses the file and names the place (records are
+   never collapsed); more key shapes (AKIA, three-part eyJ tokens, sk_ hex, a base64-wrapped key, a long
+   mixed key right after words like "key" or "token", and a plain field named "key"); and the words say
+   what is covered instead of "never". */
 (function (root) {
   'use strict';
 
   var VERSION = 'v-backup-keys-home';
   var NOTE_KEY = 'fl_backup_keys_note';          // a small note for after the reload: kind, time, key names (never values)
-  var KEPT_HOME_NOTE = 'Keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
+  // before (ef550fbf): var KEPT_HOME_NOTE = 'Keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
+  var KEPT_HOME_NOTE = 'Saved keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
   // Sealed with a device's own unlock key: never readable on another device, so never "in the clear".
   var SEALED_RULE = /_enc$/;
   var SEALED_KEYS = ['fl_ghSyncToken'];
@@ -67,27 +74,88 @@
   // a long run of key characters, on word edges, with both letters and digits. Lengths are bounded so
   // ordinary words and numbers are never cut.
   var KEY_SHAPE_PARTS = [
-    'sk-[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
+    // before (ef550fbf): 'sk-[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
+    // Soft 1: an sk- value needs an unbroken run of 16+ letters and digits, so slugs such as
+    // "sk-2024-annual-report-final-v2-draft" are never cut.
+    'sk-(?=[A-Za-z0-9_-]*[A-Za-z0-9]{16})[A-Za-z0-9_-]{20,250}', '(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{16,120}',
     'gh[pousr]_[A-Za-z0-9]{30,100}', 'github_pat_[A-Za-z0-9_]{30,120}',
     'hf_[A-Za-z0-9]{30,60}', 'gsk_[A-Za-z0-9]{30,80}', 'xai-[A-Za-z0-9]{30,120}',
     'AIza[0-9A-Za-z_-]{35}', 'ya29\\.[0-9A-Za-z_-]{20,400}', 'xox[abprs]-[A-Za-z0-9-]{10,200}',
     'glpat-[A-Za-z0-9_-]{20,60}', 'r8_[A-Za-z0-9]{30,60}', 'pplx-[A-Za-z0-9]{30,80}', 'nvapi-[A-Za-z0-9_-]{30,90}',
-    '[0-9]{8,10}:AA[A-Za-z0-9_-]{30,40}'
+    '[0-9]{8,10}:AA[A-Za-z0-9_-]{30,40}',
+    // Soft 3: access key ids, three-part eyJ tokens and sk_ followed by hex.
+    '(?:AKIA|ASIA)[0-9A-Z]{16}', 'eyJ[A-Za-z0-9_-]{8,2000}\\.eyJ[A-Za-z0-9_-]{8,4000}\\.[A-Za-z0-9_-]{16,1000}', 'sk_[0-9a-f]{32,80}'
   ];
   function keyShapeRe() { return new RegExp('(^|[^A-Za-z0-9_-])(' + KEY_SHAPE_PARTS.join('|') + ')(?![A-Za-z0-9_-])', 'g'); }
-  function realShape(m) { return /[0-9]/.test(m) && /[A-Za-z]/.test(m); }
+  // before (ef550fbf): function realShape(m) { return /[0-9]/.test(m) && /[A-Za-z]/.test(m); }
+  // Soft 5: letters and digits are looked for after a short prefix such as "sk-", so the prefix alone
+  // never makes a run of digits look like a key.
+  function realShape(m) {
+    var body = m.replace(/^[A-Za-z]{2,6}[-_]/, '');
+    return /[0-9]/.test(body) && /[A-Za-z]/.test(body);
+  }
+  // Soft 3: a long key with no prefix is caught only right after words that name it ("my key is …",
+  // "token: …", "Bearer …") and only when it mixes capitals, small letters and digits, so hashes, ids
+  // and commit names (one case of hex) are never cut.
+  function contextRe() {
+    return /(^|[^A-Za-z0-9])((?:api[ _-]?key|apikey|key|token|secret|password|passwd|bearer)["']?\s{0,3}(?:[:=]|is)?\s{0,3}["']?)([A-Za-z0-9]{32,64})(?![A-Za-z0-9_+\/=.-])/gi;
+  }
+  function mixedKey(v) { return /[a-z]/.test(v) && /[A-Z]/.test(v) && /[0-9]/.test(v); }
+  // Soft 3: a key wrapped in base64 is caught by reading the base64 (here, nothing sent anywhere): only a
+  // run whose decoded text holds a key shape is hidden, so base64 clay, hashes and ids stay as they are.
+  function b64Re() { return /(^|[^A-Za-z0-9+\/=_-])([A-Za-z0-9+\/]{28,8192}={0,2})(?![A-Za-z0-9+\/=_-])/g; }
+  var B64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  function b64Text(t) {
+    var s = t.replace(/=+$/, '');
+    if (s.length % 4 === 1) return null;
+    var out = '', bits = 0, acc = 0;
+    for (var i = 0; i < s.length; i++) {
+      var c = B64.indexOf(s.charAt(i));
+      if (c < 0) return null;
+      acc = (acc << 6) | c; bits += 6;
+      if (bits >= 8) { bits -= 8; out += String.fromCharCode((acc >> bits) & 255); }
+    }
+    return out;
+  }
+  function plainShape(str) {
+    var re = keyShapeRe(), m;
+    while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    var cr = contextRe();
+    while ((m = cr.exec(str))) { if (mixedKey(m[3])) return true; }
+    return false;
+  }
+  function wrapsKey(run) { var d = b64Text(run); return !!d && plainShape(d); }
   function hideKeyShapes(str, counter) {
     if (typeof str !== 'string' || str.length < 16) return str;
-    return str.replace(keyShapeRe(), function (m, edge, key) {
+    // before (ef550fbf): return str.replace(keyShapeRe(), function (m, edge, key) {
+    // before (ef550fbf):   if (!realShape(key)) return m;
+    // before (ef550fbf):   counter.n += 1;
+    // before (ef550fbf):   return edge + KEPT;
+    // before (ef550fbf): });
+    var out = str.replace(keyShapeRe(), function (m, edge, key) {
       if (!realShape(key)) return m;
+      counter.n += 1;
+      return edge + KEPT;
+    });
+    out = out.replace(contextRe(), function (m, edge, words, key) {
+      if (!mixedKey(key)) return m;
+      counter.n += 1;
+      return edge + words + KEPT;
+    });
+    return out.replace(b64Re(), function (m, edge, run) {
+      if (!wrapsKey(run)) return m;
       counter.n += 1;
       return edge + KEPT;
     });
   }
   function hasKeyShape(str) {
     if (typeof str !== 'string') return false;
-    var re = keyShapeRe(), m;
-    while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    // before (ef550fbf): var re = keyShapeRe(), m;
+    // before (ef550fbf): while ((m = re.exec(str))) { if (realShape(m[2])) return true; }
+    // before (ef550fbf): return false;
+    if (plainShape(str)) return true;
+    var br = b64Re(), m;
+    while ((m = br.exec(str))) { if (wrapsKey(m[2])) return true; }
     return false;
   }
   function hideString(v, K, values, counts) {
@@ -106,7 +174,63 @@
     var o = {};
     ownKeys(v).forEach(function (k) {
       if (K.secretFieldValue(k, v[k])) { o[k] = K.KEPT_LINE; counts.fields.n += 1; return; }
+      // Soft 3: a field named plainly "key" holding one long word of letters and digits is a key too
+      // (a record's own id is never touched: see walkRecord).
+      if (plainKeyField(k, v[k])) { o[k] = K.KEPT_LINE; counts.fields.n += 1; return; }
       o[k] = walk(v[k], K, values, counts, depth + 1);
+    });
+    return o;
+  }
+  function plainKeyField(k, v) {
+    return /^key$/i.test(k) && typeof v === 'string' && v.length >= 12 && v.length <= 512 && !/\s/.test(v) &&
+      /[0-9]/.test(v) && /[A-Za-z]/.test(v) && v.indexOf(KEPT) === -1;
+  }
+
+  // Soft 2: a record's id is never rewritten. Two records whose ids were both hidden would become one on
+  // restore, so a key used as an id refuses the file and the place is named instead. The id field is the
+  // store's own keyPath when this device can read it, otherwise "id" and "key".
+  function idFields(keyPaths, dbName, st) {
+    var d = keyPaths && own(keyPaths, dbName) ? keyPaths[dbName] : null;
+    if (!d || !own(d, st)) return ['id', 'key'];
+    var kp = d[st];
+    if (typeof kp === 'string') return kp ? [kp.split('.')[0]] : [];
+    if (Array.isArray(kp)) return kp.map(function (x) { return String(x).split('.')[0]; });
+    return [];
+  }
+  function idHoldsKey(k, v, K, values) {
+    var t = typeof v === 'string' ? v : (v && typeof v === 'object' ? JSON.stringify(v) : '');
+    if (!t) return false;
+    // Read with its field name too, as the file's own check does ("key": "…").
+    return hasKeyShape(t) || hasKeyShape(k + ': ' + t) || values.some(function (sv) { return K.containsSecret(t, sv); });
+  }
+  function walkRecord(r, ids, K, values, counts, where, idPlaces) {
+    if (!r || typeof r !== 'object' || Array.isArray(r)) return walk(r, K, values, counts, 1);
+    var o = {};
+    ownKeys(r).forEach(function (k) {
+      if (ids.indexOf(k) !== -1) {
+        o[k] = r[k];
+        if (idHoldsKey(k, r[k], K, values) && idPlaces.length < 5) idPlaces.push(where + ' (a key used as a record id)');
+        return;
+      }
+      var one = {}; one[k] = r[k];
+      o[k] = walk(one, K, values, counts, 1)[k];
+    });
+    return o;
+  }
+  function walkDb(db, K, values, counts, keyPaths, idPlaces) {
+    if (!db || typeof db !== 'object' || Array.isArray(db) || !db.stores || typeof db.stores !== 'object') return walk(db, K, values, counts, 0);
+    var o = {};
+    ownKeys(db).forEach(function (k) {
+      if (k !== 'stores') { o[k] = walk(db[k], K, values, counts, 1); return; }
+      var outStores = {};
+      ownKeys(db.stores).forEach(function (st) {
+        var rows = db.stores[st];
+        var ids = idFields(keyPaths, db.name, st);
+        outStores[st] = Array.isArray(rows) ? rows.map(function (r, i) {
+          return walkRecord(r, ids, K, values, counts, String(db.name || 'a database') + ' \u203a ' + st + ' \u203a item ' + (i + 1), idPlaces);
+        }) : walk(rows, K, values, counts, 2);
+      });
+      o[k] = outStores;
     });
     return o;
   }
@@ -148,7 +272,8 @@
 
   // Take keys out of a backup object. liveSecrets: key values this device holds that may not be in the
   // file (the unlock key is never in it), so a copy of them inside a record is hidden too.
-  function redact(backup, K, liveSecrets) {
+  // before (ef550fbf): function redact(backup, K, liveSecrets) {
+  function redact(backup, K, liveSecrets, keyPaths) {
     var values = [];
     var names = [];
     var ls = (backup && backup.localStorage && typeof backup.localStorage === 'object') ? backup.localStorage : {};
@@ -167,7 +292,9 @@
     // before (649d5cce): var counts = { hidden: { n: 0 }, fields: { n: 0 } };
     var counts = { hidden: { n: 0 }, fields: { n: 0 }, shapes: { n: 0 } };
     ownKeys(outLs).forEach(function (k) { outLs[k] = walkSetting(outLs[k], K, values, counts); });
-    var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walk(db, K, values, counts, 0); }) : backup.indexedDB;
+    // before (ef550fbf): var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walk(db, K, values, counts, 0); }) : backup.indexedDB;
+    var idPlaces = [];
+    var idb = Array.isArray(backup.indexedDB) ? backup.indexedDB.map(function (db) { return walkDb(db, K, values, counts, keyPaths, idPlaces); }) : backup.indexedDB;
     var meta = {};
     ownKeys(backup._meta || {}).forEach(function (k) { meta[k] = backup._meta[k]; });
     meta.keys_kept_home = true;
@@ -185,7 +312,9 @@
     ownKeys(outLs).forEach(function (k) { if (K.isSecretName(k)) problems.push('a key setting is still in the file'); });
     if (Array.isArray(out.indexedDB) && K.countSecretFields(out.indexedDB, 0) > 0) problems.push('a key field is still in the file');
     if (hasKeyShape(text)) problems.push('a key-shaped value is still in the file');
-    var places = [];
+    if (idPlaces.length) problems.unshift('a key is used as a record id');
+    // before (ef550fbf): var places = [];
+    var places = idPlaces.slice();
     if (problems.length) {
       keyNamePlaces(outLs, K, values, ['your settings'], places, 0);
       (Array.isArray(out.indexedDB) ? out.indexedDB : []).forEach(function (db) {
@@ -344,6 +473,32 @@
     }, function () { return device; });
   }
 
+  // Soft 2: which field is each store's id? Read from this device only (never creates a database); when
+  // it cannot be read, "id" and "key" are both treated as ids and never rewritten.
+  function readKeyPaths() {
+    var idb = root.indexedDB, out = {};
+    if (!idb || typeof idb.databases !== 'function') return Promise.resolve(out);
+    return Promise.resolve().then(function () { return idb.databases(); }).then(function (list) {
+      return Promise.all((list || []).map(function (d) {
+        return new Promise(function (resolve) {
+          var req;
+          try { req = idb.open(d.name); } catch (e) { resolve(); return; }
+          req.onerror = function () { resolve(); };
+          req.onsuccess = function () {
+            var con = req.result, names = [];
+            try { names = Array.prototype.slice.call(con.objectStoreNames); } catch (e) { names = []; }
+            if (!names.length) { con.close(); resolve(); return; }
+            try {
+              var tx = con.transaction(names, 'readonly'), mine = out[d.name] = {};
+              names.forEach(function (st) { mine[st] = tx.objectStore(st).keyPath; });
+            } catch (e) { /* this database cannot be read now: "id" and "key" are kept as ids */ }
+            con.close(); resolve();
+          };
+        });
+      }));
+    }).then(function () { return out; }, function () { return out; });
+  }
+
   function liveSecrets(K) {
     var out = [];
     try {
@@ -379,7 +534,9 @@
       (n.fields ? (n.names && n.names.length ? ' and ' : ', ') + plural(n.fields, 'key inside a record', 'keys inside records') : '') +
       (n.shapes ? ((n.names && n.names.length) || n.fields ? ' and ' : ', ') + plural(n.shapes, 'pasted key in chats or records', 'pasted keys in chats or records') : '') +
       ', so anyone holding that file could read them. Everything was restored and works as before. ' +
-      'You can save a new, safe backup now: keys stay on this device and never go in the file. After that, you may delete the old file.';
+      // before (ef550fbf): 'You can save a new, safe backup now: keys stay on this device and never go in the file. After that, you may delete the old file.';
+      'You can save a new, safer backup now: saved keys, and pasted keys in the shapes Save Vault knows, stay on this device and are left out of the file. ' +
+      'After that, you may delete the old file.';
   }
   function renderNote() {
     var n = readNote();
@@ -402,8 +559,10 @@
     p.style.margin = '0 0 10px';
     // before (649d5cce): p.textContent = n.kind === 'clear' ? clearWords(n) : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.';
     p.textContent = n.kind === 'clear' ? clearWords(n) : (n.kept
-      ? 'This backup kept keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
-      : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
+      // before (ef550fbf): ? 'This backup kept keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
+      // before (ef550fbf): : 'This backup kept keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
+      ? 'This backup kept saved keys and passwords at home. Keys this device already had were kept as they are; enter any others again in Settings when you need them.'
+      : 'This backup kept saved keys and passwords at home, on the device that made it. Enter them again in Settings when you need them.');
     box.appendChild(p);
     function btn(label, fn, strong) {
       var b = root.document.createElement('button');
@@ -452,6 +611,9 @@
           lastExport = { ok: false, problems: ['key check not loaded'] };
           return;
         }
+        return readKeyPaths().then(function (keyPaths) { return saveWith(K, keyPaths); });
+      }).then(function () { busy = false; }, function (err) { busy = false; throw err; });
+      function saveWith(K, keyPaths) {
         var RealBlob = root.Blob;
         var secrets = liveSecrets(K);
         function SafeBlob(parts, opts) {
@@ -459,12 +621,14 @@
             var parsed = null;
             try { parsed = JSON.parse(parts[0]); } catch (e) { parsed = null; }
             if (parsed && parsed._meta && parsed._meta.type === 'freelattice-backup') {
-              var r = redact(parsed, K, secrets);
+              // before (ef550fbf): var r = redact(parsed, K, secrets);
+              var r = redact(parsed, K, secrets, keyPaths);
               lastExport = r;
               // No file is made if a key could still be in it: FlBackup shows "Export failed" with this reason.
               // before (649d5cce): if (!r.ok) throw new Error('a saved key could not be taken out, so nothing was saved (' + r.problems[0] + ')');
               if (!r.ok) throw new Error('a saved key could not be taken out, so nothing was saved (' + r.problems[0] + ')' +
-                (r.places.length ? '. It is written as a name in: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
+                // before (ef550fbf): (r.places.length ? '. It is written as a name in: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
+                (r.places.length ? '. It is written where it cannot be hidden: ' + r.places.join('; ') + '. Rename or remove it there, then save again.' : ''));
               parts = [r.text];
             }
           }
@@ -475,13 +639,15 @@
         return Promise.resolve().then(function () { return inner.apply(self, args); }).then(function () {
           root.Blob = RealBlob;
           if (lastExport && lastExport.ok) {
-            addLine('Keys and passwords stayed on this device' +
+            // before (ef550fbf): addLine('Keys and passwords stayed on this device' +
+            addLine('Saved keys and passwords stayed on this device' +
               (lastExport.names.length ? ' (' + plural(lastExport.names.length, 'key setting', 'key settings') + ' left out)' : '') +
               (lastExport.hidden ? ', and ' + plural(lastExport.hidden, 'copy of a key was', 'copies of keys were') + ' hidden in your records' : '') +
-              '. On a new device, enter them again in Settings.');
+              // before (ef550fbf): '. On a new device, enter them again in Settings.');
+              '. On a new device, enter them again in Settings. A key pasted in an unusual form may not be recognised, so look before you share the file.');
           }
         }, function (err) { root.Blob = RealBlob; throw err; });
-      }).then(function () { busy = false; }, function (err) { busy = false; throw err; });
+      }
     };
     safe.__flKeysHome = VERSION;
     return safe;
@@ -552,7 +718,10 @@
     // before (649d5cce): _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS }
     _internal: { redact: redact, inspect: inspect, walk: walk, NOTE_KEY: NOTE_KEY, KEPT_HOME_NOTE: KEPT_HOME_NOTE, SEALED_KEYS: SEALED_KEYS,
       hideKeyShapes: hideKeyShapes, hasKeyShape: hasKeyShape, fits: fits, keepDevice: keepDevice, mergeSetting: mergeSetting,
-      mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT }
+      // before (ef550fbf): mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT }
+      mergeBackup: mergeBackup, kitRules: kitRules, KIT_FUNCTIONS: KIT_FUNCTIONS, KEPT: KEPT,
+      readDevice: readDevice, readKeyPaths: readKeyPaths, idFields: idFields, b64Text: b64Text, plainKeyField: plainKeyField,
+      KEY_SHAPE_PARTS: KEY_SHAPE_PARTS }
   };
   root.FLBackupKeysHome = api;
 

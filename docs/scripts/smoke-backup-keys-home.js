@@ -148,6 +148,100 @@ assert.strictEqual(inside('String(FLBackupKeysHome._internal.kitRules())'), 'nul
 inside('FLGardenMoveKit = { _internal: Object.assign({}, STUB, { KEPT_LINE: "[x]" }) }; delete FLGardenMoveKit; ""');
 assert.strictEqual(inside('String(FLBackupKeysHome._internal.kitRules())'), 'null', 'no pack module, no rules');
 
+// 3e. Hypha softs on #368 (after ef550fbf).
+const SH = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.KEY_SHAPE_PARTS)'));
+const AZ = 'Ab3dEf6hIj9lMn2pQr5tUv8xYz1bCd4fGh7jKl0n'.repeat(3);
+function a(n) { return AZ.slice(0, n); }
+function hid(str) { return JSON.parse(inside('(function(){ var c = { n: 0 }; var o = FLBackupKeysHome._internal.hideKeyShapes(' + JSON.stringify(str) + ', c); return JSON.stringify([o, c.n]); })()')); }
+function has(str) { return inside('String(FLBackupKeysHome._internal.hasKeyShape(' + JSON.stringify(str) + '))') === 'true'; }
+// Soft 5: one sample per shape, at its shortest, and each sample is that shape's own.
+const SAMPLES = [
+  ['sk-' + a(20), 'sk-' + a(19)], ['sk_live_' + a(16), 'sk_live_' + a(15)], ['gho_' + a(30), 'gho_' + a(29)], ['github_pat_' + a(30), 'github_pat_' + a(29)],
+  ['hf_' + a(30), 'hf_' + a(29)], ['gsk_' + a(30), 'gsk_' + a(29)], ['xai-' + a(30), 'xai-' + a(29)], ['AIza' + a(35), 'AIza' + a(34)],
+  ['ya29.' + a(20), 'ya29.' + a(19)], ['xoxb-' + a(10), 'xoxb-' + a(9)], ['glpat-' + a(20), 'glpat-' + a(19)], ['r8_' + a(30), 'r8_' + a(29)],
+  ['pplx-' + a(30), 'pplx-' + a(29)], ['nvapi-' + a(30), 'nvapi-' + a(29)], ['12345678:AA' + a(30), '12345678:AA' + a(29)],
+  ['AKIA' + 'ABCDEFGH12345678', 'AKIA' + 'ABCDEFGH1234567'], ['eyJ' + a(8) + '.eyJ' + a(8) + '.' + a(16), 'eyJ' + a(8) + '.eyJ' + a(8) + '.' + a(15)],
+  ['sk_' + '0a1b2c3d4e5f6a7b'.repeat(2), 'sk_' + '0a1b2c3d4e5f6a7'.repeat(2)]
+];
+assert.strictEqual(SAMPLES.length, SH.length, 'one test per shape');
+SAMPLES.forEach(function (pair, i) {
+  assert.ok(new RegExp('^(?:' + SH[i] + ')$').test(pair[0]), 'sample ' + i + ' is its own shape: ' + SH[i]);
+  assert.deepStrictEqual(hid('see ' + pair[0] + ' ok'), ['see [kept on this device] ok', 1], 'the shortest ' + SH[i] + ' key is hidden');
+  assert.deepStrictEqual(hid('see ' + pair[1] + ' ok'), ['see ' + pair[1] + ' ok', 0], 'one character shorter is not a ' + SH[i] + ' key');
+});
+// Letters and digits are looked for after the prefix.
+['sk-' + '1'.repeat(24), 'sk-' + 'abcdefghijklmnopqrstuvwxyz', 'ghp_' + 'a'.repeat(32), 'hf_' + '7'.repeat(32)].forEach(function (x) {
+  assert.deepStrictEqual(hid('x ' + x), ['x ' + x, 0], 'a prefix alone does not make a key: ' + x);
+});
+// A shape inside a longer word is not a key.
+['mask-' + a(24), 'Xghp_' + a(30), 'nohf_' + a(30), 'ZAIza' + a(35)].forEach(function (x) {
+  assert.deepStrictEqual(hid('w ' + x), ['w ' + x, 0], 'a shape inside a longer word is left alone: ' + x.slice(0, 8));
+});
+// Soft 1: an sk- value needs an unbroken run of 16 letters and digits.
+['sk-ii-facial-treatment-essence-230ml-2024', 'sk-2024-annual-report-final-v2-draft', 'sk-learn-pipeline-transformer-step'].forEach(function (x) {
+  assert.deepStrictEqual(hid('buy ' + x + ' now'), ['buy ' + x + ' now', 0], 'soft 1: a slug is never cut: ' + x);
+});
+assert.deepStrictEqual(hid('k sk-ab-' + a(18)), ['k [kept on this device]', 1], 'soft 1: a real sk- key with a 16-run is hidden');
+// Soft 3: more shapes, and look-alikes that must come back byte for byte.
+const JWT = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dBjftJeZ4CVPmB92K27uhbUJU1p1r_wW1gFWFOEjXk';
+const M32 = a(32);
+const WRAP = Buffer.from('sk-proj-' + a(40)).toString('base64');
+let seed = 11; const bytes = Buffer.alloc(3000); for (let i = 0; i < bytes.length; i++) { seed = (seed * 1103515245 + 12345) & 0x7fffffff; bytes[i] = seed >> 16 & 255; }
+const CLAY = bytes.toString('base64');
+const SHA = '2d711642b726b04401627ca9fbac32f5c8530fb1903cc4db02258717921a4881';
+const LOOK = ['3f9a2c7e-41b8-4d2e-9a6f-0b1c2d3e4f50', 'key 3f9a2c7e41b84d2e9a6f0b1c2d3e4f50', SHA, 'commit 649d5ccedb12018ece65f6b33189b073887f4172', '\u03c8-3f9a2c7e41b8-0007',
+  '\u03c8_' + a(40), CLAY, 'internationalization-supercalifragilistic-antidisestablishmentarianism', 'hf_hub_download_models_and_datasets',
+  'task-1234567890123456789012345', '12345678:AAbc', 'gsk_tutorial-notes-for-beginners', 'https://example.com/a/b?ref=docs&page=12', M32, 'id ' + M32];
+LOOK.forEach(function (x) { assert.deepStrictEqual(hid(x), [x, 0], 'never cut: ' + x.slice(0, 40)); assert.strictEqual(has(x), false, 'not a key: ' + x.slice(0, 40)); });
+assert.deepStrictEqual(hid('cloud AKIAIOSFODNN7EXAMPLE | ' + JWT + ' | sk_' + SHA.slice(0, 48)), ['cloud [kept on this device] | [kept on this device] | [kept on this device]', 3], 'soft 3: AKIA, eyJ and sk_ hex are hidden');
+assert.deepStrictEqual(hid('my key is ' + M32 + ', token: ' + a(40) + ' and Bearer ' + a(33)), ['my key is [kept on this device], token: [kept on this device] and Bearer [kept on this device]', 3], 'soft 3: a long mixed key right after "key", "token" or "Bearer" is hidden');
+assert.deepStrictEqual(hid('wrapped ' + WRAP + ' end'), ['wrapped [kept on this device] end', 1], 'soft 3: a base64-wrapped key is hidden');
+assert.deepStrictEqual([has('x ' + WRAP), has('x ' + Buffer.from('just some words here, nothing more').toString('base64'))], [true, false], 'the file check reads base64 too');
+assert.strictEqual(inside('FLBackupKeysHome._internal.b64Text(' + JSON.stringify(WRAP) + ')'), 'sk-proj-' + a(40), 'the base64 reader is exact');
+const fieldFile = {
+  _meta: { type: 'freelattice-backup' },
+  localStorage: { fl_companions: JSON.stringify([{ name: 'Willow', grid: [[{ key: 'grid-key-value-4444', n: 1 }, { key: 'theme', n: 2 }, { key: 'short12' }, { key: 'letters-only-value-here' }]] }]), fl_clay: CLAY, fl_fp: JSON.stringify({ sha: SHA, words: LOOK[7] }) },
+  indexedDB: [{ name: 'FreeLatticeDB', version: 1, stores: {
+    meta: [{ key: 'lastSync2024abc', value: 3 }],
+    notes: [{ id: 'n1', key: 'abc123def456ghi789', body: 'kept' }]
+  } }]
+};
+const rf = call('redact', 'STUB', [fieldFile, []]);
+assert.strictEqual(rf.ok, true, 'a file with plain key fields is allowed');
+const grid = JSON.parse(rf.backup.localStorage.fl_companions)[0].grid[0];
+assert.deepStrictEqual(grid.map(function (g) { return g.key; }), ['[kept on this device]', 'theme', 'short12', 'letters-only-value-here'], 'soft 3: a field named "key" with a long letters-and-digits value is hidden; words stay');
+assert.strictEqual(rf.backup.localStorage.fl_clay, CLAY, 'base64 clay comes back byte for byte');
+assert.strictEqual(rf.backup.localStorage.fl_fp, fieldFile.localStorage.fl_fp, 'hashes and long words come back as they are');
+assert.deepStrictEqual([rf.backup.indexedDB[0].stores.meta[0].key, rf.backup.indexedDB[0].stores.notes[0].key], ['lastSync2024abc', 'abc123def456ghi789'], 'when the id field is not known, "id" and "key" are both kept as ids');
+const rk = call('redact', 'STUB', [fieldFile, [], { FreeLatticeDB: { meta: 'key', notes: 'id' } }]);
+assert.deepStrictEqual([rk.backup.indexedDB[0].stores.meta[0].key, rk.backup.indexedDB[0].stores.notes[0].key, rk.backup.indexedDB[0].stores.notes[0].id], ['lastSync2024abc', '[kept on this device]', 'n1'],
+  'with the store\u2019s id field known, only that field is kept as an id');
+assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(["a.b",["x","y.z"],null,undefined].map(function (kp, i) { var m = { D: {} }; if (i < 3) m.D.s = kp; return FLBackupKeysHome._internal.idFields(i < 3 ? m : null, "D", "s"); }))')),
+  [['a'], ['x', 'y'], [], ['id', 'key']], 'id fields follow the store\u2019s keyPath');
+// Soft 2: a key used as a record id refuses the file, names the place, and never collapses records.
+const idFile = { _meta: { type: 'freelattice-backup' }, localStorage: { fl_theme: 'dusk' },
+  indexedDB: [{ name: 'FreeLatticeDB', version: 1, stores: { notes: [{ id: 'sk-' + a(30), text: 'row one' }, { id: 'sk-' + a(31), text: 'row two' }, { id: 'n3', text: 'fine' }] } }] };
+const ri = call('redact', 'STUB', [idFile, []]);
+assert.strictEqual(ri.ok, false, 'soft 2: a key used as a record id refuses the file');
+assert.strictEqual(ri.problems[0], 'a key is used as a record id', 'and says why');
+assert.deepStrictEqual(ri.places.slice(0, 2), ['FreeLatticeDB \u203a notes \u203a item 1 (a key used as a record id)', 'FreeLatticeDB \u203a notes \u203a item 2 (a key used as a record id)'], 'and names each place');
+assert.ok(JSON.stringify(ri.places).indexOf('sk-') === -1, 'without showing the key');
+assert.deepStrictEqual(ri.backup.indexedDB[0].stores.notes.map(function (x) { return x.id; }), ['sk-' + a(30), 'sk-' + a(31), 'n3'], 'ids are never rewritten, so two records never become one');
+const ri2 = call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [{ name: 'D', stores: { m: [{ key: M32, v: 1 }] } }] }, []]);
+assert.deepStrictEqual([ri2.ok, ri2.places], [false, ['D \u203a m \u203a item 1 (a key used as a record id)']], 'a long mixed id under "key" is named as well');
+// Soft 5: every rule from the pack module is checked, one at a time, and the placeholder words too.
+const NEEDED = ['isSecretName', 'huntable', 'hideSecretLeaves', 'secretFieldValue', 'containsSecret', 'countSecretFields'];
+assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.KIT_FUNCTIONS)')), NEEDED, 'every rule the module uses is on its check list');
+NEEDED.forEach(function (f) {
+  inside('FLGardenMoveKit = { _internal: Object.assign({}, STUB, { ' + f + ': undefined }) }; ""');
+  assert.strictEqual(inside('String(FLBackupKeysHome._internal.kitRules())'), 'null', 'a pack module without ' + f + ' is refused');
+});
+inside('FLGardenMoveKit = { _internal: Object.assign({}, STUB, { KEPT_LINE: "[x]" }) }; ""');
+assert.strictEqual(inside('String(FLBackupKeysHome._internal.kitRules())'), 'null', 'a pack module with other placeholder words is refused');
+inside('FLGardenMoveKit = { _internal: STUB }; ""');
+assert.strictEqual(inside('String(FLBackupKeysHome._internal.kitRules() === STUB)'), 'true', 'and the full rules are used again');
+inside('delete FLGardenMoveKit; ""');
+
 // 3d. H2: restoring never lets the placeholder replace a real value this device has.
 const P = '[kept on this device]';
 const safeFile = {
@@ -207,7 +301,10 @@ assert.deepStrictEqual(code.match(/removeItem\([^)]*\)/g), ['removeItem(NOTE_KEY
 assert.ok(/root\.Blob = SafeBlob;/.test(code) && (code.match(/root\.Blob = RealBlob;/g) || []).length === 2, 'the real Blob is put back on success and on failure');
 assert.ok(/if \(!r\.ok\) throw new Error\('a saved key could not be taken out, so nothing was saved/.test(code), 'no file is made when the check fails');
 assert.ok(/Save Vault could not load its key check, so nothing was saved\. Please reload the page once and try again\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules, in plain words');
-assert.ok(/It is written as a name in: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
+// before (ef550fbf): assert.ok(/It is written as a name in: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
+assert.ok(/It is written where it cannot be hidden: ' \+ r\.places\.join\('; '\)/.test(code), 'a refusal says where');
+assert.ok(!/never go in the file/.test(code) && /pasted keys in the shapes Save Vault knows/.test(code) && /may not be recognised, so look before you share the file/.test(code), 'soft 4: the words say what is covered, not "never"');
+assert.ok(/return readKeyPaths\(\)\.then\(function \(keyPaths\) \{ return saveWith\(K, keyPaths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
 assert.ok(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/.test(code) && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
 assert.ok(/else root\.document\.body\.insertBefore\(box, root\.document\.body\.firstChild\);/.test(code), 'the card comes early in the focus order');
 assert.ok(!/onupgradeneeded|createObjectStore/.test(code) && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database');
@@ -219,11 +316,61 @@ assert.ok(/'Save a safe backup now'/.test(code) && /'Not now'/.test(code), 'it g
 assert.ok(/so anyone holding that file could read them\. Everything was restored and works as before\./.test(code), 'it says plainly what the old file carried');
 assert.ok(/s\.src = 'modules\/garden-move-kit\.js';/.test(code) && /root\.FLGardenMoveKit && root\.FLGardenMoveKit\._internal/.test(code), 'it uses the pack module\u2019s rules');
 assert.ok(/s\.src = 'modules\/backup-keys-home\.js';/.test(cer) && /function hookFlBackup\(\) \{\s*if \(typeof FlBackup === 'undefined'\) return;/.test(cer) && /hookFlBackup\(\);/.test(cer), 'soul-ceremony loads it and keeps its own hook');
-['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 
 // The checks below were reworded by the heal; the earlier wording is kept here.
 // before (649d5cce): assert.ok(/Save Vault is waiting for its key check to load\. Nothing was saved\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules');
 // before (649d5cce): assert.ok(/return inner\.call\(self, fileInput\);/.test(code) && !/fileInput\.files\[0\] =|backup\.localStorage\[[^\]]+\] =/.test(code), 'restore is passed through untouched');
 // before (649d5cce): assert.ok(/position:fixed;left:12px;right:12px;bottom:16px;/.test(code) && /else root\.document\.body\.appendChild\(box\);/.test(code), 'after the reload the note is in sight, not buried in Settings');
+// before (ef550fbf): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+// before (ef550fbf): console.log('SMOKE_OK backup keys home');   (now printed after the device-read checks below)
 // before (649d5cce): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
-console.log('SMOKE_OK backup keys home');
+// 6. Reading this device (a stand-in database written inside the vm): records are read, never created.
+vm.runInContext(`
+  function FakeIDB(dbs) {
+    var log = [];
+    function later(f) { Promise.resolve().then(f); }
+    return { log: log,
+      databases: function () { return Promise.resolve(Object.keys(dbs).map(function (n) { return { name: n, version: 1 }; })); },
+      open: function (name) {
+        log.push({ open: name, args: arguments.length });
+        var r = {};
+        later(function () {
+          if (!dbs[name] || arguments.length > 1) { if (r.onerror) r.onerror(); return; }
+          var d = dbs[name], names = Object.keys(d.stores);
+          names.contains = function (s) { return !!d.stores[s]; };
+          r.result = { objectStoreNames: names, close: function () { log.push({ close: name }); },
+            transaction: function (list, mode) {
+              log.push({ tx: name, mode: mode });
+              var tx = { pending: 0, fired: false, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
+                objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, get: function (k) { var g = {}; tx.pending += 1;
+                  later(function () { g.result = S.rows.filter(function (x) { return x[S.keyPath] === k; })[0]; if (g.onsuccess) g.onsuccess(); tx.pending -= 1; tx.done(); }); return g; } }; } };
+              later(function () { later(function () { tx.done(); }); });
+              return tx; } };
+          if (r.onsuccess) r.onsuccess();
+        });
+        return r;
+      } };
+  }
+  localStorage = { getItem: function (k) { return k === 'fl_customAuth' ? 'Bearer real-token-777' : null; } };
+  indexedDB = FakeIDB({ FreeLatticeCore: { stores: { settings: { keyPath: 'id', rows: [{ id: 'k1', config: { apiKey: 'real-core-key' } }, { id: 'k9', other: 1 }] }, meta: { keyPath: 'key', rows: [] } } } });
+  RD = null; KP = null;
+`, ctx, { timeout: 2000 });
+const devFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: { fl_customAuth: 'Bearer ' + P, fl_theme: 'dusk' },
+  indexedDB: [{ name: 'FreeLatticeCore', stores: { settings: [{ id: 'k1', config: { apiKey: P } }, { id: 'k2', note: 'no placeholder' }] } }, { name: 'NotOnThisDevice', stores: { s: [{ id: 'z', t: P }] } }] };
+inside('FLBackupKeysHome._internal.readDevice(JSON.parse(' + JSON.stringify(JSON.stringify(devFile)) + ')).then(function (d) { RD = JSON.stringify(d); }); FLBackupKeysHome._internal.readKeyPaths().then(function (k) { KP = JSON.stringify(k); }); ""');
+function flush(n) { return n ? new Promise(function (res) { setImmediate(res); }).then(function () { return flush(n - 1); }) : Promise.resolve(); }
+flush(20).then(function () {
+  const rd = JSON.parse(inside('String(RD)'));
+  assert.deepStrictEqual(rd.ls, { fl_customAuth: 'Bearer real-token-777' }, 'only settings holding the placeholder are read from this device');
+  assert.deepStrictEqual(rd.records, { FreeLatticeCore: { settings: [{ id: 'k1', config: { apiKey: 'real-core-key' } }, null] } }, 'this device\u2019s records are read for the rows that hold the placeholder');
+  const log = JSON.parse(inside('JSON.stringify(indexedDB.log)'));
+  const opens = log.filter(function (x) { return x.open; });
+  assert.ok(opens.length >= 2 && opens.every(function (x) { return x.args === 1 && x.open === 'FreeLatticeCore'; }), 'databases are opened with no version and only when this device has them: ' + JSON.stringify(opens));
+  assert.ok(log.filter(function (x) { return x.tx; }).every(function (x) { return x.mode === 'readonly'; }), 'and read only');
+  assert.strictEqual(log.filter(function (x) { return x.open; }).length, log.filter(function (x) { return x.close; }).length, 'every database opened is closed');
+  assert.deepStrictEqual(JSON.parse(inside('String(KP)')), { FreeLatticeCore: { settings: 'id', meta: 'key' } }, 'soft 2: each store\u2019s id field is read from this device');
+  const merged = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.mergeBackup(JSON.parse(' + JSON.stringify(JSON.stringify(devFile)) + '), JSON.parse(RD)))'));
+  assert.deepStrictEqual([merged.backup.localStorage.fl_customAuth, merged.backup.indexedDB[0].stores.settings[0].config.apiKey, merged.stats], ['Bearer real-token-777', 'real-core-key', { kept: 2, left: 1 }], 'what was read is what is kept');
+  console.log('SMOKE_OK backup keys home');
+}).catch(function (e) { console.error(e); process.exitCode = 1; });
