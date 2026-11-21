@@ -14,13 +14,17 @@ The new module `docs/modules/backup-keys-home.js` (`window.FLBackupKeysHome`) la
   - Settings named like a key (`isSecretName`) are left out. Provider names (`fl_apiKey_provider`), `fl_tokenLimit`, `max_tokens` and similar are not secrets, so they stay.
   - Only real key values are hunted (`huntable`: a real-looking credential, or a value saved under an exact key name). This includes the keys this device holds that are never in the file. Any copy of one inside a record or a setting becomes `[kept on this device]`. Numbers and names are never touched.
   - A record field named like a key whose value could be a key (`secretFieldValue`) becomes `[kept on this device]`. This includes fields inside settings that hold JSON.
+  - **Pasted keys this device never held (heal 1).** A key pasted into a chat, a memory or a record may come from somewhere else, so this device does not know its value. The module also looks for the common shapes of keys and tokens (a short known prefix followed by a long run of letters and digits, within sensible lengths, holding at least one letter and one digit). Each one found anywhere in the file becomes `[kept on this device]`. Ordinary words, short codes, ids and numbers do not match. **Save a safe backup now** goes through the same path, so it drops them too.
 - **The result is checked.** If any saved key value, key setting or key field is still in the file, no file is made and FlBackup's own "Export failed" line says why.
 - The file gains `_meta.keys_kept_home: true`, `keys_note`, `keys_left_out`, `keys_hidden_in_records` and `keys_layer`.
 - The page adds one plain line: "Keys and passwords stayed on this device… On a new device, enter them again in Settings."
 - If the rules cannot load, nothing is saved, and the page says to try again in a moment. A file with keys in it is never made silently.
+  - (heal) The module checks every rule it uses from the kit, not only one. If the page holds an older copy of the kit, nothing is saved and the page says plainly: "Please reload the page once and try again."
+  - (heal) When a key is used as the name of a field or an id, it cannot be hidden without changing the record, so the file is refused. The message now says where it sits (for example "your settings › fl_map", or a database › store › item), without showing the key.
 
 **Restoring (Weft's guard, Reed's note):**
 - **Every older backup still restores exactly as before.** FlBackup's restore is not changed or filtered, so nothing becomes unreadable.
+- **`[kept on this device]` never overwrites a real value (heal 2).** A safe backup restored on the same device used to write the placeholder over keys the device still held inside settings and records (nested companion keys, `fl_customAuth`, core settings, chat records). Now, before FlBackup writes, the module reads what this device already has (read only; it never creates a database) and, for each field holding the placeholder at any depth, keeps this device's value when its words around the placeholder match. FlBackup then restores that merged copy. On a new device there is nothing to keep, so the file restores as it did before, and the page says which keys to enter again.
 - **A backup that carried keys in the clear:** before the restore, the module reads the file (nothing written) and notes which settings held real key values in the clear, plus key fields inside records. Sealed values (`*_enc`, `fl_ghSyncToken`) are not counted, because they cannot be read on another device. After the restore the page says plainly: "This backup carried saved keys in the clear (…), so anyone holding that file could read them. Everything was restored and works as before." It gently offers **Save a safe backup now** or **Not now**. The note is kept in `fl_backup_keys_note` (kind, time and key names, never values), so it is still there after FlBackup's reload. It shows as a small card at the bottom of the screen until it is answered, because the Memory Vault sits inside Settings, under Advanced. When the Vault is open, it shows under its buttons instead.
 - **A backup that kept keys home:** a gentle note says to enter the keys again in Settings.
 
@@ -28,6 +32,15 @@ Nothing is sent anywhere and nothing is cleared. The only key this module remove
 
 ### SoulFile store names
 Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so the fix is not tiny.
+
+### Screen readers
+The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
+
+### Not covered yet
+This layer covers Save Vault (`FlBackup`) only. These exports are not covered yet and are left for their own bricks: the memory vault export (MemoryIndex vault export), `.lattice` files, the wallet export, `lattice-export`, and SoulFile. Settings whose names do not look like keys and whose values have no known key shape are also not caught.
+
+### Follow-up (waiting on Kirk's OK for lock moves)
+The service worker serves `soul-ceremony.js` cache-first, so installed gardens only get this after a `CACHE_NAME` bump in `sw.js`. That bump is paired with a guard for the short window before this layer loads. Both need lock moves, so they are not in this brick. Pins to update with them: the LOCK rows for `sw.js` and `docs/sw.js`; `smoke-garden-move-kit-1`, `smoke-chat-bottom-clarity-v0.1`, `smoke-snowflake-cache-strategy-v0.1` (cache name) and `smoke-menu-contrast-more-cards` (edit the pin only); the HEARTH_CODE doc; and `GARDEN-MOVE-KIT-2.md`.
 
 ## Why
 
@@ -50,4 +63,5 @@ Delete `docs/modules/backup-keys-home.js`, this note and `docs/scripts/smoke-bac
   - There is no network, no clearing and no innerHTML.
   - The loader is in `soul-ceremony.js`, with the ceremony hook intact.
   - This note is complete.
+- (heal) It also checks: pasted keys of many shapes in chats, JSON settings and records are hidden while plain words stay; a key used as a name is refused and its place is named; an older kit is refused with the plain reload message; a same-device restore keeps nested, auth, core-setting and chat-record values and never writes the placeholder over a real one; a line that does not fit is not replaced; a new device restores as before; the device read never creates a database; the merged copy is what FlBackup restores; and the lines are announced.
 - It fails on base because the module is missing.
