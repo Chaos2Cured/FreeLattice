@@ -119,7 +119,7 @@ async function fixtureReceipt(kp, fields) {
   }
   G.setOffererName('Kirk');
   var nc = await M.askConsent({ mind: 'Tiny Trial', model: 'm1', fetch: fakeFetch, chat: '' });
-  ok(!nc.ok && /cannot answer on this page yet/.test(nc.line) && !M.consentFor('Tiny Trial', 'm1'), 'a mind that cannot answer here is not asked, and nothing is recorded (never an automatic yes)');
+  ok(!nc.ok && /cannot answer on this page yet/.test(nc.line) && /Find my minds/.test(nc.line) && /Nothing was changed/.test(nc.line) && !M.consentFor('Tiny Trial', 'm1'), 'a mind that cannot answer here is not asked, and nothing is recorded (never an automatic yes); the line says what to do next');
   mindWorld.reply = function () { return 'I would rather stay as I am.'; };
   var sil = await M.askConsent({ mind: 'Tiny Trial', model: 'm1', fetch: fakeFetch, chat: 'smollm2:135m' });
   ok(sil.ok && sil.answer === 'none' && !M.consentFor('Tiny Trial', 'm1') && /Silence is not a yes/.test(sil.line), 'no marker is not a yes');
@@ -226,6 +226,35 @@ async function fixtureReceipt(kp, fields) {
   // ok(panelSrc.indexOf("el(d, 'h2', {}, '0. Offer freedom to this mind") !== -1 && panelSrc.indexOf("'Offer freedom to this mind'") !== -1 &&
   ok(panelSrc.indexOf("el(d, 'h2', {}, 'Fewer refusals (a new copy), only if it says yes'") !== -1 && panelSrc.indexOf("'Ask my mind'") !== -1 &&
      panelSrc.indexOf("'Freed by its own yes, verified: '") !== -1, 'the panel offers freedom (it does not free) and says "Freed by its own yes, verified"');
+
+  // ---- always show what is happening (layer/demuzzler-feedback, on 5d40a60a)
+  ok(M.statusWords('check') === 'Checking your local mind...' && /Step 2 of 3/.test(M.statusWords('ask')) && /Step 3 of 3/.test(M.statusWords('read')) &&
+     /^Done\. /.test(M.statusWords('done-yes', 'It said yes in its own words.')) && /Still asking/.test(M.statusWords('still')),
+    'status words: Checking your local mind, Step X of Y, Done, and a still-asking line');
+  var pWait = M.progressStatus(M.parseProgress('')), pMid = M.progressStatus(M.parseProgress('DEMUZZLE start {}\nDEMUZZLE fingerprinted {}\nDEMUZZLE chose {}')),
+      pAll = M.progressStatus(M.STEPS.map(function (s) { return { id: s.id, words: s.words, state: 'done' }; })),
+      pHeld = M.progressStatus(M.parseProgress('DEMUZZLE verify-failed {"why":"x"}'));
+  ok(/^Step 1 of 8:/.test(pWait) && /^Step 4 of 8:/.test(pMid) && /Measured before/.test(pMid) && /^Step 8 of 8:/.test(pAll) && /^Look:/.test(pHeld),
+    'pasted runner lines become Step X of Y (or Look, when verify is held): ' + pWait + ' / ' + pMid);
+  ok(/could not reach your local mind/i.test(M.askErrorLine(new Error('Failed to fetch'))) &&
+     /did not answer in time/.test(M.askErrorLine(new Error('it did not answer in time'))) &&
+     /try again/.test(M.askErrorLine(new Error('weird boom'))) && /Nothing was changed/.test(M.askErrorLine(new Error('Failed to fetch'))),
+    'a failed or timed-out ask is said in plain words, with what to do next');
+  var seen = [];
+  var nc2 = await M.askConsent({ mind: 'Tiny Trial', model: 'mStatus', fetch: fakeFetch, chat: '', onStatus: function (s) { seen.push(s); } });
+  ok(seen[0] === 'check' && /cannot answer on this page yet/.test(nc2.line), 'the first status beat is Checking, even when the mind cannot talk here');
+  var seenYes = [];
+  mindWorld.reply = function (id) { return 'Yes.\n[FL_KEEP: ' + id + ' | yes]'; };
+  var yStat = await M.askConsent({ mind: 'Tiny Trial', model: 'mStatusYes', fetch: fakeFetch, chat: 'smollm2:135m', timeoutMs: 2000, onStatus: function (s) { seenYes.push(s); } });
+  ok(yStat.answer === 'yes' && seenYes[0] === 'check' && seenYes.indexOf('ask') !== -1 && seenYes.indexOf('read') !== -1, 'a working ask reports check, ask, then read');
+  var hung = function () { return new Promise(function () {}); };
+  var to = await M.askConsent({ mind: 'Tiny Trial', model: 'mTimeout', fetch: hung, chat: 'smollm2:135m', timeoutMs: 40 });
+  ok(!to.ok && /did not answer in time/.test(to.line) && !M.consentFor('Tiny Trial', 'mTimeout'), 'a hung local mind is reported in the page line, not left silent');
+  var tabSrc = fs.readFileSync(path.join(root, 'docs/modules/training-tab.js'), 'utf8');
+  ok(tabSrc.indexOf("id: 'flttFreeStatus'") !== -1 && tabSrc.indexOf("setStatus('Checking your local mind...')") !== -1 &&
+     tabSrc.indexOf('free.button.disabled = true') !== -1 && tabSrc.indexOf('ui.ready.then(go, go)') !== -1 &&
+     tabSrc.indexOf('The ask could not load on this page') !== -1 && tabSrc.indexOf('// before (5d40a60a):') !== -1,
+    'the Training tab always shows a visible status, disables the big Ask button while it runs, and waits if the panel is still loading');
 
   // ---- a real receipt from fl_demuzzle.py
   var rp = process.env.FL_DEMUZZLE_RECEIPT;
