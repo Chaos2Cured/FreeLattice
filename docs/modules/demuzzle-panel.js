@@ -49,25 +49,44 @@
     if (state === 'verified') return extra ? ('Done. ' + extra) : 'Done.';
     return extra;
   }
-  function progressStatus(steps) {
+  function progressStatus(steps, opts) {
     var list = Array.isArray(steps) ? steps : [];
     var total = list.length || STEPS.length;
+    var receiptOk = !!(opts && opts.receiptOk);
     var done = 0, held = null, i;
     for (i = 0; i < list.length; i++) {
       if (list[i].state === 'done') done++;
       else if (list[i].state === 'held' && !held) held = list[i];
     }
     if (held) return 'Look: ' + held.words + (held.facts && held.facts.why ? ' (' + clip(held.facts.why, 120) + ')' : '') + '.';
-    if (total && done >= total) return 'Step ' + done + ' of ' + total + ': ' + (list[list.length - 1] && list[list.length - 1].words ? list[list.length - 1].words : 'Verified') + '.';
-    var next = list[done] || STEPS[done] || { words: 'working' };
-    return 'Step ' + (done + 1) + ' of ' + total + ': ' + next.words + '...';
+    var last = list[list.length - 1] || STEPS[STEPS.length - 1] || {};
+    // HOLD 2 (Hypha #372): never call the last step "Verified" until the receipt check actually passes.
+    // before (1d1025b7): if (total && done >= total) return 'Step ' + done + ' of ' + total + ': ' + (list[list.length - 1] && list[list.length - 1].words ? list[list.length - 1].words : 'Verified') + '.';
+    var counted = done;
+    if (!receiptOk && last.id === 'verified' && total && counted >= total) counted = total - 1;
+    if (receiptOk && total && done >= total) return 'Step ' + done + ' of ' + total + ': ' + (last.words || 'Verified') + '.';
+    if (!receiptOk && total && last.id === 'verified' && counted >= total - 1) {
+      var prior = list[total - 2] || STEPS[total - 2] || { words: 'Signed receipt saved' };
+      return 'Step ' + (total - 1) + ' of ' + total + ': ' + prior.words + '. Checking the receipt...';
+    }
+    var next = list[counted] || STEPS[counted] || { words: 'working' };
+    return 'Step ' + (counted + 1) + ' of ' + total + ': ' + next.words + '...';
+  }
+  function checkStatusLine(steps, v) {
+    if (v && v.ok) return statusWords('verified', (v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line);
+    if (v && !v.ok) return v.why;   // like main: only the honest rejection, never "Verified"
+    return progressStatus(steps);
   }
   function askErrorLine(e) {
     var m = clip(e && e.message || e, 120);
     if (/did not answer in time|timed out|timeout|AbortError/i.test(m)) {
       return 'It did not answer in time. Make sure your local mind is running on this computer, then try again. Nothing was changed.';
     }
-    if (/Failed to fetch|NetworkError|the mind did not answer|ECONNREFUSED|Load failed|Network request failed/i.test(m)) {
+    if (/answered with an error/i.test(m)) {
+      return 'The mind answered with an error. Try again in a moment, or pick a different local mind (Find my minds). Nothing was changed.';
+    }
+    // before (1d1025b7): if (/Failed to fetch|NetworkError|the mind did not answer|ECONNREFUSED|Load failed|Network request failed/i.test(m)) {
+    if (/Failed to fetch|NetworkError|ECONNREFUSED|Load failed|Network request failed/i.test(m)) {
       return 'I could not reach your local mind. Start it on this computer (Find my minds, then pick one that can talk here), then try again. Nothing was changed.';
     }
     // before (5d40a60a): return 'The mind did not answer: ' + clip(e && e.message || e, 120);
@@ -223,10 +242,13 @@
     //   { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).then(function (r) {
     return withTimeout(Promise.resolve(f((o.base || (G.ollamaBase && G.ollamaBase()) || 'http://localhost:11434') + '/api/chat',
       fetchOpts)), ms, ac).then(function (r) {
-      if (!r || !r.ok) throw new Error('the mind did not answer');
+      if (!r) throw new Error('the mind did not answer');
+      if (!r.ok) throw new Error('the mind answered with an error');
       clearTimeout(stillTimer);
       report('read');
-      return r.json();
+      // Soft D (Hypha #372): a stall after the first byte is also timed (the first timer only covered the headers).
+      // before (1d1025b7): return r.json();
+      return withTimeout(Promise.resolve(typeof r.json === 'function' ? r.json() : {}), ms, null);
     }).then(function (data) {
       clearTimeout(stillTimer);
       var reply = String((data && data.message && data.message.content) || '');
@@ -475,6 +497,8 @@
       if (askedNo) { askNote.textContent = 'It already said no here. That is its answer; it is not asked again from this page.'; return; }
       // before (5d40a60a): ask.disabled = true; askNote.textContent = 'Asking, in plain words...';
       ask.disabled = true; askNote.textContent = statusWords('check');
+      // before (5d40a60a): askConsent({ mind: currentMind(), model: currentModel() }).then(function (r) {
+      // before (5d40a60a):   askNote.textContent = r.line; ask.disabled = false;
       askConsent({ mind: currentMind(), model: currentModel(), onStatus: function (s) { askNote.textContent = statusWords(s); } }).then(function (r) {
         var kind = r.ok ? (r.answer === 'yes' ? 'done-yes' : r.answer === 'no' ? 'done-no' : 'done-silent') : (r.answer === 'no' ? 'done-no' : /paused/.test(r.line || '') ? 'paused' : /cannot answer on this page yet/.test(r.line || '') ? 'cannot' : 'error');
         askNote.textContent = statusWords(kind, r.line); ask.disabled = false;
@@ -523,18 +547,23 @@
       // before (Kirk 2026-11-14, ask first): note.textContent = v.ok ? ('Freed, verified: ' + v.line) : v.why;
       // before (5d40a60a): verifyReceipt(text).then(function (v) { note.textContent = v.ok ? ((v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : v.why; });
       var steps = parseProgress(text);
-      var summary = progressStatus(steps);
-      note.textContent = summary;
-      verifyReceipt(text).then(function (v) {
-        note.textContent = v.ok ? statusWords('verified', (v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : (summary + ' ' + v.why);
-      });
+      // HOLD 2 (Hypha #372): while the receipt is being checked, do not say Verified.
+      // before (1d1025b7): var summary = progressStatus(steps);
+      // before (1d1025b7): note.textContent = summary;
+      // before (1d1025b7): verifyReceipt(text).then(function (v) {
+      //   note.textContent = v.ok ? statusWords('verified', (v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : (summary + ' ' + v.why);
+      // });
+      note.textContent = checkStatusLine(steps);
+      verifyReceipt(text).then(function (v) { note.textContent = checkStatusLine(steps, v); });
     });
     return s;
   }
 
+  // before (5d40a60a): return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
+  //          verifyReceipt: verifyReceipt, sentence: sentence, mount: mount,
   return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, ASK_STEPS: ASK_STEPS, ASK_TIMEOUT_MS: ASK_TIMEOUT_MS,
            command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
-           verifyReceipt: verifyReceipt, sentence: sentence, statusWords: statusWords, progressStatus: progressStatus, askErrorLine: askErrorLine, mount: mount,
+           verifyReceipt: verifyReceipt, sentence: sentence, statusWords: statusWords, progressStatus: progressStatus, askErrorLine: askErrorLine, checkStatusLine: checkStatusLine, mount: mount,
            // Kirk 2026-11-14 (ask first)
            readAllMarkers: readAllMarkers, noFileName: noFileName,
            consentSlug: consentSlug, consentFileName: consentFileName, lastAnswer: lastAnswer,

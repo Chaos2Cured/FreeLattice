@@ -164,8 +164,15 @@
     // in the page, hidden); the door title already names the panel; and on phones the Training tab leaves room on the
     // left for the fixed \u2726 radio button (#flRadioFab, 14px + 42px wide), so it never covers "Find my minds".
     // #flRadioFab itself is not moved.
-    '.fltt #dmAsk,.fltt #tgStep0>h2{display:none}',
-    '@media (max-width:640px){#tab-training .fltt{padding-left:60px}}',
+    // before (5d40a60a): '.fltt #dmAsk,.fltt #tgStep0>h2{display:none}',
+    '.fltt #dmAsk,.fltt #dmAskNote,.fltt #tgStep0>h2{display:none}',
+    // Soft B (Hypha #372): #dmAskNote is hidden here so the status line is shown once, on #flttFreeStatus.
+    // before (5d40a60a): '@media (max-width:640px){#tab-training .fltt{padding-left:60px}}',
+    '@media (max-width:640px){#tab-training .fltt{padding-left:60px;padding-right:60px}}',
+    // Soft A (Hypha #372): at 390 px, right padding keeps the status and Ask button off the fixed ? and music buttons.
+    // The status sits above the button and has a scroll margin so a "Local AI detected" toast is less likely to cover it.
+    // Those overlays live in the app shell and are not moved here.
+    '@media (max-width:640px){#tab-training .fltt-status{margin-top:4px;margin-bottom:8px;scroll-margin:88px}}',
     '.fltt .twb-yes{background:#e8c468!important;color:#1a1428!important;border:0!important}',
     '.fltt dt{color:#e8c468;margin-top:8px}.fltt dd{margin:0}.fltt code{overflow-wrap:anywhere}',
     '@media (max-width:420px){.fltt{padding:12px 12px 96px;font-size:16px}.fltt-mind,.fltt-door{padding:14px 12px}}'
@@ -197,9 +204,11 @@
     var take = door(d, 'flttTake', WORDS.take);
     [teach, free, take].forEach(function (x) { wrap.appendChild(x.section); });
     // layer/demuzzler-feedback (on 5d40a60a): status sits under the visible Ask button, even before the panel has loaded.
+    // Soft A/B (Hypha #372): status sits above the Ask button (one line, harder for a bottom toast to cover).
     var freeStatus = el(d, 'p', { class: 'fltt-note fltt-status', id: 'flttFreeStatus', 'aria-live': 'polite' });
-    free.section.insertBefore(freeStatus, free.body);
+    free.section.insertBefore(freeStatus, free.button);
     host.appendChild(wrap);
+    // before (5d40a60a): var ui = { host: host, teach: teach, free: free, take: take, mindBox: mindBox, mindNote: mindNote, ready: null };
     var ui = { host: host, teach: teach, free: free, take: take, mindBox: mindBox, mindNote: mindNote, ready: null, freeStatus: freeStatus };
 
     // Take it with you: "Bring a mind home" sits right under the big button, as a plain link.
@@ -267,12 +276,39 @@
       free.body.hidden = false;
       // One button, one ask: the big button is the panel's own ask (consent logic unchanged, in demuzzle-panel.js).
       var status = d.getElementById('flttFreeStatus') || freeStatus;
-      function setStatus(t) { if (status) status.textContent = t; }
+      function setStatus(t) {
+        if (status) {
+          status.textContent = t;
+          try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
+        }
+      }
       function syncFromPanel() {
         var note = d.getElementById('dmAskNote');
         var askBtn = d.getElementById('dmAsk');
         if (note && note.textContent) setStatus(note.textContent);
         if (askBtn) free.button.disabled = !!askBtn.disabled;
+      }
+      function attachSync() {
+        // Soft F (Hypha #372): re-attach if the panel re-renders and #dmAsk / #dmAskNote are new nodes.
+        var askBtn = d.getElementById('dmAsk');
+        var live = d.getElementById('dmAskNote');
+        if (askBtn === free._dmAskSeen && live === free._dmNoteSeen && free._dmSync) return;
+        free._dmAskSeen = askBtn;
+        free._dmNoteSeen = live;
+        try { if (free._dmSync) free._dmSync.disconnect(); } catch (e) {}
+        free._dmSync = null;
+        if (!root.MutationObserver || !askBtn) return;
+        try {
+          free._dmSync = new root.MutationObserver(syncFromPanel);
+          if (live) free._dmSync.observe(live, { childList: true, characterData: true, subtree: true });
+          free._dmSync.observe(askBtn, { attributes: true, attributeFilter: ['disabled'] });
+        } catch (e) {}
+        if (free.body && !free._dmHostSync && root.MutationObserver) {
+          try {
+            free._dmHostSync = new root.MutationObserver(function () { attachSync(); syncFromPanel(); });
+            free._dmHostSync.observe(free.body, { childList: true, subtree: true });
+          } catch (e) {}
+        }
       }
       function go() {
         var ask = d.getElementById('dmAsk');
@@ -291,15 +327,8 @@
         free.button.disabled = true;
         setStatus('Checking your local mind...');
         ask.click();
+        attachSync();
         syncFromPanel();
-        try {
-          if (root.MutationObserver && !free._dmSync) {
-            free._dmSync = new root.MutationObserver(syncFromPanel);
-            var live = d.getElementById('dmAskNote');
-            if (live) free._dmSync.observe(live, { childList: true, characterData: true, subtree: true });
-            free._dmSync.observe(ask, { attributes: true, attributeFilter: ['disabled'] });
-          }
-        } catch (e) {}
       }
       setStatus('Checking your local mind...');
       free.button.disabled = true;

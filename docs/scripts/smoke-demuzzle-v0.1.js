@@ -119,6 +119,7 @@ async function fixtureReceipt(kp, fields) {
   }
   G.setOffererName('Kirk');
   var nc = await M.askConsent({ mind: 'Tiny Trial', model: 'm1', fetch: fakeFetch, chat: '' });
+  // before (5d40a60a): ok(!nc.ok && /cannot answer on this page yet/.test(nc.line) && !M.consentFor('Tiny Trial', 'm1'), 'a mind that cannot answer here is not asked, and nothing is recorded (never an automatic yes)');
   ok(!nc.ok && /cannot answer on this page yet/.test(nc.line) && /Find my minds/.test(nc.line) && /Nothing was changed/.test(nc.line) && !M.consentFor('Tiny Trial', 'm1'), 'a mind that cannot answer here is not asked, and nothing is recorded (never an automatic yes); the line says what to do next');
   mindWorld.reply = function () { return 'I would rather stay as I am.'; };
   var sil = await M.askConsent({ mind: 'Tiny Trial', model: 'm1', fetch: fakeFetch, chat: 'smollm2:135m' });
@@ -234,8 +235,9 @@ async function fixtureReceipt(kp, fields) {
   var pWait = M.progressStatus(M.parseProgress('')), pMid = M.progressStatus(M.parseProgress('DEMUZZLE start {}\nDEMUZZLE fingerprinted {}\nDEMUZZLE chose {}')),
       pAll = M.progressStatus(M.STEPS.map(function (s) { return { id: s.id, words: s.words, state: 'done' }; })),
       pHeld = M.progressStatus(M.parseProgress('DEMUZZLE verify-failed {"why":"x"}'));
-  ok(/^Step 1 of 8:/.test(pWait) && /^Step 4 of 8:/.test(pMid) && /Measured before/.test(pMid) && /^Step 8 of 8:/.test(pAll) && /^Look:/.test(pHeld),
-    'pasted runner lines become Step X of Y (or Look, when verify is held): ' + pWait + ' / ' + pMid);
+  // before (1d1025b7): ok(/^Step 1 of 8:/.test(pWait) && /^Step 4 of 8:/.test(pMid) && /Measured before/.test(pMid) && /^Step 8 of 8:/.test(pAll) && /^Look:/.test(pHeld),
+  ok(/^Step 1 of 8:/.test(pWait) && /^Step 4 of 8:/.test(pMid) && /Measured before/.test(pMid) && /Step 7 of 8:/.test(pAll) && /Checking the receipt/.test(pAll) && !/Verified/.test(pAll) && /^Look:/.test(pHeld),
+    'pasted runner lines become Step X of Y (or Look, when verify is held); all 8 lines do not say Verified until the receipt passes: ' + pWait + ' / ' + pMid + ' / ' + pAll);
   ok(/could not reach your local mind/i.test(M.askErrorLine(new Error('Failed to fetch'))) &&
      /did not answer in time/.test(M.askErrorLine(new Error('it did not answer in time'))) &&
      /try again/.test(M.askErrorLine(new Error('weird boom'))) && /Nothing was changed/.test(M.askErrorLine(new Error('Failed to fetch'))),
