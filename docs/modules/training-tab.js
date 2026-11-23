@@ -276,26 +276,40 @@
       free.body.hidden = false;
       // One button, one ask: the big button is the panel's own ask (consent logic unchanged, in demuzzle-panel.js).
       var status = d.getElementById('flttFreeStatus') || freeStatus;
-      free._statusScrolled = false;
+      // before (174b9e18): free._statusScrolled = false;
+      free._statusScrollY = null;
       function setStatus(t) {
         if (status) {
           status.textContent = t;
           // before (c8a11891): try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
-          // Soft 3 (#372): scroll into view only when the status is not already visible, and only once, not on every update.
-          if (!free._statusScrolled) {
-            var need = true;
-            try {
-              if (typeof status.getBoundingClientRect === 'function') {
-                var r = status.getBoundingClientRect();
-                var view = d.documentElement || d.scrollingElement;
-                var h = (view && view.clientHeight) || (d.defaultView && d.defaultView.innerHeight) || 0;
-                if (r && h && r.top >= 0 && r.bottom <= h) need = false;
+          // before (174b9e18): if (!free._statusScrolled) { var need = true; try { if (typeof status.getBoundingClientRect === 'function') { var r = status.getBoundingClientRect(); var view = d.documentElement || d.scrollingElement; var h = (view && view.clientHeight) || (d.defaultView && d.defaultView.innerHeight) || 0; if (r && h && r.top >= 0 && r.bottom <= h) need = false; } } catch (e) { need = true; } if (need) { try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e2) {} } free._statusScrolled = true; }
+          // Soft 2 (#374): re-check the final rendered line on every update (the first "Checking…"
+          // line is short; the last line can grow under the Local AI toast at 390). Only scroll if
+          // that line is not visible; do not yank a person who has scrolled away.
+          var need = true;
+          try {
+            if (typeof status.getBoundingClientRect === 'function') {
+              var r = status.getBoundingClientRect();
+              var view = d.documentElement || d.scrollingElement;
+              var win = d.defaultView;
+              var h = (view && view.clientHeight) || (win && win.innerHeight) || 0;
+              var topBound = 0, bottomBound = h;
+              var toast = d.getElementById('flOllamaToast');
+              if (toast && toast.classList && toast.classList.contains('fl-toast-show') && typeof toast.getBoundingClientRect === 'function') {
+                var tr = toast.getBoundingClientRect();
+                if (tr && tr.height && tr.top > topBound && tr.top < bottomBound) bottomBound = tr.top;
               }
-            } catch (e) { need = true; }
-            if (need) {
-              try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e2) {}
+              if (r && h && r.top >= topBound && r.bottom <= bottomBound) need = false;
             }
-            free._statusScrolled = true;
+          } catch (e) { need = true; }
+          var y = 0;
+          try { y = (d.defaultView && typeof d.defaultView.scrollY === 'number') ? d.defaultView.scrollY : ((d.documentElement && d.documentElement.scrollTop) || 0); } catch (e2) { y = 0; }
+          if (free._statusScrollY != null && Math.abs(y - free._statusScrollY) > 2) need = false;
+          if (need) {
+            try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e3) {}
+            try { free._statusScrollY = (d.defaultView && typeof d.defaultView.scrollY === 'number') ? d.defaultView.scrollY : y; } catch (e4) { free._statusScrollY = y; }
+          } else if (free._statusScrollY == null) {
+            free._statusScrollY = y;
           }
         }
       }

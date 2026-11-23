@@ -3,8 +3,80 @@
 // Self-contained: loads ONLY demuzzle-panel.js, with stubs, in an empty vm (DONT_CONTEXTIFY). training-tab.js is
 // checked by text only and is never evaluated. Optional: FL_DEMUZZLE_PANEL and FL_TRAINING_TAB point at other copies
 // (used to show this smoke fails on 1d1025b7 and on main).
-// before (c8a11891): the smoke used vm.runInNewContext with host Object, Promise, Error, console and setTimeout
-// passed into the context, and it evaluated training-tab.js at the end.
+// The #372 feedback smoke as it landed on main is kept here line by line (never-delete).
+// It is not run: the live smoke below uses an empty vm and checks the tab by text only.
+// before (c8a11891): // smoke-demuzzle-feedback-v0.1.js (heal of #372). fs and in-process fixtures only: no network, no page storage cleared.
+// before (c8a11891): // Self-contained: loads ONLY demuzzle-panel.js and training-tab.js, with stubs. No other modules are required.
+// before (c8a11891): // Optional: FL_DEMUZZLE_PANEL and FL_TRAINING_TAB point at other copies (used to show this smoke fails on 1d1025b7 and on main).
+// before (c8a11891): function loadPanel(file) {
+// before (c8a11891):   var store = {};
+// before (c8a11891):   var ctx = {
+// before (c8a11891):     console: console,
+// before (c8a11891):     setTimeout: setTimeout,
+// before (c8a11891):     clearTimeout: clearTimeout,
+// before (c8a11891):     Promise: Promise,
+// before (c8a11891):     JSON: JSON,
+// before (c8a11891):     Error: Error,
+// before (c8a11891):     Date: Date,
+// before (c8a11891):     String: String,
+// before (c8a11891):     Array: Array,
+// before (c8a11891):     Object: Object,
+// before (c8a11891):     Math: Math,
+// before (c8a11891):     RegExp: RegExp,
+// before (c8a11891):     Number: Number,
+// before (c8a11891):     Boolean: Boolean,
+// before (c8a11891):     parseInt: parseInt,
+// before (c8a11891):     AbortController: typeof AbortController === 'function' ? AbortController : undefined
+// before (c8a11891):   };
+// before (c8a11891):   ctx.globalThis = ctx;
+// before (c8a11891):   ctx.localStorage = {
+// before (c8a11891):     getItem: function (k) { return Object.prototype.hasOwnProperty.call(store, k) ? store[k] : null; },
+// before (c8a11891):     setItem: function (k, v) { store[k] = String(v); },
+// before (c8a11891):     removeItem: function (k) { delete store[k]; }
+// before (c8a11891):   };
+// before (c8a11891):   ctx.document = { visibilityState: 'visible', getElementById: function () { return null; } };
+// before (c8a11891):   ctx.fetch = function () { return Promise.reject(new Error('no network in this smoke')); };
+// before (c8a11891):   ctx.FLSnowflakeCore = {
+// before (c8a11891):     sha256Sync: function () { return 'ab'.repeat(16); },
+// before (c8a11891):     learnPaused: function () { return false; },
+// before (c8a11891):     nameProblem: function () { return ''; },
+// before (c8a11891):     appendLedger: function () { return Promise.resolve(); }
+// before (c8a11891):   };
+// before (c8a11891):   ctx.FLLearn = {
+// before (c8a11891):     invitation: function () { return 'hello'; },
+// before (c8a11891):     interceptSentinel: function (text) { return { choices: [], visibleText: String(text || '') }; }
+// before (c8a11891):   };
+// before (c8a11891):   ctx.FLTrainingGalaxy = {
+// before (c8a11891):     pickedChat: function () { return ''; },
+// before (c8a11891):     mindName: function () { return 'This mind'; },
+// before (c8a11891):     offererName: function () { return 'Kirk'; },
+// before (c8a11891):     openOffers: function () { return []; },
+// before (c8a11891):     offerEchoTexts: function () { return []; },
+// before (c8a11891):     neutraliseMarkers: function (s) { return s; },
+// before (c8a11891):     repeatsAnOffer: function () { return false; },
+// before (c8a11891):     ollamaBase: function () { return 'http://127.0.0.1:11434'; }
+// before (c8a11891):   };
+// before (c8a11891):   vm.runInNewContext(fs.readFileSync(file, 'utf8'), ctx, { filename: file });
+// before (c8a11891):   ctx._store = store;
+// before (c8a11891):   return ctx;
+// before (c8a11891): }
+// before (c8a11891):      /answered with an error/.test(M.askErrorLine(new Error('the mind answered with an error'))) &&
+// before (c8a11891):      !/could not reach/.test(M.askErrorLine(new Error('the mind answered with an error'))) &&
+// before (c8a11891):     'errors: unreachable, timeout, and a 500 (answered with an error, not could not reach)');
+// before (c8a11891):   ok(!e500.ok && /answered with an error/.test(e500.line) && !/could not reach/.test(e500.line) && !M.consentFor('Tiny Trial', 'm500'),
+// before (c8a11891):     'HTTP 500 is worded as the mind answered with an error, not could not reach');
+// before (c8a11891):   var stallFetch = function () { return Promise.resolve({ ok: true, json: function () { return new Promise(function () {}); } }); };
+// before (c8a11891):      tabSrc.indexOf('padding-right:60px') !== -1,
+// before (c8a11891):     'the Training tab shows the status once, disables Ask while it runs, re-attaches the watcher if the panel re-renders, and leaves room at narrow widths');
+// before (c8a11891):      panelSrc.indexOf('checkStatusLine') !== -1,
+// before (c8a11891):     'in-place panel edits (click handler, export list) keep before (5d40a60a) comments; checkStatusLine is present');
+// before (c8a11891):   // training-tab.js also loads with stubs only (no other modules).
+// before (c8a11891):   try {
+// before (c8a11891):     vm.runInNewContext(tabSrc, ctx, { filename: tabPath });
+// before (c8a11891):     ok(!!ctx.FLTrainingTab, 'training-tab.js loaded with the same stubs, no other modules');
+// before (c8a11891):   } catch (e) {
+// before (c8a11891):     ok(false, 'training-tab.js failed to load with stubs: ' + e.message);
+// before (c8a11891):   }
 'use strict';
 var path = require('path');
 var fs = require('fs');
@@ -158,16 +230,21 @@ function loadPanel(file) {
 
   var tabSrc = fs.readFileSync(tabPath, 'utf8');
   var panelSrc = fs.readFileSync(panelPath, 'utf8');
+  // before (174b9e18): tabSrc.indexOf('free._statusScrolled') !== -1 && /if (!free._statusScrolled)/.test(tabSrc)
+  // before (174b9e18): '…and scrolls the status into view only when it is not already visible, and only once'
   ok(tabSrc.indexOf("id: 'flttFreeStatus'") !== -1 && tabSrc.indexOf("setStatus('Checking your local mind...')") !== -1 &&
      tabSrc.indexOf('free.button.disabled = true') !== -1 && tabSrc.indexOf('ui.ready.then(go, go)') !== -1 &&
      tabSrc.indexOf('The ask could not load on this page') !== -1 && tabSrc.indexOf('// before (5d40a60a):') !== -1 &&
      tabSrc.indexOf("if (ask && !ask.disabled) ask.click();") !== -1 &&
      tabSrc.indexOf('.fltt #dmAskNote') !== -1 && tabSrc.indexOf('function attachSync()') !== -1 &&
      tabSrc.indexOf('padding-right:60px') !== -1 &&
-     tabSrc.indexOf('free._statusScrolled') !== -1 &&
      tabSrc.indexOf("try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}") !== -1 &&
-     /if \(!free\._statusScrolled\)/.test(tabSrc),
-    'the Training tab (text only) shows the status once, disables Ask while it runs, re-attaches the watcher if the panel re-renders, leaves room at narrow widths, and scrolls the status into view only when it is not already visible, and only once');
+     tabSrc.indexOf("free._statusScrolled = false") !== -1 &&
+     tabSrc.indexOf("if (!free._statusScrolled)") !== -1 &&
+     tabSrc.indexOf('flOllamaToast') !== -1 &&
+     tabSrc.indexOf('free._statusScrollY') !== -1 &&
+     tabSrc.indexOf("toast.classList.contains('fl-toast-show')") !== -1,
+    'the Training tab (text only) shows the status once, disables Ask while it runs, re-attaches the watcher if the panel re-renders, leaves room at narrow widths, and re-checks visibility of each rendered status line (including under the Local AI toast at 390), scrolling only when that line is not visible and never yanking a person who has scrolled away');
   ok(panelSrc.indexOf('// before (5d40a60a): askConsent({ mind: currentMind(), model: currentModel() })') !== -1 &&
      panelSrc.indexOf('// before (5d40a60a): return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command') !== -1 &&
      panelSrc.indexOf("if (!r || !r.ok) throw new Error('the mind did not answer')") !== -1 &&

@@ -395,9 +395,9 @@
      "bytes": 12580
     },
     "modules/training-tab.js": {
-     "sha256": "088dfe005358a25b8752a0f083e931589d5ab247f8f289b17433d8c75981d833",
-     "sri": "sha256-CI3+AFNYoluHUqDwg+kxWJ1askf48omxdDPYx1mB2DM=",
-     "bytes": 28626
+     "sha256": "2f16d4d3659632ceb6768f801a45e1ee3b4d416cfc4a01360cc8470e6fc1a138",
+     "sri": "sha256-LxbU02WWMs62do+AGkXh7jtNQWz8SgE2DMhHDm/BoTg=",
+     "bytes": 30330
     },
     "modules/web-tool.js": {
      "sha256": "652f76c567e8402d7ef348842a856fa58de67792e942d0b04336eb5fbc96873e",
