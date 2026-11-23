@@ -28,6 +28,7 @@
 
   var VERSION = 'v-backup-keys-home';
   var NOTE_KEY = 'fl_backup_keys_note';          // a small note for after the reload: kind, time, key names (never values)
+  var RESTORE_NOTE_KEY = 'fl_backup_restore_note';   // after the reload: how many chats did not come home, and why (never content)
   // before (ef550fbf): var KEPT_HOME_NOTE = 'Keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
   var KEPT_HOME_NOTE = 'Saved keys and passwords stayed on the device that made this backup. Enter them again on the new device.';
   // Sealed with a device's own unlock key: never readable on another device, so never "in the clear".
@@ -320,7 +321,8 @@
     var outLs = {};
     ownKeys(ls).forEach(function (k) {
       var v = ls[k];
-      if (k === NOTE_KEY) return;
+      // before (5d40a60a): if (k === NOTE_KEY) return;
+      if (k === NOTE_KEY || k === RESTORE_NOTE_KEY) return;
       if (K.isSecretName(k)) {
         names.push(k);
         if (typeof v === 'string' && K.huntable(k, v)) values.push(v.trim());
@@ -708,6 +710,8 @@
   function readNote() { try { var n = JSON.parse(root.localStorage.getItem(NOTE_KEY) || 'null'); return n && typeof n === 'object' ? n : null; } catch (e) { return null; } }
   function writeNote(n) { try { root.localStorage.setItem(NOTE_KEY, JSON.stringify(n)); } catch (e) { /* the note shows now, not after reload */ } }
   function clearNote() { try { root.localStorage.removeItem(NOTE_KEY); } catch (e) { /* nothing to do */ } }
+  function writeRestoreNote(n) { try { root.localStorage.setItem(RESTORE_NOTE_KEY, JSON.stringify(n)); } catch (e) { /* the line shows now, not after reload */ } }
+
   function clearWords(n) {
     var list = (n.names || []).slice(0, 6).join(', ');
     return 'This backup carried ' + (n.names && n.names.length ? 'saved keys in the clear (' + list + ')' : 'a saved key in the clear') +
@@ -769,6 +773,27 @@
     else root.document.body.insertBefore(box, root.document.body.firstChild);
   }
 
+  function renderRestoreNote() {
+    var n = null;
+    try { n = JSON.parse(root.localStorage.getItem(RESTORE_NOTE_KEY) || 'null'); } catch (e) { n = null; }
+    if (!n || typeof n.words !== 'string' || !root.document.body || root.document.getElementById('flBackupRestoreNote')) return;
+    var box = root.document.createElement('div');
+    box.id = 'flBackupRestoreNote';
+    box.setAttribute('role', 'status');
+    box.setAttribute('aria-live', 'polite');
+    box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:16px;margin:0 auto;max-width:560px;z-index:99991;padding:14px 16px;border-radius:12px;' +
+      'border:1px solid rgba(240,198,116,0.6);background:var(--bg-secondary,#16161d);color:var(--text-primary,#eee);box-shadow:0 8px 28px rgba(0,0,0,0.45);line-height:1.6;font-size:0.9rem;';
+    var p = root.document.createElement('p');
+    p.style.margin = '0 0 10px';
+    p.textContent = '\u26a0\ufe0f ' + n.words;
+    box.appendChild(p);
+    var b = root.document.createElement('button');
+    b.type = 'button'; b.className = 'fl-backup-btn'; b.textContent = 'OK';
+    b.style.cssText = 'min-height:44px;width:auto;margin:6px 8px 0 0;padding:0 16px;border-radius:8px;font:inherit;cursor:pointer;color:inherit;border:1px solid rgba(212,160,23,0.55);background:rgba(212,160,23,0.18);font-weight:600;';
+    b.addEventListener('click', function () { try { root.localStorage.removeItem(RESTORE_NOTE_KEY); } catch (e) { /* fine */ } box.remove(); });
+    box.appendChild(b);
+    root.document.body.insertBefore(box, root.document.body.firstChild);
+  }
   // Hypha soft on #369: say plainly what happened and what a person can do from the app.
   function refusalWords(r) {
     var where = r.places && r.places.length ? ' It is in: ' + r.places.join('; ') + '.' : '';
@@ -872,6 +897,8 @@
     b.style.cssText = 'margin-left:8px;min-height:44px;padding:6px 14px;border-radius:8px;border:1px solid var(--border, #555);background:transparent;color:inherit;font:inherit;cursor:pointer;';
     b.onclick = function () { b.disabled = true; cancelNow(); };
     if (typeof line.appendChild === 'function') line.appendChild(b);
+    // Hypha soft on #370: on a phone the line can sit under the bottom bar, so it is brought into view.
+    try { if (typeof line.scrollIntoView === 'function') line.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) { /* an older browser */ }
   }
   var restoring = false;
   function wrapImport(inner) {
@@ -894,6 +921,9 @@
       var read = file && typeof file.text === 'function' ? file.text() : Promise.resolve(null);
       var merged = null;
       var stopped = null;
+      var schemaOk = null;
+      var fitted = null;
+      var devV = null;
       lastRestore = null;
       announceStatus();
       // Hypha soft on #369: the old "Exported" line goes, and the reading line shows at once.
@@ -935,12 +965,41 @@
         // before (dec6128a): var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
         // before (dec6128a): try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
         // before (dec6128a): return inner.call(self, { files: [f], value: '' });
-        return appSchemaFirst(parsedFile).then(function () {
-          if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
-          var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+        // before (5d40a60a): return appSchemaFirst(parsedFile).then(function () {
+        // before (5d40a60a):   if (!m || !m.stats.kept || typeof root.File !== 'function') return inner.call(self, fileInput);
+        // before (5d40a60a):   var f = new root.File([JSON.stringify(m.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+        // before (5d40a60a):   try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
+        // before (5d40a60a):   return inner.call(self, { files: [f], value: '' });
+        // before (5d40a60a): });
+        appVersion = null;
+        return appSchemaFirst(parsedFile).then(function (ok) {
+          schemaOk = ok;
+          return chatDbVersion();
+        }).then(function (deviceVersion) {
+          devV = deviceVersion;
+          var fit = fitChatVersion(m ? m.backup : parsedFile, deviceVersion);
+          fitted = fit;
+          if ((!m || !m.stats.kept) && fit.to === null) return inner.call(self, fileInput);
+          if (typeof root.File !== 'function') return inner.call(self, fileInput);
+          var f = new root.File([JSON.stringify(fit.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
           try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
           return inner.call(self, { files: [f], value: '' });
         });
+      }).then(function (how) {
+        // Older backups: say honestly if any chats did not come home (counted by id, after FlBackup wrote).
+        if (how === 'stopped' || !parsedFile) return how;
+        return checkChats(fitted ? fitted.backup : parsedFile).then(function (c) {
+          if (!c) return how;
+          var fileV = null;
+          (parsedFile.indexedDB || []).forEach(function (d) { if (d && d.name === APP_DB) fileV = typeof d.version === 'number' ? d.version : 1; });
+          var words = chatWords(c, fileV !== null && typeof devV === 'number' && fileV > devV && c.recordsHome < c.records);
+          if (lastRestore) lastRestore.chats = { inFile: c.chats, home: c.chatsHome, records: c.records, recordsHome: c.recordsHome, indexOk: c.indexOk, versionFrom: fitted ? fitted.from : null, versionTo: fitted ? fitted.to : null };
+          if (words) {
+            addLine('\u26a0\ufe0f ' + words, 'warn');
+            writeRestoreNote({ at: new Date().toISOString(), words: words });
+          }
+          return how;
+        }, function () { return how; });
       }).then(function (v) { restoring = false; return v; }, function (e) { restoring = false; throw e; }).then(function (how) {
         if (how === 'stopped') return;
         var st = statusEl();
@@ -976,9 +1035,103 @@
     if (!wants || typeof open !== 'function') return Promise.resolve(false);
     return Promise.resolve().then(function () { return open(); }).then(function (con) {
       var ok = !!con && con.name === APP_DB;
+      // The app's own version, so an older backup's chats can be written at it (older backups, after #370).
+      if (ok && typeof con.version === 'number') appVersion = con.version;
       try { if (con && typeof con.close === 'function') con.close(); } catch (e) { /* already closed */ }
       return ok;
     }, function () { return false; });
+  }
+  var appVersion = null;
+
+  // Older backups (Hypha, #370 walk): a backup made when FreeLatticeDB was at v1 or v2 told FlBackup to open it
+  // at that version. On a device where the app has run (v3), that open failed with a VersionError and the chats
+  // were skipped without a word, while the page said "Restored". Now the file FlBackup reads is given this
+  // device's own version for FreeLatticeDB, so the chats are written into the app's v3 stores. Nothing in the
+  // records changes; the app's own migrateToV2() fills the newer fields when it opens, as it does for any old chat.
+  // Only FreeLatticeDB is touched, and only when this device already has it.
+  function chatDbVersion() {
+    if (typeof appVersion === 'number') return Promise.resolve(appVersion);
+    var idb = root.indexedDB;
+    if (!idb) return Promise.resolve(null);
+    return openExisting(idb, APP_DB).then(function (got) {
+      if (!got.con) return null;
+      var v = got.con.version;
+      try { got.con.close(); } catch (e) { /* already closed */ }
+      return typeof v === 'number' ? v : null;
+    });
+  }
+  function fitChatVersion(backup, deviceVersion) {
+    var out = { backup: backup, from: null, to: null };
+    if (!backup || !Array.isArray(backup.indexedDB) || typeof deviceVersion !== 'number') return out;
+    var changed = false;
+    var list = backup.indexedDB.map(function (db) {
+      if (!db || db.name !== APP_DB) return db;
+      var v = typeof db.version === 'number' ? db.version : 1;
+      if (v === deviceVersion) return db;
+      changed = true; out.from = v; out.to = deviceVersion;
+      var copy = {};
+      ownKeys(db).forEach(function (k) { copy[k] = db[k]; });
+      copy.version = deviceVersion;
+      return copy;
+    });
+    if (!changed) return out;
+    var b = {};
+    ownKeys(backup).forEach(function (k) { b[k] = backup[k]; });
+    b.indexedDB = list;
+    out.backup = b;
+    return out;
+  }
+  // After FlBackup restores: did the chats come home? Counted by id, read only, never by content.
+  function checkChats(backup) {
+    var idb = root.indexedDB;
+    var db = backup && Array.isArray(backup.indexedDB) ? backup.indexedDB.filter(function (d) { return d && d.name === APP_DB && d.stores && typeof d.stores === 'object'; })[0] : null;
+    if (!db || !idb) return Promise.resolve(null);
+    var want = ownKeys(db.stores).filter(function (st) { return Array.isArray(db.stores[st]) && db.stores[st].length; });
+    if (!want.length) return Promise.resolve(null);
+    var res = { chats: 0, chatsHome: 0, records: 0, recordsHome: 0, indexOk: true, why: null };
+    want.forEach(function (st) { res.records += db.stores[st].length; if (st === 'conversations') res.chats = db.stores[st].length; });
+    return openExisting(idb, APP_DB).then(function (got) {
+      if (!got.con) { res.why = 'open'; return res; }
+      var con = got.con;
+      return new Promise(function (resolve) {
+        var here = want.filter(function (st) { return con.objectStoreNames.contains(st); });
+        if (!here.length) { try { con.close(); } catch (e) { /* closed */ } resolve(res); return; }
+        var tx;
+        try { tx = con.transaction(here, 'readonly'); } catch (e) { try { con.close(); } catch (e2) { /* closed */ } res.why = 'open'; resolve(res); return; }
+        here.forEach(function (st) {
+          var os = tx.objectStore(st), kp = os.keyPath;
+          if (st === 'messages') { try { res.indexOk = os.indexNames.contains('conversationId'); } catch (e) { res.indexOk = false; } }
+          var rows = db.stores[st];
+          // A store with no key path cannot be checked by id; its records are not counted as missing.
+          if (typeof kp !== 'string') { res.recordsHome += rows.length; if (st === 'conversations') res.chatsHome += rows.length; return; }
+          var q = os.getAllKeys();
+          q.onsuccess = function () {
+            var keys = {};
+            (q.result || []).forEach(function (k) { keys[typeof k + ':' + String(k)] = true; });
+            rows.forEach(function (r) {
+              var ok = !!r && typeof r === 'object' && own(r, kp) && keys[typeof r[kp] + ':' + String(r[kp])];
+              if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+            });
+          };
+        });
+        tx.oncomplete = function () { con.close(); resolve(res); };
+        tx.onerror = tx.onabort = function () { con.close(); res.why = 'open'; resolve(res); };
+      });
+    });
+  }
+  function chatWords(c, newer) {
+    var missChats = c.chats - c.chatsHome, missRecs = c.records - c.recordsHome;
+    if (missRecs <= 0 && c.indexOk) return null;
+    if (missRecs <= 0) {
+      return 'Your chats were restored, but this device\u2019s chat database was not made by the app, so they may not open here yet. Your backup file still holds them; keep it.';
+    }
+    var what = missChats > 0
+      ? plural(missChats, 'chat', 'chats') + ' (of ' + c.chats + ')' + (missRecs > missChats ? ' and ' + plural(missRecs - missChats, 'other chat record', 'other chat records') : '')
+      : plural(missRecs, 'chat record', 'chat records');
+    var why = newer ? 'this backup was made by a newer FreeLattice than this one'
+      : c.why === 'open' ? 'this device\u2019s chat database could not be opened'
+      : 'FreeLattice could not write them';
+    return what + ' in this backup did not come home, because ' + why + '. They are still in your backup file; nothing was deleted. Keep the file.';
   }
   // Wrap once. soul-ceremony.js may wrap again on top of this (it calls what it found), which keeps both.
   var installed = false;
@@ -1011,7 +1164,9 @@
       KEY_SHAPE_PARTS: KEY_SHAPE_PARTS, namedKeyField: namedKeyField, innocentId: innocentId, refusalWords: refusalWords,
       // before (f0823316): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
       // before (dec6128a): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
-      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst }
+      // before (5d40a60a): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst }
+      openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst,
+      fitChatVersion: fitChatVersion, checkChats: checkChats, chatWords: chatWords, RESTORE_NOTE_KEY: RESTORE_NOTE_KEY, renderRestoreNote: renderRestoreNote }
   };
   root.FLBackupKeysHome = api;
 
@@ -1022,6 +1177,7 @@
       // soul-ceremony.js also wraps FlBackup, 2 seconds after load. Wrapping whatever is there keeps both.
       if (!install() && tries++ < 40) { root.setTimeout(go, 250); return; }
       renderNote();
+      renderRestoreNote();
       root.setTimeout(renderNote, 2600);
     };
     if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', go);

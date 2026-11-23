@@ -69,6 +69,12 @@ Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so
 - **The reading line shows at once,** and the old "Exported" line goes.
 - Still not done here: a device whose `FreeLatticeDB` was already made without indexes is not mended (that needs a new version in the app's own open, in `app.html`).
 
+### Older backups, and the restore softs (after #370)
+- **Chats from an older backup come home.** A backup made when the chat database (`FreeLatticeDB`) was at version 1 or 2 asked FlBackup to open it at that version. On a device where the app had already run (version 3), that open failed, the chats were skipped without a word, and the page still said "Restored". Now the file FlBackup reads gives `FreeLatticeDB` this device's own version, so the chats are written into the app's version 3 stores. The records are not changed; the app's own `migrateToV2()` fills in the newer fields when it opens, as it does for any old chat. Only `FreeLatticeDB` is touched, and only when this device already has it (the app makes it when the page loads, or just before the restore).
+- **The page says honestly if any did not come home.** After FlBackup writes, the chats are counted by id (never by content). If some are missing, the page says how many chats (of how many) and other chat records did not come home and why, that they are still in the backup file and nothing was deleted, and to keep the file. The same words wait in a small card for after the reload.
+- **No plain "Restored" over a broken chat database.** If the app could not prepare its chat database first, and the restore made one without the app's indexes, the page says the chats may not open here yet and to keep the backup file.
+- **Softs:** the lock resets after an error; picking no file (the file dialog cancelled) never holds the lock; a stopped restore never prepares the chat database; Cancel restore is a 44 px button with its label, disabled once pressed; and on a phone the waiting line is scrolled into view so it is not under the bottom bar.
+
 ### Screen readers
 The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
 

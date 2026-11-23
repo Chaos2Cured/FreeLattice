@@ -350,7 +350,8 @@ assert.strictEqual(call('inspect', 'STUB', [{ hello: 1 }]).isBackup, false, 'not
 // 5. As text: how it is wired.
 [/\bfetch\s*\(/, /XMLHttpRequest/, /WebSocket/, /sendBeacon/, /\.clear\(\)/, /deleteDatabase/, /innerHTML/, /\beval\s*\(/, /new Function/]
   .forEach(function (re) { assert.ok(!re.test(code), 'the module must not use ' + re); });
-assert.deepStrictEqual(code.match(/removeItem\([^)]*\)/g), ['removeItem(NOTE_KEY)'], 'only its own note is ever removed');
+// before (5d40a60a): assert.deepStrictEqual(code.match(/removeItem\([^)]*\)/g), ['removeItem(NOTE_KEY)'], 'only its own note is ever removed');
+assert.deepStrictEqual(code.match(/removeItem\([^)]*\)/g), ['removeItem(NOTE_KEY)', 'removeItem(RESTORE_NOTE_KEY)'], 'only its own notes are ever removed');
 assert.ok(/root\.Blob = SafeBlob;/.test(code) && (code.match(/root\.Blob = RealBlob;/g) || []).length === 2, 'the real Blob is put back on success and on failure');
 // before (6b5c4046): assert.ok(/if \(!r\.ok\) throw new Error\('a saved key could not be taken out, so nothing was saved/.test(code), 'no file is made when the check fails');
 assert.ok(/if \(!r\.ok\) throw new Error\(refusalWords\(r\)\);/.test(code) && !/could not be taken out|Rename or remove it there/.test(code), 'no file is made when the check fails, and the words are plain');
@@ -362,7 +363,10 @@ assert.ok(!/never go in the file/.test(code) && /pasted keys in the shapes Save 
 // before (6b5c4046): assert.ok(/return readKeyPaths\(\)\.then\(function \(keyPaths\) \{ return saveWith\(K, keyPaths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
 assert.ok(/return readKeyPaths\(\)\.then\(function \(kp\) \{ busyDbs = kp\.busy; return saveWith\(K, kp\.paths\); \}\);/.test(code) && /var r = redact\(parsed, K, secrets, keyPaths\);/.test(code), 'soft 2: the save reads each store\u2019s id field first');
 assert.ok(/st0\.textContent = 'Save Vault is checking your records before saving\\u2026';/.test(code) && /busy \(perhaps open in another tab\), so record ids there were kept the safe way\./.test(code) && /\(busyDbs \? ' ' \+ plural\(busyDbs, /.test(code), 'HOLD 1: the save is never silent: it says it is checking, and says when a database was busy');
-assert.ok(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/.test(code) && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
+// before (5d40a60a): assert.ok(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/.test(code) && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
+// Two cards now (the key note, and the after-restore note); both must be announced.
+assert.ok((code.match(/box\.setAttribute\('role', 'status'\);\s*box\.setAttribute\('aria-live', 'polite'\);/g) || []).length === 2 && /p\.setAttribute\('role', 'status'\);/.test(code), 'the note is announced');
+assert.ok(/renderNote\(\);\s*renderRestoreNote\(\);/.test(code), 'the after-restore note is shown on load, beside the key note');
 assert.ok(/else root\.document\.body\.insertBefore\(box, root\.document\.body\.firstChild\);/.test(code), 'the card comes early in the focus order');
 // before (6b5c4046): assert.ok(!/onupgradeneeded|createObjectStore/.test(code) && /typeof idb\.databases !== 'function'\) return Promise\.resolve\(device\);/.test(code) && /here\.indexOf\(db\.name\) !== -1/.test(code), 'reading this device never creates a database');
 const busyFile = { _meta: { type: 'freelattice-backup', keys_kept_home: true }, localStorage: {},
@@ -376,7 +380,8 @@ assert.ok(/readDevice\(parsed, function \(\) \{ waitLine\(addLine\('Waiting for 
   /Nothing was restored, and nothing on this device was changed: ' \+ stopped \+/.test(code) && /Close other FreeLattice tabs and try again\./.test(code), 'NEW HOLD: the wait is announced, and a stop says plainly that nothing was changed');
 assert.ok(/if \(!st\.getAttribute\('role'\)\) st\.setAttribute\('role', 'status'\);/.test(code) && /if \(!st\.getAttribute\('aria-live'\)\) st\.setAttribute\('aria-live', 'polite'\);/.test(code) &&
   (code.match(/announceStatus\(\);/g) || []).length >= 3, 'soft: Save Vault\u2019s own status line is announced');
-assert.ok(/if \(!m \|\| !m\.stats\.kept \|\| typeof root\.File !== 'function'\) return inner\.call\(self, fileInput\);/.test(code) && /return inner\.call\(self, \{ files: \[f\], value: '' \}\);/.test(code), 'restore is FlBackup\u2019s own, given a copy that keeps this device\u2019s keys');
+// before (5d40a60a): assert.ok(/if \(!m \|\| !m\.stats\.kept \|\| typeof root\.File !== 'function'\) return inner\.call\(self, fileInput\);/.test(code) && /return inner\.call\(self, \{ files: \[f\], value: '' \}\);/.test(code), 'restore is FlBackup\u2019s own, given a copy that keeps this device\u2019s keys');
+assert.ok(/if \(\(!m \|\| !m\.stats\.kept\) && fit\.to === null\) return inner\.call\(self, fileInput\);/.test(code) && /new root\.File\(\[JSON\.stringify\(fit\.backup\)\]/.test(code) && /return inner\.call\(self, \{ files: \[f\], value: '' \}\);/.test(code), 'restore is FlBackup\u2019s own, given a copy that keeps this device\u2019s keys (and, for an older backup, this device\u2019s chat database version)');
 assert.ok(/return inner\.call\(self, fileInput\);/.test(code) && !/fileInput\.files\[0\] =|backup\.localStorage\[[^\]]+\] =/.test(code), 'restore is passed through untouched when nothing here needs keeping');
 assert.ok(/if \(installed\) return true;/.test(code) && /safe\.__flKeysHome = VERSION;/.test(code), 'it wraps once');
 assert.ok(/position:fixed;left:12px;right:12px;bottom:16px;/.test(code) && /else root\.document\.body\.insertBefore\(box, root\.document\.body\.firstChild\);/.test(code), 'after the reload the note is in sight, not buried in Settings');
@@ -384,10 +389,12 @@ assert.ok(/'Save a safe backup now'/.test(code) && /'Not now'/.test(code), 'it g
 assert.ok(/so anyone holding that file could read them\. Everything was restored and works as before\./.test(code), 'it says plainly what the old file carried');
 assert.ok(/s\.src = 'modules\/garden-move-kit\.js';/.test(code) && /root\.FLGardenMoveKit && root\.FLGardenMoveKit\._internal/.test(code), 'it uses the pack module\u2019s rules');
 assert.ok(/s\.src = 'modules\/backup-keys-home\.js';/.test(cer) && /function hookFlBackup\(\) \{\s*if \(typeof FlBackup === 'undefined'\) return;/.test(cer) && /hookFlBackup\(\);/.test(cer), 'soul-ceremony loads it and keeps its own hook');
+// Label note (Hypha soft on #370): the first line below carries two labels from an old edit; the second is an older phrase list that still runs. Both are kept as they were.
 // before (6b5c4046): // before (dec6128a): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds', '### Heal after #369 at f0823316', 'has no time limit', 'the restore stops before anything is written', 'Close other FreeLattice tabs and try again', 'The kept count is the truth', 'only capitals and digits'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 // before (f0823316): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
-['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds', '### Heal after #369 at f0823316', 'has no time limit', 'the restore stops before anything is written', 'Close other FreeLattice tabs and try again', 'The kept count is the truth', 'only capitals and digits', '### New-device restore, and the restore softs (after #369)', 'the app\u2019s own `openDB()` opens it first'.replace('\u2019', "'"), 'Cancel button', 'One restore at a time'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+// before (5d40a60a): ['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds', '### Heal after #369 at f0823316', 'has no time limit', 'the restore stops before anything is written', 'Close other FreeLattice tabs and try again', 'The kept count is the truth', 'only capitals and digits', '### New-device restore, and the restore softs (after #369)', 'the app\u2019s own `openDB()` opens it first'.replace('\u2019', "'"), 'Cancel button', 'One restore at a time'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
+['## What', '## Why', '## Rollback', '## Smoke', 'v-backup-keys-home', 'keys_kept_home', 'fl_backup_keys_note', 'never overwrites a real value', '### Not covered yet', 'MemoryIndex vault export', '### Follow-up', '### Softs after #368', 'Record ids are never rewritten', 'not caught, on purpose', '### Heal after #369', 'about 1.5 seconds', '### Heal after #369 at f0823316', 'has no time limit', 'the restore stops before anything is written', 'Close other FreeLattice tabs and try again', 'The kept count is the truth', 'only capitals and digits', '### New-device restore, and the restore softs (after #369)', 'the app\u2019s own `openDB()` opens it first'.replace('\u2019', "'"), 'Cancel button', 'One restore at a time', '### Older backups, and the restore softs (after #370)', 'Chats from an older backup come home', 'The page says honestly if any did not come home', 'nothing was deleted'].forEach(function (s) { assert.ok(note.indexOf(s) !== -1, 'note has ' + s); });
 
 // The checks below were reworded by the heal; the earlier wording is kept here.
 // before (649d5cce): assert.ok(/Save Vault is waiting for its key check to load\. Nothing was saved\./.test(code) && /lastExport = \{ ok: false, problems: \['key check not loaded'\] \};\s*return;\s*\}/.test(code), 'no file is made without the rules');
@@ -423,14 +430,18 @@ vm.runInContext(`
           var d = dbs[name], names = Object.keys(d.stores);
           // before (f0823316): names.contains = function (s) { return !!d.stores[s]; };
           names.contains = function (s) { if (d.badcon) throw new Error('a broken connection'); return !!d.stores[s]; };
-          r.result = { objectStoreNames: names, close: function () { log.push({ close: name }); },
+          // before (5d40a60a): r.result = { objectStoreNames: names, close: function () { log.push({ close: name }); },
+          r.result = { name: name, version: d.version || 1, objectStoreNames: names, close: function () { log.push({ close: name }); },
             transaction: function (list, mode) {
               log.push({ tx: name, mode: mode });
               // before (f0823316): var tx = { pending: 0, fired: false, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
               if (d.txfail) throw new Error('cannot read now');
               if (d.txabort) later(function () { if (TXA && TXA.onabort) TXA.onabort(); });
               var tx = TXA = { pending: 0, fired: !!d.txabort, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
-                objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, get: function (k) { var g = {}; tx.pending += 1;
+                // before (5d40a60a): objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, get: function (k) { var g = {}; tx.pending += 1;
+                objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, indexNames: Object.assign((S.indexes || []).slice(), { contains: function (n) { return (S.indexes || []).indexOf(n) !== -1; } }),
+                  getAllKeys: function () { var g = {}; tx.pending += 1; later(function () { g.result = S.rows.map(function (x) { return x[S.keyPath]; }); if (g.onsuccess) g.onsuccess(); tx.pending -= 1; tx.done(); }); return g; },
+                  get: function (k) { var g = {}; tx.pending += 1;
                   later(function () { g.result = S.rows.filter(function (x) { return x[S.keyPath] === k; })[0]; if (g.onsuccess) g.onsuccess(); tx.pending -= 1; tx.done(); }); return g; } }; } };
               later(function () { later(function () { tx.done(); }); });
               return tx; } };
@@ -521,7 +532,8 @@ flush(20).then(function () {
     STATUS = { textContent: '', a: {}, lines: [], nodes: [], getAttribute: function (k) { return this.a[k] || null; }, setAttribute: function (k, v) { this.a[k] = v; }, appendChild: function (n) { this.lines.push(n.textContent); this.nodes.push(n); } };
     // before (dec6128a): FAKEDOC = { getElementById: function (id) { return id === 'flBackupStatus' ? STATUS : null; }, createElement: function () { return { style: {}, setAttribute: function () {} }; } };
     BUTTONS = [];
-    FAKEDOC = { getElementById: function (id) { return id === 'flBackupStatus' ? STATUS : null; }, createElement: function (tag) { var n = { tag: tag, style: {}, kids: [], setAttribute: function () {}, appendChild: function (k) { this.kids.push(k); } }; if (tag === 'button') BUTTONS.push(n); return n; } };
+    // before (5d40a60a): FAKEDOC = { getElementById: function (id) { return id === 'flBackupStatus' ? STATUS : null; }, createElement: function (tag) { var n = { tag: tag, style: {}, kids: [], setAttribute: function () {}, appendChild: function (k) { this.kids.push(k); } }; if (tag === 'button') BUTTONS.push(n); return n; } };
+    FAKEDOC = { getElementById: function (id) { return id === 'flBackupStatus' ? STATUS : null; }, createElement: function (tag) { var n = { tag: tag, style: {}, kids: [], attrs: {}, scrolled: 0, setAttribute: function (k, v) { this.attrs[k] = v; }, appendChild: function (k) { this.kids.push(k); }, scrollIntoView: function () { this.scrolled += 1; }, addEventListener: function (t, f) { this['on' + t] = f; }, remove: function () { this.removed = true; } }; if (tag === 'button') BUTTONS.push(n); return n; } };
     File = function (parts, name) { this.parts = parts; this.name = name; };
     FLGardenMoveKit = { _internal: STUB };
     INNER = [];
@@ -663,6 +675,112 @@ flush(20).then(function () {
     }).then(function () {
       assert.deepStrictEqual([inside('String(INNER.length)'), inside('JSON.stringify(OPENS)')], ['1', '["close"]'], 'and a stranger connection is closed too');
       inside('delete globalThis.openDB; document = undefined; ""');
+    }).then(function () {
+      // Older backups (after #370): a v2 FreeLatticeDB is written at this device's version, records unchanged.
+      const v2 = { _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [
+        { name: 'FreeLatticeDB', version: 2, stores: { conversations: [{ id: 'c1', title: 'Old talk' }, { id: 'c2', title: 'Second' }], messages: [{ id: 1, conversationId: 'c1', content: 'hi' }, { id: 2, conversationId: 'c2', content: 'yo' }], meta: [{ key: 'm', value: 1 }] } },
+        { name: 'FreeLatticeSkills', version: 1, stores: { skills: [{ id: 's1' }] } }] };
+      const fit = JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.fitChatVersion(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '), 3))'));
+      assert.deepStrictEqual([fit.from, fit.to, fit.backup.indexedDB[0].version, fit.backup.indexedDB[1].version], [2, 3, 3, 1], 'an older chat database is given this device\u2019s version; nothing else changes');
+      assert.deepStrictEqual(fit.backup.indexedDB[0].stores, v2.indexedDB[0].stores, 'and its records are exactly as in the file');
+      assert.strictEqual(inside('(function () { var b = JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '); FLBackupKeysHome._internal.fitChatVersion(b, 3); return String(b.indexedDB[0].version); })()'), '2', 'the file read is never changed in place');
+      assert.deepStrictEqual(JSON.parse(inside('JSON.stringify([FLBackupKeysHome._internal.fitChatVersion(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '), null).to, FLBackupKeysHome._internal.fitChatVersion(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '), 2).to])')), [null, null], 'without a version, or at the same version, nothing changes');
+      const DEV = '{ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [{ id: "c1" }, { id: "c2" }] }, messages: { keyPath: "id", indexes: ["conversationId"], rows: [{ id: 1 }, { id: 2 }] }, meta: { keyPath: "key", rows: [{ key: "m" }] } } } }';
+      vm.runInContext(`
+        localStorage = { s: {}, getItem: function (k) { return Object.prototype.hasOwnProperty.call(this.s, k) ? this.s[k] : null; }, setItem: function (k, v) { this.s[k] = String(v); }, removeItem: function (k) { delete this.s[k]; } };
+        OPENS = []; openDB = function () { OPENS.push('open'); return Promise.resolve({ name: 'FreeLatticeDB', version: 3, close: function () {} }); };
+        INNER = []; WROTE = null;
+        RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { var f = input && input.files && input.files[0]; INNER.push(f && f.parts ? JSON.parse(f.parts[0]) : 'original'); if (WROTE) indexedDB = FakeIDB(WROTE); return Promise.resolve(); });
+        document = FAKEDOC; STATUS.lines = []; STATUS.nodes = [];
+      `, ctx, { timeout: 2000 });
+      inside('indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [] }, messages: { keyPath: "id", indexes: ["conversationId"], rows: [] }, meta: { keyPath: "key", rows: [] } } } }); WROTE = ' + DEV + '; ""');
+      inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+      return flush(40).then(function () {
+        const got = JSON.parse(inside('JSON.stringify(INNER)'));
+        assert.deepStrictEqual([got.length, got[0].indexedDB[0].version, got[0].indexedDB[1].version], [1, 3, 1], 'OLDER BACKUP: FlBackup is given the chats at this device\u2019s version (v2 -> v3), so they are not skipped');
+        assert.deepStrictEqual(got[0].indexedDB[0].stores, v2.indexedDB[0].stores, 'and the chats are the file\u2019s, unchanged');
+        const lr = JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())'));
+        assert.deepStrictEqual(lr.chats, { inFile: 2, home: 2, records: 5, recordsHome: 5, indexOk: true, versionFrom: 2, versionTo: 3 }, 'every chat is counted home by id');
+        assert.ok(!/did not come home/.test(inside('JSON.stringify(STATUS.lines)')) && inside('String(localStorage.getItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY))') === 'null', 'and nothing alarming is said');
+        // If FlBackup still could not write them, the page says so, and a note waits for after the reload.
+        inside('indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [] }, messages: { keyPath: "id", indexes: ["conversationId"], rows: [] }, meta: { keyPath: "key", rows: [] } } } }); WROTE = { FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [{ id: "c1" }] }, messages: { keyPath: "id", indexes: ["conversationId"], rows: [{ id: 1 }] }, meta: { keyPath: "key", rows: [{ key: "m" }] } } } }; INNER = []; STATUS.lines = []; ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        const want = '1 chat (of 2) and 1 other chat record in this backup did not come home, because FreeLattice could not write them. They are still in your backup file; nothing was deleted. Keep the file.';
+        assert.ok(JSON.parse(inside('JSON.stringify(STATUS.lines)')).indexOf('\u26a0\ufe0f ' + want) !== -1, 'OLDER BACKUP: chats that did not come home are counted and named honestly on the page');
+        assert.strictEqual(JSON.parse(inside('localStorage.getItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY)')).words, want, 'and the same words wait for after the reload');
+        assert.ok(!/Old talk|Second|conversationId|"content"/.test(inside('localStorage.getItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY)')), 'the note never holds chat content');
+        // The schema soft from #370: if the app could not prepare its chat database, a warning, not a plain Restored.
+        inside('localStorage.s = {}; openDB = function () { return Promise.reject(new Error("no")); }; indexedDB = FakeIDB({}); WROTE = { FreeLatticeDB: { version: 2, stores: { conversations: { keyPath: "id", rows: [{ id: "c1" }, { id: "c2" }] }, messages: { keyPath: "id", rows: [{ id: 1 }, { id: 2 }] }, meta: { keyPath: "key", rows: [{ key: "m" }] } } } }; INNER = []; STATUS.lines = []; ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        assert.strictEqual(inside('JSON.stringify(INNER[0])'), '"original"', 'with no chat database here and no app open, FlBackup restores as before');
+        assert.ok(JSON.parse(inside('JSON.stringify(STATUS.lines)')).indexOf('\u26a0\ufe0f Your chats were restored, but this device\u2019s chat database was not made by the app, so they may not open here yet. Your backup file still holds them; keep it.') !== -1, 'SOFT: a chat database made without the app\u2019s indexes is warned about, not passed off as Restored');
+        assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(FLBackupKeysHome._internal.chatWords({ chats: 3, chatsHome: 0, records: 9, recordsHome: 0, indexOk: true, why: null }, true))')), '3 chats (of 3) and 6 other chat records in this backup did not come home, because this backup was made by a newer FreeLattice than this one. They are still in your backup file; nothing was deleted. Keep the file.', 'a newer backup is named as the reason');
+        assert.strictEqual(inside('String(FLBackupKeysHome._internal.chatWords({ chats: 3, chatsHome: 3, records: 9, recordsHome: 9, indexOk: true }, false))'), 'null', 'all home: nothing said');
+        const v4 = JSON.parse(JSON.stringify(v2)); v4.indexedDB[0].version = 4;
+        assert.strictEqual(inside('String(FLBackupKeysHome._internal.fitChatVersion(JSON.parse(' + JSON.stringify(JSON.stringify(v4)) + '), 3).to)'), '3', 'a newer backup is written at this device\u2019s version too (never an upgrade the app does not know)');
+        // The note for after the reload never travels in a backup.
+        const ex = call('redact', 'STUB', [{ _meta: { type: 'freelattice-backup' }, localStorage: { fl_backup_restore_note: '{"words":"x"}', fl_theme: 'dusk' } }, []]);
+        assert.deepStrictEqual(Object.keys(ex.backup.localStorage), ['fl_theme'], 'the after-reload restore note is never saved in a backup');
+        // The after-reload card: announced, with its words and an OK button.
+        inside('CARD = null; document = { body: { firstChild: null, insertBefore: function (n) { CARD = n; } }, getElementById: function () { return null; }, createElement: FAKEDOC.createElement }; localStorage.setItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY, JSON.stringify({ words: "2 chats (of 2) in this backup did not come home." })); FLBackupKeysHome._internal.renderRestoreNote(); ""');
+        assert.deepStrictEqual(JSON.parse(inside('JSON.stringify([CARD.attrs.role, CARD.attrs["aria-live"], CARD.kids[0].textContent, CARD.kids[1].textContent, /min-height:44px/.test(CARD.kids[1].style.cssText)])')), ['status', 'polite', '\u26a0\ufe0f 2 chats (of 2) in this backup did not come home.', 'OK', true], 'the after-reload card is announced and says the same words');
+        inside('document = FAKEDOC; ""');
+        // Which version: the app's own open (even before this device lists it), else this device's database.
+        inside('localStorage.s = {}; openDB = function () { return Promise.resolve({ name: "FreeLatticeDB", version: 3, close: function () {} }); }; indexedDB = FakeIDB({}); WROTE = null; INNER = []; RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { var f = input && input.files && input.files[0]; INNER.push(f && f.parts ? JSON.parse(f.parts[0]).indexedDB[0].version : "original"); return Promise.resolve(); }); ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        inside('delete globalThis.openDB; indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [] } } } }); ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        inside('openDB = function () { return Promise.resolve({ name: "Another", version: 7, close: function () {} }); }; indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [] } } } }); ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(INNER)')), [3, 3, 3], 'the version comes from the app\u2019s own open, else from this device; a stranger connection\u2019s version is never used');
+        // #370 softs: restoring resets after an error, an empty pick never locks, a stopped restore never prepares the schema.
+        inside('localStorage.s = {}; OPENS = []; openDB = function () { OPENS.push("open"); return Promise.resolve({ name: "FreeLatticeDB", version: 3, close: function () {} }); }; WROTE = null; indexedDB = FakeIDB({}); ERRS = 0; RESTORE = FLBackupKeysHome._internal.wrapImport(function () { return Promise.reject(new Error("boom")); }); ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))).catch(function () { ERRS += 1; }); ""');
+        return flush(40);
+      }).then(function () {
+        assert.strictEqual(inside('String(ERRS)'), '1', 'an error in FlBackup\u2019s restore comes back as an error');
+        inside('INNER = []; RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { INNER.push(input && input.files && input.files.length ? "file" : "empty"); return Promise.resolve(); }); ""');
+        inside('SECOND = null; RESTORE({ files: [], value: "" }).then(function (v) { SECOND = v; }); ""');
+        return flush(20);
+      }).then(function () {
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2)) + '))).then(function (v) { SECOND = String(v); }); ""');
+        return flush(40);
+      }).then(function () {
+        assert.deepStrictEqual(JSON.parse(inside('JSON.stringify(INNER)')), ['empty', 'file'], 'SOFT: after an error, and after an empty pick (the file dialog cancelled), the next restore still goes on');
+        // A stopped restore never opens the chat database (nothing on this device is changed).
+        inside('OPENS = []; INNER = []; indexedDB = FakeIDB({ FreeLatticeCore: { error: true } }); ""');
+        const stopFile = JSON.parse(JSON.stringify(busyFile)); stopFile.indexedDB.push(v2.indexedDB[0]);
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(stopFile)) + '))); ""');
+        return flush(40);
+      }).then(function () {
+        assert.deepStrictEqual([inside('String(INNER.length)'), inside('JSON.stringify(OPENS)'), JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())')).stopped], ['0', '[]', true], 'SOFT: a stopped restore never prepares the chat database');
+        // The Cancel button: label, height, disabled once pressed, and the line is brought into view.
+        inside('BUTTONS = []; STATUS.nodes = []; BUSY = { FreeLatticeCore: { slowFull: true, stores: { settings: { keyPath: "id", rows: [{ id: "k1", config: { apiKey: "core-api-key-abcdef12", telegram: "tg-real-1" } }] } } } }; indexedDB = FakeIDB(BUSY); TIMERS = []; ""');
+        inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))); ""');
+        return flush(20);
+      }).then(function () {
+        inside('runTimers(); ""');
+        return flush(20);
+      }).then(function () {
+        const b = JSON.parse(inside('JSON.stringify({ t: BUTTONS[0].textContent, type: BUTTONS[0].type, aria: BUTTONS[0].attrs["aria-label"], css: BUTTONS[0].style.cssText, dis: !!BUTTONS[0].disabled, scrolled: STATUS.nodes.filter(function (n) { return n.kids && n.kids[0] === BUTTONS[0]; })[0].scrolled })'));
+        assert.deepStrictEqual([b.t, b.type, b.aria, /min-height:44px/.test(b.css), b.dis, b.scrolled], ['Cancel restore', 'button', 'Cancel restore', true, false, 1], 'SOFT: Cancel restore is a 44 px button with its label, and the waiting line is scrolled into view');
+        inside('BUTTONS[0].onclick(); ""');
+        return flush(20);
+      }).then(function () {
+        assert.strictEqual(inside('String(!!BUTTONS[0].disabled)'), 'true', 'and once pressed it is disabled');
+        inside('BUSY.FreeLatticeCore.release(); delete globalThis.openDB; document = undefined; ""');
+        return flush(20);
+      });
     });
   });
 }).then(function () {
