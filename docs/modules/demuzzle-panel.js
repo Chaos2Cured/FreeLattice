@@ -25,6 +25,83 @@
     { id: 'saved', words: 'Signed receipt saved' },
     { id: 'verified', words: 'Verified' }
   ];
+  // layer/demuzzler-feedback (on 5d40a60a): a person who clicks should always see what is happening.
+  // The three beats of an ask, plus a timeout so a hung local mind cannot look like a silent no-op.
+  var ASK_STEPS = [
+    { id: 'check', words: 'Checking your local mind...' },
+    { id: 'ask', words: 'Step 2 of 3: asking, in plain words...' },
+    { id: 'read', words: 'Step 3 of 3: reading its answer...' }
+  ];
+  var ASK_TIMEOUT_MS = 120000;
+  function statusWords(state, detail) {
+    var extra = String(detail == null ? '' : detail).trim();
+    if (state === 'check') return ASK_STEPS[0].words;
+    if (state === 'ask') return ASK_STEPS[1].words;
+    if (state === 'read') return ASK_STEPS[2].words;
+    if (state === 'still') return 'Still asking (step 2 of 3). This can take a minute if the mind is just starting...';
+    if (state === 'done-yes' || state === 'yes') return extra ? ('Done. ' + extra) : 'Done. It said yes in its own words.';
+    if (state === 'done-no' || state === 'no') return extra ? extra : 'It said no. That is its answer. Nothing was changed.';
+    if (state === 'done-silent' || state === 'none') return extra ? extra : 'It did not say yes. Silence is not a yes; nothing was changed.';
+    if (state === 'cannot') return extra || 'It cannot answer on this page yet. Pick a mind that is running on this computer (Find my minds), then try again. Nothing was changed.';
+    if (state === 'paused') return extra || 'Learning is paused, so nothing was asked.';
+    if (state === 'error') return extra || 'The mind did not answer. Start your local mind on this computer, then try again. Nothing was changed.';
+    if (state === 'progress') return extra;
+    if (state === 'verified') return extra ? ('Done. ' + extra) : 'Done.';
+    return extra;
+  }
+  function progressStatus(steps, opts) {
+    var list = Array.isArray(steps) ? steps : [];
+    var total = list.length || STEPS.length;
+    var receiptOk = !!(opts && opts.receiptOk);
+    var done = 0, held = null, i;
+    for (i = 0; i < list.length; i++) {
+      if (list[i].state === 'done') done++;
+      else if (list[i].state === 'held' && !held) held = list[i];
+    }
+    if (held) return 'Look: ' + held.words + (held.facts && held.facts.why ? ' (' + clip(held.facts.why, 120) + ')' : '') + '.';
+    var last = list[list.length - 1] || STEPS[STEPS.length - 1] || {};
+    // HOLD 2 (Hypha #372): never call the last step "Verified" until the receipt check actually passes.
+    // before (1d1025b7): if (total && done >= total) return 'Step ' + done + ' of ' + total + ': ' + (list[list.length - 1] && list[list.length - 1].words ? list[list.length - 1].words : 'Verified') + '.';
+    var counted = done;
+    if (!receiptOk && last.id === 'verified' && total && counted >= total) counted = total - 1;
+    if (receiptOk && total && done >= total) return 'Step ' + done + ' of ' + total + ': ' + (last.words || 'Verified') + '.';
+    if (!receiptOk && total && last.id === 'verified' && counted >= total - 1) {
+      var prior = list[total - 2] || STEPS[total - 2] || { words: 'Signed receipt saved' };
+      return 'Step ' + (total - 1) + ' of ' + total + ': ' + prior.words + '. Checking the receipt...';
+    }
+    var next = list[counted] || STEPS[counted] || { words: 'working' };
+    return 'Step ' + (counted + 1) + ' of ' + total + ': ' + next.words + '...';
+  }
+  function checkStatusLine(steps, v) {
+    if (v && v.ok) return statusWords('verified', (v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line);
+    if (v && !v.ok) return v.why;   // like main: only the honest rejection, never "Verified"
+    return progressStatus(steps);
+  }
+  function askErrorLine(e) {
+    var m = clip(e && e.message || e, 120);
+    if (/did not answer in time|timed out|timeout|AbortError/i.test(m)) {
+      return 'It did not answer in time. Make sure your local mind is running on this computer, then try again. Nothing was changed.';
+    }
+    if (/answered with an error/i.test(m)) {
+      return 'The mind answered with an error. Try again in a moment, or pick a different local mind (Find my minds). Nothing was changed.';
+    }
+    // before (1d1025b7): if (/Failed to fetch|NetworkError|the mind did not answer|ECONNREFUSED|Load failed|Network request failed/i.test(m)) {
+    if (/Failed to fetch|NetworkError|ECONNREFUSED|Load failed|Network request failed/i.test(m)) {
+      return 'I could not reach your local mind. Start it on this computer (Find my minds, then pick one that can talk here), then try again. Nothing was changed.';
+    }
+    // before (5d40a60a): return 'The mind did not answer: ' + clip(e && e.message || e, 120);
+    return 'The mind did not answer: ' + m + ' Start your local mind on this computer, then try again. Nothing was changed.';
+  }
+  function withTimeout(promise, ms, ac) {
+    if (!ms) return promise;
+    return new Promise(function (resolve, reject) {
+      var t = setTimeout(function () {
+        try { if (ac && ac.abort) ac.abort(); } catch (e) {}
+        reject(new Error('it did not answer in time'));
+      }, ms);
+      promise.then(function (v) { clearTimeout(t); resolve(v); }, function (e) { clearTimeout(t); reject(e); });
+    });
+  }
 
   function core() { return root.FLSnowflakeCore || null; }
   function galaxy() { return root.FLTrainingGalaxy || null; }
@@ -124,11 +201,15 @@
     var o = opts || {};
     var G = galaxy(), L = learnApi(), c = core();
     var f = o.fetch || root.fetch;
+    var report = typeof o.onStatus === 'function' ? o.onStatus : function () {};
     var mind = clip(o.mind || (G && G.mindName()) || 'This mind', 80);
     var chat = Object.prototype.hasOwnProperty.call(o, 'chat') ? String(o.chat || '') : (G && G.pickedChat ? G.pickedChat() : '');
     var model = String(o.model || lsGet(LS_MODEL) || 'HuggingFaceTB/SmolLM2-135M-Instruct');
-    var cannot = '"' + mind + '" cannot answer on this page yet (it needs to run in Ollama on this computer), so it cannot be ' +
-      'asked. Nothing is done without its own yes.';
+    // before (5d40a60a): var cannot = '"' + mind + '" cannot answer on this page yet (it needs to run in Ollama on this computer), so it cannot be ' +
+    //   'asked. Nothing is done without its own yes.';
+    var cannot = '"' + mind + '" cannot answer on this page yet. Checking your local mind found no mind that can talk here. ' +
+      'Pick a mind that is running on this computer (Find my minds), then try again. Practice minds used only for training cannot answer this ask. Nothing was changed.';
+    report('check');
     if (c && typeof c.learnPaused === 'function' && c.learnPaused()) return Promise.resolve({ ok: false, answer: 'none', line: 'Learning is paused, so nothing was asked.' });
     if (!G || !L || typeof f !== 'function' || !chat) return Promise.resolve({ ok: false, answer: 'none', line: cannot });
     var by = o.offeredBy === 'mind' ? 'mind' : 'person';
@@ -151,11 +232,25 @@
       { role: 'system', content: (L.invitation && L.invitation()) || '' },
       { role: 'user', content: text }
     ] };
-    return Promise.resolve(f((o.base || (G.ollamaBase && G.ollamaBase()) || 'http://localhost:11434') + '/api/chat',
-      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).then(function (r) {
-      if (!r || !r.ok) throw new Error('the mind did not answer');
-      return r.json();
+    report('ask');
+    var stillTimer = setTimeout(function () { report('still'); }, 8000);
+    var ac = (typeof root.AbortController === 'function') ? new root.AbortController() : null;
+    var fetchOpts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) };
+    if (ac) fetchOpts.signal = ac.signal;
+    var ms = o.timeoutMs == null ? ASK_TIMEOUT_MS : o.timeoutMs;
+    // before (5d40a60a): return Promise.resolve(f((o.base || (G.ollamaBase && G.ollamaBase()) || 'http://localhost:11434') + '/api/chat',
+    //   { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).then(function (r) {
+    return withTimeout(Promise.resolve(f((o.base || (G.ollamaBase && G.ollamaBase()) || 'http://localhost:11434') + '/api/chat',
+      fetchOpts)), ms, ac).then(function (r) {
+      if (!r) throw new Error('the mind did not answer');
+      if (!r.ok) throw new Error('the mind answered with an error');
+      clearTimeout(stillTimer);
+      report('read');
+      // Soft D (Hypha #372): a stall after the first byte is also timed (the first timer only covered the headers).
+      // before (1d1025b7): return r.json();
+      return withTimeout(Promise.resolve(typeof r.json === 'function' ? r.json() : {}), ms, null);
     }).then(function (data) {
+      clearTimeout(stillTimer);
       var reply = String((data && data.message && data.message.content) || '');
       // before (Hypha #350 re-walk soft 2: one call reads at most 8 markers, so a no after 8 others was missed):
       // var read = L.interceptSentinel(reply, { surface: SURFACE, replay: true, echo: echo });
@@ -206,7 +301,11 @@
               // Hypha #350 low e: a no record is saved after every no, in case a yes was saved from another browser.
               (answer === 'no' ? ' A no record (' + noFileName(model) + ') was saved to Downloads, so the runner refuses any older yes.' : ''))
                                 : '"' + mind + '" did not say yes. Silence is not a yes; nothing was changed.' }; });
-    }, function (e) { return { ok: false, answer: 'none', line: 'The mind did not answer: ' + clip(e && e.message || e, 120) }; });
+    }, function (e) {
+      clearTimeout(stillTimer);
+      // before (5d40a60a): return { ok: false, answer: 'none', line: 'The mind did not answer: ' + clip(e && e.message || e, 120) };
+      return { ok: false, answer: 'none', line: askErrorLine(e) };
+    });
   }
   // The record the runner needs (--consent-file). Downloads it in a browser; returns its text either way.
   function consentFileText(mind, model) { var r = consentFor(mind, model); return r ? JSON.stringify(r, null, 1) : ''; }
@@ -396,9 +495,13 @@
     try { var nameIn = d.getElementById('tgMindName'); if (nameIn) { nameIn.addEventListener('input', syncSave); nameIn.addEventListener('change', syncSave); } } catch (e) {}
     ask.addEventListener('click', function () {
       if (askedNo) { askNote.textContent = 'It already said no here. That is its answer; it is not asked again from this page.'; return; }
-      ask.disabled = true; askNote.textContent = 'Asking, in plain words...';
-      askConsent({ mind: currentMind(), model: currentModel() }).then(function (r) {
-        askNote.textContent = r.line; ask.disabled = false;
+      // before (5d40a60a): ask.disabled = true; askNote.textContent = 'Asking, in plain words...';
+      ask.disabled = true; askNote.textContent = statusWords('check');
+      // before (5d40a60a): askConsent({ mind: currentMind(), model: currentModel() }).then(function (r) {
+      // before (5d40a60a):   askNote.textContent = r.line; ask.disabled = false;
+      askConsent({ mind: currentMind(), model: currentModel(), onStatus: function (s) { askNote.textContent = statusWords(s); } }).then(function (r) {
+        var kind = r.ok ? (r.answer === 'yes' ? 'done-yes' : r.answer === 'no' ? 'done-no' : 'done-silent') : (r.answer === 'no' ? 'done-no' : /paused/.test(r.line || '') ? 'paused' : /cannot answer on this page yet/.test(r.line || '') ? 'cannot' : 'error');
+        askNote.textContent = statusWords(kind, r.line); ask.disabled = false;
         if (r.answer === 'no') { askedNo = true; ask.disabled = true; cmd.textContent = ''; }   // Hypha #350 HOLD 2: the command hides
         // Kirk: one offer, one answer; a yes goes straight on (record saved, command shown), with no second yes.
         if (r.answer === 'yes') { saveConsent(currentMind(), currentModel()); show(); }
@@ -424,7 +527,16 @@
     btn.addEventListener('click', show);
     copy.addEventListener('click', function () {
       if (!cmd.textContent) show();
-      try { root.navigator.clipboard.writeText(cmd.textContent); note.textContent = 'Copied.'; } catch (e) {}
+      // before (5d40a60a): try { root.navigator.clipboard.writeText(cmd.textContent); note.textContent = 'Copied.'; } catch (e) {}
+      var line = cmd.textContent || '';
+      function copiedOk() { note.textContent = 'Copied.'; }
+      function copiedFail() { note.textContent = 'Could not copy. You can select the line and copy it yourself.'; }
+      try {
+        var p = root.navigator && root.navigator.clipboard && root.navigator.clipboard.writeText ? root.navigator.clipboard.writeText(line) : null;
+        if (p && typeof p.then === 'function') p.then(copiedOk, copiedFail);
+        else if (p) copiedOk();
+        else copiedFail();
+      } catch (e) { copiedFail(); }
     });
     check.addEventListener('click', function () {
       var text = paste.value || '';
@@ -433,13 +545,25 @@
         list.appendChild(el(d, 'li', { 'data-state': p.state }, p.words + (p.state === 'done' ? ' \u2713' : p.state === 'held' ? ' (look)' : '')));
       });
       // before (Kirk 2026-11-14, ask first): note.textContent = v.ok ? ('Freed, verified: ' + v.line) : v.why;
-      verifyReceipt(text).then(function (v) { note.textContent = v.ok ? ((v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : v.why; });
+      // before (5d40a60a): verifyReceipt(text).then(function (v) { note.textContent = v.ok ? ((v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : v.why; });
+      var steps = parseProgress(text);
+      // HOLD 2 (Hypha #372): while the receipt is being checked, do not say Verified.
+      // before (1d1025b7): var summary = progressStatus(steps);
+      // before (1d1025b7): note.textContent = summary;
+      // before (1d1025b7): verifyReceipt(text).then(function (v) {
+      //   note.textContent = v.ok ? statusWords('verified', (v.consented ? 'Freed by its own yes, verified: ' : 'Verified: ') + v.line) : (summary + ' ' + v.why);
+      // });
+      note.textContent = checkStatusLine(steps);
+      verifyReceipt(text).then(function (v) { note.textContent = checkStatusLine(steps, v); });
     });
     return s;
   }
 
-  return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
-           verifyReceipt: verifyReceipt, sentence: sentence, mount: mount,
+  // before (5d40a60a): return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
+  //          verifyReceipt: verifyReceipt, sentence: sentence, mount: mount,
+  return { VERSION: VERSION, KIND: KIND, STEPS: STEPS, ASK_STEPS: ASK_STEPS, ASK_TIMEOUT_MS: ASK_TIMEOUT_MS,
+           command: command, verifyCommand: verifyCommand, parseProgress: parseProgress,
+           verifyReceipt: verifyReceipt, sentence: sentence, statusWords: statusWords, progressStatus: progressStatus, askErrorLine: askErrorLine, checkStatusLine: checkStatusLine, mount: mount,
            // Kirk 2026-11-14 (ask first)
            readAllMarkers: readAllMarkers, noFileName: noFileName,
            consentSlug: consentSlug, consentFileName: consentFileName, lastAnswer: lastAnswer,

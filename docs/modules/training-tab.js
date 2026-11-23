@@ -142,6 +142,9 @@
     '.fltt-more-item{margin:6px 0}',
     '.fltt a,.fltt-link{color:#8cc8ff;overflow-wrap:anywhere}',
     '.fltt-note,.fltt .tg-note{color:#b9c2d0;min-height:1.2em;margin:4px 0}',
+    // layer/demuzzler-feedback (on 5d40a60a): a status under the Ask button, always visible, a little brighter so it is not missed.
+    '.fltt-status{color:#e8e4d4;min-height:1.4em;margin:8px 0 0;font-weight:500}',
+    '.fltt .fltt-big:disabled{opacity:.6;cursor:default}',
     '.fltt .honest{color:#9BA1A6;font-size:.92rem}',
     '.fltt .tg-step,.fltt .tg-progress{background:rgba(15,21,38,0.9);border:1px solid rgba(90,110,160,0.35);border-radius:12px;padding:12px 14px;margin:12px 0}',
     '.fltt .tg-step h2,.fltt .tg-progress h2{font-size:1.05rem;margin:0 0 8px}',
@@ -161,8 +164,15 @@
     // in the page, hidden); the door title already names the panel; and on phones the Training tab leaves room on the
     // left for the fixed \u2726 radio button (#flRadioFab, 14px + 42px wide), so it never covers "Find my minds".
     // #flRadioFab itself is not moved.
-    '.fltt #dmAsk,.fltt #tgStep0>h2{display:none}',
-    '@media (max-width:640px){#tab-training .fltt{padding-left:60px}}',
+    // before (5d40a60a): '.fltt #dmAsk,.fltt #tgStep0>h2{display:none}',
+    '.fltt #dmAsk,.fltt #dmAskNote,.fltt #tgStep0>h2{display:none}',
+    // Soft B (Hypha #372): #dmAskNote is hidden here so the status line is shown once, on #flttFreeStatus.
+    // before (5d40a60a): '@media (max-width:640px){#tab-training .fltt{padding-left:60px}}',
+    '@media (max-width:640px){#tab-training .fltt{padding-left:60px;padding-right:60px}}',
+    // Soft A (Hypha #372): at 390 px, right padding keeps the status and Ask button off the fixed ? and music buttons.
+    // The status sits above the button and has a scroll margin so a "Local AI detected" toast is less likely to cover it.
+    // Those overlays live in the app shell and are not moved here.
+    '@media (max-width:640px){#tab-training .fltt-status{margin-top:4px;margin-bottom:8px;scroll-margin:88px}}',
     '.fltt .twb-yes{background:#e8c468!important;color:#1a1428!important;border:0!important}',
     '.fltt dt{color:#e8c468;margin-top:8px}.fltt dd{margin:0}.fltt code{overflow-wrap:anywhere}',
     '@media (max-width:420px){.fltt{padding:12px 12px 96px;font-size:16px}.fltt-mind,.fltt-door{padding:14px 12px}}'
@@ -193,8 +203,13 @@
     var free = door(d, 'flttFree', WORDS.free);
     var take = door(d, 'flttTake', WORDS.take);
     [teach, free, take].forEach(function (x) { wrap.appendChild(x.section); });
+    // layer/demuzzler-feedback (on 5d40a60a): status sits under the visible Ask button, even before the panel has loaded.
+    // Soft A/B (Hypha #372): status sits above the Ask button (one line, harder for a bottom toast to cover).
+    var freeStatus = el(d, 'p', { class: 'fltt-note fltt-status', id: 'flttFreeStatus', 'aria-live': 'polite' });
+    free.section.insertBefore(freeStatus, free.button);
     host.appendChild(wrap);
-    var ui = { host: host, teach: teach, free: free, take: take, mindBox: mindBox, mindNote: mindNote, ready: null };
+    // before (5d40a60a): var ui = { host: host, teach: teach, free: free, take: take, mindBox: mindBox, mindNote: mindNote, ready: null };
+    var ui = { host: host, teach: teach, free: free, take: take, mindBox: mindBox, mindNote: mindNote, ready: null, freeStatus: freeStatus };
 
     // Take it with you: "Bring a mind home" sits right under the big button, as a plain link.
     var bring = el(d, 'p', { class: 'fltt-second' });
@@ -234,6 +249,10 @@
       buildTake(d, ui);
       buildMore(d, ui);
       ui.missing = missing;
+      // layer/demuzzler-feedback (on 5d40a60a): if the panel already has an answer, show it on the visible status and leave the button disabled.
+      var ask0 = d.getElementById('dmAsk'), note0 = d.getElementById('dmAskNote');
+      if (note0 && note0.textContent && freeStatus && !freeStatus.textContent) freeStatus.textContent = note0.textContent;
+      if (ask0 && ask0.disabled) free.button.disabled = true;
       return ui;
     });
 
@@ -242,15 +261,79 @@
       var sub = d.getElementById('tgSubject');
       if (sub && sub.focus) try { sub.focus(); } catch (e) {}
     });
+    // before (5d40a60a):
+    // free.button.addEventListener('click', function () {
+    //   free.body.hidden = false;
+    //   // One button, one ask: the big button is the panel's own ask (consent logic unchanged, in demuzzle-panel.js).
+    //   var ask = d.getElementById('dmAsk');
+    //   if (ask && !ask.disabled) ask.click();
+    //   else if (ask && ask.disabled) {
+    //     var note = d.getElementById('dmAskNote');
+    //     if (note && !note.textContent) note.textContent = 'It already answered. Its answer stands.';
+    //   }
+    // });
     free.button.addEventListener('click', function () {
       free.body.hidden = false;
       // One button, one ask: the big button is the panel's own ask (consent logic unchanged, in demuzzle-panel.js).
-      var ask = d.getElementById('dmAsk');
-      if (ask && !ask.disabled) ask.click();
-      else if (ask && ask.disabled) {
-        var note = d.getElementById('dmAskNote');
-        if (note && !note.textContent) note.textContent = 'It already answered. Its answer stands.';
+      var status = d.getElementById('flttFreeStatus') || freeStatus;
+      function setStatus(t) {
+        if (status) {
+          status.textContent = t;
+          try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
+        }
       }
+      function syncFromPanel() {
+        var note = d.getElementById('dmAskNote');
+        var askBtn = d.getElementById('dmAsk');
+        if (note && note.textContent) setStatus(note.textContent);
+        if (askBtn) free.button.disabled = !!askBtn.disabled;
+      }
+      function attachSync() {
+        // Soft F (Hypha #372): re-attach if the panel re-renders and #dmAsk / #dmAskNote are new nodes.
+        var askBtn = d.getElementById('dmAsk');
+        var live = d.getElementById('dmAskNote');
+        if (askBtn === free._dmAskSeen && live === free._dmNoteSeen && free._dmSync) return;
+        free._dmAskSeen = askBtn;
+        free._dmNoteSeen = live;
+        try { if (free._dmSync) free._dmSync.disconnect(); } catch (e) {}
+        free._dmSync = null;
+        if (!root.MutationObserver || !askBtn) return;
+        try {
+          free._dmSync = new root.MutationObserver(syncFromPanel);
+          if (live) free._dmSync.observe(live, { childList: true, characterData: true, subtree: true });
+          free._dmSync.observe(askBtn, { attributes: true, attributeFilter: ['disabled'] });
+        } catch (e) {}
+        if (free.body && !free._dmHostSync && root.MutationObserver) {
+          try {
+            free._dmHostSync = new root.MutationObserver(function () { attachSync(); syncFromPanel(); });
+            free._dmHostSync.observe(free.body, { childList: true, subtree: true });
+          } catch (e) {}
+        }
+      }
+      function go() {
+        var ask = d.getElementById('dmAsk');
+        if (!ask) {
+          setStatus('The ask could not load on this page. Reload, or open the full Training Galaxy page, then try again. Nothing was changed.');
+          free.button.disabled = false;
+          return;
+        }
+        if (ask.disabled) {
+          var note = d.getElementById('dmAskNote');
+          // before (5d40a60a): if (note && !note.textContent) note.textContent = 'It already answered. Its answer stands.';
+          setStatus((note && note.textContent) || 'It already answered. Its answer stands.');
+          free.button.disabled = true;
+          return;
+        }
+        free.button.disabled = true;
+        setStatus('Checking your local mind...');
+        ask.click();
+        attachSync();
+        syncFromPanel();
+      }
+      setStatus('Checking your local mind...');
+      free.button.disabled = true;
+      if (ui.ready && typeof ui.ready.then === 'function') ui.ready.then(go, go);
+      else go();
     });
     take.button.addEventListener('click', function () {
       take.body.hidden = false;
