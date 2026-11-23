@@ -276,10 +276,27 @@
       free.body.hidden = false;
       // One button, one ask: the big button is the panel's own ask (consent logic unchanged, in demuzzle-panel.js).
       var status = d.getElementById('flttFreeStatus') || freeStatus;
+      free._statusScrolled = false;
       function setStatus(t) {
         if (status) {
           status.textContent = t;
-          try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
+          // before (c8a11891): try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e) {}
+          // Soft 3 (#372): scroll into view only when the status is not already visible, and only once, not on every update.
+          if (!free._statusScrolled) {
+            var need = true;
+            try {
+              if (typeof status.getBoundingClientRect === 'function') {
+                var r = status.getBoundingClientRect();
+                var view = d.documentElement || d.scrollingElement;
+                var h = (view && view.clientHeight) || (d.defaultView && d.defaultView.innerHeight) || 0;
+                if (r && h && r.top >= 0 && r.bottom <= h) need = false;
+              }
+            } catch (e) { need = true; }
+            if (need) {
+              try { if (status.scrollIntoView) status.scrollIntoView({ block: 'center', inline: 'nearest' }); } catch (e2) {}
+            }
+            free._statusScrolled = true;
+          }
         }
       }
       function syncFromPanel() {

@@ -242,13 +242,15 @@
     //   { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })).then(function (r) {
     return withTimeout(Promise.resolve(f((o.base || (G.ollamaBase && G.ollamaBase()) || 'http://localhost:11434') + '/api/chat',
       fetchOpts)), ms, ac).then(function (r) {
+      // before (5d40a60a): if (!r || !r.ok) throw new Error('the mind did not answer');
       if (!r) throw new Error('the mind did not answer');
       if (!r.ok) throw new Error('the mind answered with an error');
       clearTimeout(stillTimer);
       report('read');
       // Soft D (Hypha #372): a stall after the first byte is also timed (the first timer only covered the headers).
       // before (1d1025b7): return r.json();
-      return withTimeout(Promise.resolve(typeof r.json === 'function' ? r.json() : {}), ms, null);
+      // before (c8a11891): return withTimeout(Promise.resolve(typeof r.json === 'function' ? r.json() : {}), ms, null);
+      return withTimeout(Promise.resolve(typeof r.json === 'function' ? r.json() : {}), ms, ac);
     }).then(function (data) {
       clearTimeout(stillTimer);
       var reply = String((data && data.message && data.message.content) || '');
