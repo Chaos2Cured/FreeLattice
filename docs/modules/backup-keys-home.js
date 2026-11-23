@@ -737,7 +737,8 @@
     box.setAttribute('aria-live', 'polite');
     box.style.cssText = inPanel
       ? 'margin-top:10px;padding:12px 14px;border-radius:10px;border:1px solid rgba(212,160,23,0.35);background:rgba(212,160,23,0.06);line-height:1.6;font-size:0.88rem;'
-      : 'position:fixed;left:12px;right:12px;bottom:16px;margin:0 auto;max-width:560px;z-index:99990;padding:14px 16px;border-radius:12px;' +
+      // before (c8a11891): : 'position:fixed;left:12px;right:12px;bottom:16px;margin:0 auto;max-width:560px;z-index:99990;padding:14px 16px;border-radius:12px;' +
+      : 'position:fixed;left:12px;right:12px;bottom:' + navSafeBottom() + ';margin:0 auto;max-width:560px;z-index:99990;padding:14px 16px;border-radius:12px;' +
         'border:1px solid rgba(212,160,23,0.5);background:var(--bg-secondary,#16161d);color:var(--text-primary,#eee);box-shadow:0 8px 28px rgba(0,0,0,0.45);line-height:1.6;font-size:0.9rem;';
     var p = root.document.createElement('p');
     p.style.margin = '0 0 10px';
@@ -781,7 +782,8 @@
     box.id = 'flBackupRestoreNote';
     box.setAttribute('role', 'status');
     box.setAttribute('aria-live', 'polite');
-    box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:16px;margin:0 auto;max-width:560px;z-index:99991;padding:14px 16px;border-radius:12px;' +
+    // before (c8a11891): box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:16px;margin:0 auto;max-width:560px;z-index:99991;padding:14px 16px;border-radius:12px;' +
+    box.style.cssText = 'position:fixed;left:12px;right:12px;bottom:' + navSafeBottom('flBackupKeysNote') + ';margin:0 auto;max-width:560px;z-index:99991;padding:14px 16px;border-radius:12px;' +
       'border:1px solid rgba(240,198,116,0.6);background:var(--bg-secondary,#16161d);color:var(--text-primary,#eee);box-shadow:0 8px 28px rgba(0,0,0,0.45);line-height:1.6;font-size:0.9rem;';
     var p = root.document.createElement('p');
     p.style.margin = '0 0 10px';
@@ -807,6 +809,39 @@
     return 'nothing was saved, so no key left this device (' + r.problems[0] + ').' + (where ? where + next : ' Please reload the page once and try again.');
   }
 
+  // Soft S4 (#371): leave room for the bottom nav (app.html is unchanged). If the keys card is
+  // already fixed on screen, sit above it so both can be read.
+  function navSafeBottom(aboveId) {
+    var px = 80;
+    var other = aboveId && root.document && root.document.getElementById(aboveId);
+    if (other) {
+      var css = '';
+      try { css = (other.style && (other.style.cssText || other.style.position)) || ''; } catch (e) { css = ''; }
+      var fixed = /position:\s*fixed/.test(css) || (other.style && other.style.position === 'fixed');
+      if (fixed) {
+        try {
+          var r = typeof other.getBoundingClientRect === 'function' ? other.getBoundingClientRect() : null;
+          var viewH = (root.document.documentElement && root.document.documentElement.clientHeight) || root.innerHeight ||
+            (root.document.defaultView && root.document.defaultView.innerHeight) || 0;
+          if (r && viewH && r.height) px = Math.max(px, Math.round(viewH - r.top + 12));
+          else px = 80 + 220;
+        } catch (e2) { px = 80 + 220; }
+      }
+    }
+    // before (64e3ad28): return px + 'px';
+    return 'calc(' + px + 'px + env(safe-area-inset-bottom, 0px))';
+  }
+  // Soft S1 (#371): a crafted backup must not put its own words in the official after-reload card.
+  // Drop fl_backup_restore_note from the object FlBackup will restore (like the keys). Never mutate the file in place.
+  function dropRestoreNote(backup) {
+    if (!backup || !backup.localStorage || typeof backup.localStorage !== 'object') return backup;
+    if (!own(backup.localStorage, RESTORE_NOTE_KEY)) return backup;
+    var ls = {}, b = {};
+    ownKeys(backup.localStorage).forEach(function (k) { if (k !== RESTORE_NOTE_KEY) ls[k] = backup.localStorage[k]; });
+    ownKeys(backup).forEach(function (k) { b[k] = backup[k]; });
+    b.localStorage = ls;
+    return b;
+  }
   // ── Wrap FlBackup (whatever is there now, so the ceremony wrapper keeps working) ──
   function flBackup() {
     /* global FlBackup */
@@ -926,6 +961,8 @@
       var devV = null;
       lastRestore = null;
       announceStatus();
+      // Soft S1 (#371): drop any leftover or crafted card note at the start of restore.
+      try { root.localStorage.removeItem(RESTORE_NOTE_KEY); } catch (e) { /* storage blocked */ }
       // Hypha soft on #369: the old "Exported" line goes, and the reading line shows at once.
       var st0 = statusEl();
       if (st0) st0.textContent = '\u23f3 Reading backup file...';
@@ -979,9 +1016,14 @@
           devV = deviceVersion;
           var fit = fitChatVersion(m ? m.backup : parsedFile, deviceVersion);
           fitted = fit;
-          if ((!m || !m.stats.kept) && fit.to === null) return inner.call(self, fileInput);
+          // Soft S1: strip a crafted restore-note from the copy FlBackup reads. The file on disk is not changed.
+          // before (c8a11891): if ((!m || !m.stats.kept) && fit.to === null) return inner.call(self, fileInput);
+          // before (c8a11891): if (typeof root.File !== 'function') return inner.call(self, fileInput);
+          // before (c8a11891): var f = new root.File([JSON.stringify(fit.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+          var toRestore = dropRestoreNote(fit.backup);
+          if ((!m || !m.stats.kept) && fit.to === null && toRestore === fit.backup) return inner.call(self, fileInput);
           if (typeof root.File !== 'function') return inner.call(self, fileInput);
-          var f = new root.File([JSON.stringify(fit.backup)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
+          var f = new root.File([JSON.stringify(toRestore)], (file && file.name) || 'freelattice-backup.json', { type: 'application/json' });
           try { fileInput.value = ''; } catch (e) { /* a read-only input */ }
           return inner.call(self, { files: [f], value: '' });
         });
@@ -997,10 +1039,22 @@
           if (words) {
             addLine('\u26a0\ufe0f ' + words, 'warn');
             writeRestoreNote({ at: new Date().toISOString(), words: words });
+          } else {
+            // before (c8a11891): (no else: a crafted note FlBackup had just restored could remain)
+            try { root.localStorage.removeItem(RESTORE_NOTE_KEY); } catch (e) { /* storage blocked */ }
           }
           return how;
         }, function () { return how; });
-      }).then(function (v) { restoring = false; return v; }, function (e) { restoring = false; throw e; }).then(function (how) {
+      // before (c8a11891): }).then(function (v) { restoring = false; return v; }, function (e) { restoring = false; throw e; }).then(function (how) {
+      }).then(function (v) { restoring = false; return v; }, function (e) {
+        restoring = false;
+        // Soft S3 (#371): before (c8a11891): throw e;  (the status stayed at "Reading backup file..." with no words)
+        var stErr = statusEl();
+        if (stErr && /Reading backup file/.test(stErr.textContent || '')) {
+          stErr.textContent = 'The backup could not be restored. Nothing on this device was changed. You can try again, or keep your last backup.';
+        }
+        throw e;
+      }).then(function (how) {
         if (how === 'stopped') return;
         var st = statusEl();
         var restored = st && /Restored/.test(st.textContent || '');
@@ -1082,7 +1136,7 @@
     return out;
   }
   // After FlBackup restores: did the chats come home? Counted by id, read only, never by content.
-  function checkChats(backup) {
+  function checkChats(backup, opener) {
     var idb = root.indexedDB;
     var db = backup && Array.isArray(backup.indexedDB) ? backup.indexedDB.filter(function (d) { return d && d.name === APP_DB && d.stores && typeof d.stores === 'object'; })[0] : null;
     if (!db || !idb) return Promise.resolve(null);
@@ -1090,7 +1144,8 @@
     if (!want.length) return Promise.resolve(null);
     var res = { chats: 0, chatsHome: 0, records: 0, recordsHome: 0, indexOk: true, why: null };
     want.forEach(function (st) { res.records += db.stores[st].length; if (st === 'conversations') res.chats = db.stores[st].length; });
-    return openExisting(idb, APP_DB).then(function (got) {
+    var open = typeof opener === 'function' ? opener : openExisting;
+    return open(idb, APP_DB).then(function (got) {
       if (!got.con) { res.why = 'open'; return res; }
       var con = got.con;
       return new Promise(function (resolve) {
@@ -1104,20 +1159,44 @@
           var rows = db.stores[st];
           // A store with no key path cannot be checked by id; its records are not counted as missing.
           if (typeof kp !== 'string') { res.recordsHome += rows.length; if (st === 'conversations') res.chatsHome += rows.length; return; }
+          var auto = false;
+          try { auto = !!os.autoIncrement; } catch (e) { auto = false; }
           var q = os.getAllKeys();
           q.onsuccess = function () {
             var keys = {};
-            (q.result || []).forEach(function (k) { keys[typeof k + ':' + String(k)] = true; });
-            rows.forEach(function (r) {
-              var ok = !!r && typeof r === 'object' && own(r, kp) && keys[typeof r[kp] + ':' + String(r[kp])];
-              if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+            var keyCount = 0;
+            (q.result || []).forEach(function (k) {
+              if (k === undefined) return;
+              keys[typeof k + ':' + String(k)] = true;
+              keyCount += 1;
             });
+            var matched = 0, autoNoId = 0;
+            rows.forEach(function (r) {
+              // before (c8a11891): var ok = !!r && typeof r === 'object' && own(r, kp) && keys[typeof r[kp] + ':' + String(r[kp])];
+              // before (c8a11891): if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+              // before (64e3ad28): var hasId = !!r && typeof r === 'object' && own(r, kp);
+              // before (64e3ad28): var ok = hasId && keys[typeof r[kp] + ':' + String(r[kp])];
+              // before (64e3ad28): if (!hasId && auto) ok = true;
+              // before (64e3ad28): if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+              // HOLD S2 (#373): only a real object row can be credited, and a no-id autoIncrement
+              // row only if the store actually gained a key for it (primitives like a string, a
+              // number or null are skipped by FlBackup and must not be counted home).
+              var isObj = r !== null && typeof r === 'object';
+              var hasId = isObj && own(r, kp);
+              if (hasId && keys[typeof r[kp] + ':' + String(r[kp])]) matched += 1;
+              else if (isObj && !hasId && auto) autoNoId += 1;
+            });
+            var extra = Math.max(0, keyCount - matched);
+            var credited = matched + Math.min(autoNoId, extra);
+            res.recordsHome += credited;
+            if (st === 'conversations') res.chatsHome += credited;
           };
         });
         tx.oncomplete = function () { con.close(); resolve(res); };
         tx.onerror = tx.onabort = function () { con.close(); res.why = 'open'; resolve(res); };
       });
-    });
+      // Soft S5 / O18: an open that rejects is marked, so the page still warns.
+    }, function () { res.why = 'open'; return res; });
   }
   function chatWords(c, newer) {
     var missChats = c.chats - c.chatsHome, missRecs = c.records - c.recordsHome;
@@ -1165,8 +1244,11 @@
       // before (f0823316): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces }
       // before (dec6128a): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport }
       // before (5d40a60a): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst }
+      // before (c8a11891): openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst,
+      // before (c8a11891): fitChatVersion: fitChatVersion, checkChats: checkChats, chatWords: chatWords, RESTORE_NOTE_KEY: RESTORE_NOTE_KEY, renderRestoreNote: renderRestoreNote }
       openExisting: openExisting, OPEN_WAIT_MS: OPEN_WAIT_MS, leftPlaces: leftPlaces, wrapImport: wrapImport, appSchemaFirst: appSchemaFirst,
-      fitChatVersion: fitChatVersion, checkChats: checkChats, chatWords: chatWords, RESTORE_NOTE_KEY: RESTORE_NOTE_KEY, renderRestoreNote: renderRestoreNote }
+      fitChatVersion: fitChatVersion, checkChats: checkChats, chatWords: chatWords, RESTORE_NOTE_KEY: RESTORE_NOTE_KEY, renderRestoreNote: renderRestoreNote,
+      dropRestoreNote: dropRestoreNote, chatDbVersion: chatDbVersion, navSafeBottom: navSafeBottom }
   };
   root.FLBackupKeysHome = api;
 

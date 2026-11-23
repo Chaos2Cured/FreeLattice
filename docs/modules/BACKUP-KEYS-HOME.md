@@ -75,6 +75,13 @@ Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so
 - **No plain "Restored" over a broken chat database.** If the app could not prepare its chat database first, and the restore made one without the app's indexes, the page says the chats may not open here yet and to keep the backup file.
 - **Softs:** the lock resets after an error; picking no file (the file dialog cancelled) never holds the lock; a stopped restore never prepares the chat database; Cancel restore is a 44 px button with its label, disabled once pressed; and on a phone the waiting line is scrolled into view so it is not under the bottom bar.
 
+### Softs after #371
+- **A crafted restore note never fills the official card.** A backup file can carry `fl_backup_restore_note` with any words. That key is dropped from the copy FlBackup restores (the file on disk is not changed), and it is cleared at the start of restore and after a restore that has no honest warning of its own. The official after-reload card only ever shows words this layer just wrote.
+- **A message without an id in an autoIncrement store is not counted as missing.** FlBackup writes it with a new id, and this layer only credits a real object row if the store actually gained a key for it. A string, a number or null in that store is skipped by FlBackup and is not counted home. A conversation without an id is still not written, and is still named if it did not come home.
+- **An error no longer leaves "Reading backup file...".** If the restore fails, the status says the backup could not be restored, that nothing on this device was changed, and that you can try again or keep your last backup.
+- **The after-reload cards sit above the bottom nav.** Their offset is `calc(80px + env(safe-area-inset-bottom, 0px))`, so a safe-area inset does not cover the nav. If the keys card and the restore card both show, the restore card sits above the keys card so both can be read. `app.html` is not changed.
+- **Smoke:** `chatDbVersion` closes the connection it opened; a failed open of the chat database is marked and the page warns; a newer FreeLattice is named as the reason through the restore itself, not only by calling `chatWords` directly.
+
 ### Screen readers
 The lines and the card are `role="status"` with `aria-live="polite"`, so they are read out, and the card sits early in the page so it comes early in the focus order.
 
