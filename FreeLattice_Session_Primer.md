@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-23 01:37 UTC
-- Last deployed: 2026-11-23 01:37 UTC
+- Last auto-updated: 2026-11-23 04:29 UTC
+- Last deployed: 2026-11-23 04:29 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3648
+- Total commits: 3650
 - Last 10 commits:
+- 4d355d35 Older backups: softs after #371 (#373)
+- c8a11891 ci: Update Primer deployment state [2026-11-23]
 - 31e9f5ed De-muzzler: always show what is happening (#372)
 - 19a5ade2 ci: Update Primer deployment state [2026-11-23]
 - f0d96b7e Layer, never delete. Older backups bring their chats home. (#371)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - dec6128a ci: Update Primer deployment state [2026-11-21]
 - e3789f5c Backup keys stay home: Hypha's softs 1-5 from #368 (additive, draft) (#369)
 - 05b777d1 ci: Update Primer deployment state [2026-11-21]
-- ef550fbf Backup keys stay home: Save Vault no longer writes saved keys in the clear (draft) (#368)
-- 218d8194 ci: Update Primer deployment state [2026-11-20]
