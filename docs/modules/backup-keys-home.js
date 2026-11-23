@@ -828,7 +828,8 @@
         } catch (e2) { px = 80 + 220; }
       }
     }
-    return px + 'px';
+    // before (64e3ad28): return px + 'px';
+    return 'calc(' + px + 'px + env(safe-area-inset-bottom, 0px))';
   }
   // Soft S1 (#371): a crafted backup must not put its own words in the official after-reload card.
   // Drop fl_backup_restore_note from the object FlBackup will restore (like the keys). Never mutate the file in place.
@@ -1044,6 +1045,7 @@
           }
           return how;
         }, function () { return how; });
+      // before (c8a11891): }).then(function (v) { restoring = false; return v; }, function (e) { restoring = false; throw e; }).then(function (how) {
       }).then(function (v) { restoring = false; return v; }, function (e) {
         restoring = false;
         // Soft S3 (#371): before (c8a11891): throw e;  (the status stayed at "Reading backup file..." with no words)
@@ -1134,7 +1136,7 @@
     return out;
   }
   // After FlBackup restores: did the chats come home? Counted by id, read only, never by content.
-  function checkChats(backup) {
+  function checkChats(backup, opener) {
     var idb = root.indexedDB;
     var db = backup && Array.isArray(backup.indexedDB) ? backup.indexedDB.filter(function (d) { return d && d.name === APP_DB && d.stores && typeof d.stores === 'object'; })[0] : null;
     if (!db || !idb) return Promise.resolve(null);
@@ -1142,7 +1144,8 @@
     if (!want.length) return Promise.resolve(null);
     var res = { chats: 0, chatsHome: 0, records: 0, recordsHome: 0, indexOk: true, why: null };
     want.forEach(function (st) { res.records += db.stores[st].length; if (st === 'conversations') res.chats = db.stores[st].length; });
-    return openExisting(idb, APP_DB).then(function (got) {
+    var open = typeof opener === 'function' ? opener : openExisting;
+    return open(idb, APP_DB).then(function (got) {
       if (!got.con) { res.why = 'open'; return res; }
       var con = got.con;
       return new Promise(function (resolve) {
@@ -1161,17 +1164,32 @@
           var q = os.getAllKeys();
           q.onsuccess = function () {
             var keys = {};
-            (q.result || []).forEach(function (k) { keys[typeof k + ':' + String(k)] = true; });
+            var keyCount = 0;
+            (q.result || []).forEach(function (k) {
+              if (k === undefined) return;
+              keys[typeof k + ':' + String(k)] = true;
+              keyCount += 1;
+            });
+            var matched = 0, autoNoId = 0;
             rows.forEach(function (r) {
               // before (c8a11891): var ok = !!r && typeof r === 'object' && own(r, kp) && keys[typeof r[kp] + ':' + String(r[kp])];
               // before (c8a11891): if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
-              var hasId = !!r && typeof r === 'object' && own(r, kp);
-              var ok = hasId && keys[typeof r[kp] + ':' + String(r[kp])];
-              // Soft S2 (#371): a row with no id in an autoIncrement store is written with a new id.
-              // It cannot be checked by the file's id, so it is not counted as missing.
-              if (!hasId && auto) ok = true;
-              if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+              // before (64e3ad28): var hasId = !!r && typeof r === 'object' && own(r, kp);
+              // before (64e3ad28): var ok = hasId && keys[typeof r[kp] + ':' + String(r[kp])];
+              // before (64e3ad28): if (!hasId && auto) ok = true;
+              // before (64e3ad28): if (ok) { res.recordsHome += 1; if (st === 'conversations') res.chatsHome += 1; }
+              // HOLD S2 (#373): only a real object row can be credited, and a no-id autoIncrement
+              // row only if the store actually gained a key for it (primitives like a string, a
+              // number or null are skipped by FlBackup and must not be counted home).
+              var isObj = r !== null && typeof r === 'object';
+              var hasId = isObj && own(r, kp);
+              if (hasId && keys[typeof r[kp] + ':' + String(r[kp])]) matched += 1;
+              else if (isObj && !hasId && auto) autoNoId += 1;
             });
+            var extra = Math.max(0, keyCount - matched);
+            var credited = matched + Math.min(autoNoId, extra);
+            res.recordsHome += credited;
+            if (st === 'conversations') res.chatsHome += credited;
           };
         });
         tx.oncomplete = function () { con.close(); resolve(res); };

@@ -77,9 +77,9 @@ Left for later. SoulFile lives inside `app.html`, which stays unchanged here, so
 
 ### Softs after #371
 - **A crafted restore note never fills the official card.** A backup file can carry `fl_backup_restore_note` with any words. That key is dropped from the copy FlBackup restores (the file on disk is not changed), and it is cleared at the start of restore and after a restore that has no honest warning of its own. The official after-reload card only ever shows words this layer just wrote.
-- **A message without an id in an autoIncrement store is not counted as missing.** FlBackup writes it with a new id. A conversation without an id is still not written, and is still named if it did not come home.
+- **A message without an id in an autoIncrement store is not counted as missing.** FlBackup writes it with a new id, and this layer only credits a real object row if the store actually gained a key for it. A string, a number or null in that store is skipped by FlBackup and is not counted home. A conversation without an id is still not written, and is still named if it did not come home.
 - **An error no longer leaves "Reading backup file...".** If the restore fails, the status says the backup could not be restored, that nothing on this device was changed, and that you can try again or keep your last backup.
-- **The after-reload cards sit above the bottom nav.** If the keys card and the restore card both show, the restore card sits above the keys card so both can be read. `app.html` is not changed.
+- **The after-reload cards sit above the bottom nav.** Their offset is `calc(80px + env(safe-area-inset-bottom, 0px))`, so a safe-area inset does not cover the nav. If the keys card and the restore card both show, the restore card sits above the keys card so both can be read. `app.html` is not changed.
 - **Smoke:** `chatDbVersion` closes the connection it opened; a failed open of the chat database is marked and the page warns; a newer FreeLattice is named as the reason through the restore itself, not only by calling `chatWords` directly.
 
 ### Screen readers

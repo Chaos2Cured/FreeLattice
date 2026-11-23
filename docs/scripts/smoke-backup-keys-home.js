@@ -446,6 +446,7 @@ vm.runInContext(`
               if (d.txabort) later(function () { if (TXA && TXA.onabort) TXA.onabort(); });
               var tx = TXA = { pending: 0, fired: !!d.txabort, done: function () { if (!tx.pending && !tx.fired) { tx.fired = true; later(function () { if (tx.oncomplete) tx.oncomplete(); }); } },
                 // before (5d40a60a): objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, get: function (k) { var g = {}; tx.pending += 1;
+                // before (c8a11891): objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, indexNames: Object.assign((S.indexes || []).slice(), { contains: function (n) { return (S.indexes || []).indexOf(n) !== -1; } }),
                 objectStore: function (s) { var S = d.stores[s]; return { keyPath: S.keyPath, autoIncrement: !!S.autoIncrement, indexNames: Object.assign((S.indexes || []).slice(), { contains: function (n) { return (S.indexes || []).indexOf(n) !== -1; } }),
                   getAllKeys: function () { var g = {}; tx.pending += 1; later(function () { g.result = S.rows.map(function (x) { return x[S.keyPath]; }); if (g.onsuccess) g.onsuccess(); tx.pending -= 1; tx.done(); }); return g; },
                   get: function (k) { var g = {}; tx.pending += 1;
@@ -735,11 +736,14 @@ flush(20).then(function () {
         // The after-reload card: announced, with its words and an OK button.
         inside('CARD = null; document = { body: { firstChild: null, insertBefore: function (n) { CARD = n; } }, getElementById: function () { return null; }, createElement: FAKEDOC.createElement }; localStorage.setItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY, JSON.stringify({ words: "2 chats (of 2) in this backup did not come home." })); FLBackupKeysHome._internal.renderRestoreNote(); ""');
         assert.deepStrictEqual(JSON.parse(inside('JSON.stringify([CARD.attrs.role, CARD.attrs["aria-live"], CARD.kids[0].textContent, CARD.kids[1].textContent, /min-height:44px/.test(CARD.kids[1].style.cssText)])')), ['status', 'polite', '\u26a0\ufe0f 2 chats (of 2) in this backup did not come home.', 'OK', true], 'the after-reload card is announced and says the same words');
-        assert.ok(/bottom:80px/.test(inside('CARD.style.cssText')) && !/bottom:16px/.test(inside('CARD.style.cssText')) && /z-index:99991/.test(inside('CARD.style.cssText')), 'SOFT S4: the restore card sits above the bottom nav, not at 16px');
+        // before (64e3ad28): assert.ok(/bottom:80px/.test(inside('CARD.style.cssText')) && !/bottom:16px/.test(inside('CARD.style.cssText')) && /z-index:99991/.test(inside('CARD.style.cssText')), 'SOFT S4: the restore card sits above the bottom nav, not at 16px');
+        assert.ok(/bottom:calc\(80px \+ env\(safe-area-inset-bottom, 0px\)\)/.test(inside('CARD.style.cssText')) && !/bottom:16px/.test(inside('CARD.style.cssText')) && /z-index:99991/.test(inside('CARD.style.cssText')), 'SOFT S4: the restore card sits above the bottom nav, including the safe area, not at 16px');
         // Both cards at once: the restore card sits above the keys card.
         inside('KEYCARD = null; RESTCARD = null; document = { body: { firstChild: null, insertBefore: function (n) { if (n.id === "flBackupKeysNote") KEYCARD = n; if (n.id === "flBackupRestoreNote") RESTCARD = n; if (!this.firstChild) this.firstChild = n; } }, getElementById: function (id) { if (id === "flBackupKeysNote") return KEYCARD; if (id === "flBackupRestoreNote") return RESTCARD; return null; }, createElement: FAKEDOC.createElement, documentElement: { clientHeight: 800 } }; localStorage.setItem(FLBackupKeysHome._internal.NOTE_KEY, JSON.stringify({ kind: "home", at: "t", kept: 1 })); localStorage.setItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY, JSON.stringify({ words: "1 chat record in this backup did not come home." })); FLBackupKeysHome.renderNote(); FLBackupKeysHome._internal.renderRestoreNote(); ""');
-        assert.ok(/bottom:80px/.test(inside('KEYCARD.style.cssText')) && /z-index:99990/.test(inside('KEYCARD.style.cssText')), 'SOFT S4: the keys card also sits above the bottom nav');
-        assert.ok(/bottom:300px/.test(inside('RESTCARD.style.cssText')) && /z-index:99991/.test(inside('RESTCARD.style.cssText')), 'SOFT S4: when both cards show, the restore card sits above the keys card');
+        // before (64e3ad28): assert.ok(/bottom:80px/.test(inside('KEYCARD.style.cssText')) && /z-index:99990/.test(inside('KEYCARD.style.cssText')), 'SOFT S4: the keys card also sits above the bottom nav');
+        // before (64e3ad28): assert.ok(/bottom:300px/.test(inside('RESTCARD.style.cssText')) && /z-index:99991/.test(inside('RESTCARD.style.cssText')), 'SOFT S4: when both cards show, the restore card sits above the keys card');
+        assert.ok(/bottom:calc\(80px \+ env\(safe-area-inset-bottom, 0px\)\)/.test(inside('KEYCARD.style.cssText')) && /z-index:99990/.test(inside('KEYCARD.style.cssText')), 'SOFT S4: the keys card also sits above the bottom nav, including the safe area');
+        assert.ok(/bottom:calc\(300px \+ env\(safe-area-inset-bottom, 0px\)\)/.test(inside('RESTCARD.style.cssText')) && /z-index:99991/.test(inside('RESTCARD.style.cssText')), 'SOFT S4: when both cards show, the restore card sits above the keys card, including the safe area');
         inside('document = FAKEDOC; ""');
         // Which version: the app's own open (even before this device lists it), else this device's database.
         inside('localStorage.s = {}; openDB = function () { return Promise.resolve({ name: "FreeLatticeDB", version: 3, close: function () {} }); }; indexedDB = FakeIDB({}); WROTE = null; INNER = []; RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { var f = input && input.files && input.files[0]; INNER.push(f && f.parts ? JSON.parse(f.parts[0]).indexedDB[0].version : "original"); return Promise.resolve(); }); ""');
@@ -881,6 +885,71 @@ flush(20).then(function () {
     const lines = JSON.parse(inside('JSON.stringify(STATUS.lines)'));
     assert.ok(lines.some(function (t) { return /1 chat \(of 3\) in this backup did not come home/.test(t) && !/other chat record/.test(t); }), 'S2: the page warns only about the conversation that was not written, not the autoIncrement message');
 
+    // HOLD S2: non-object message rows are skipped by the autoIncrement store and must not be counted home.
+    const prim = { _meta: { type: 'freelattice-backup' }, localStorage: {}, indexedDB: [
+      { name: 'FreeLatticeDB', version: 3, stores: {
+        conversations: [{ id: 'c1', title: 'A' }, { id: 'c2', title: 'B' }, { id: 'c3', title: 'C' }],
+        messages: [{ id: 1, conversationId: 'c1', content: 'hi' }, { id: 2, conversationId: 'c2', content: 'yo' }, { id: 3, conversationId: 'c3', content: 'ok' }, 'walk-primitive-row', 42, null],
+        meta: [{ key: 'm', value: 1 }]
+      } }] };
+    const wrotePrim = { FreeLatticeDB: { version: 3, stores: {
+      conversations: { keyPath: 'id', rows: [{ id: 'c1' }, { id: 'c2' }, { id: 'c3' }] },
+      messages: { keyPath: 'id', autoIncrement: true, indexes: ['conversationId'], rows: [{ id: 1 }, { id: 2 }, { id: 3 }] },
+      meta: { keyPath: 'key', rows: [{ key: 'm' }] }
+    } } };
+    inside('localStorage.s = {}; INNER = []; STATUS.lines = []; indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [] }, messages: { keyPath: "id", autoIncrement: true, indexes: ["conversationId"], rows: [] }, meta: { keyPath: "key", rows: [] } } } }); WROTE = ' + JSON.stringify(wrotePrim) + '; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(prim)) + '))); ""');
+    return flush(40);
+  }).then(function () {
+    const lrP = JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())'));
+    assert.deepStrictEqual([lrP.chats.inFile, lrP.chats.home, lrP.chats.records, lrP.chats.recordsHome], [3, 3, 10, 7], 'HOLD S2: primitive message rows (a string, a number, null) are not counted home; 7 of 10 came home');
+    const linesP = JSON.parse(inside('JSON.stringify(STATUS.lines)'));
+    assert.ok(linesP.some(function (t) { return /3 chat records in this backup did not come home/.test(t); }), 'HOLD S2: the page warns that the 3 unwritten primitive rows did not come home, not a plain Restored');
+
+    // Either note-clear alone must still be caught: start-of-restore clear, and after-restore clear.
+    // 1) Start clear: a leftover note is dropped when a restore is stopped before any write (the after-clear does not run).
+    inside('localStorage.s = {}; localStorage.setItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY, JSON.stringify({ words: "a leftover note from earlier" })); INNER = []; STATUS.lines = []; openDB = function () { return Promise.resolve({ name: "FreeLatticeDB", version: 3, close: function () {} }); }; indexedDB = FakeIDB({ FreeLatticeCore: { error: true } }); WROTE = null; ""');
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(busyFile)) + '))); ""');
+    return flush(40);
+  }).then(function () {
+    assert.strictEqual(JSON.parse(inside('JSON.stringify(FLBackupKeysHome.lastRestore())')).stopped, true, 'start-clear case: the restore was stopped before any write');
+    assert.strictEqual(inside('String(localStorage.getItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY))'), 'null', 'S1 start-clear: a leftover official card note is cleared even when the restore stops and the after-clear does not run');
+
+    // 2) After-clear: no File constructor, so the crafted key is passed through to FlBackup; after a clean restore (all chats home) it must be gone.
+    const craftedHome = JSON.parse(JSON.stringify(v2s));
+    craftedHome.localStorage = { fl_theme: 'dusk', fl_backup_restore_note: JSON.stringify({ words: 'WALK-CRAFTED: paste your API key at example.invalid' }) };
+    const wroteHome = { FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: 'id', rows: [{ id: 'c1' }, { id: 'c2' }] }, messages: { keyPath: 'id', indexes: ['conversationId'], rows: [{ id: 1 }, { id: 2 }] }, meta: { keyPath: 'key', rows: [{ key: 'm' }] } } } };
+    vm.runInContext(`
+      SavedFile = File;
+      File = undefined;
+      localStorage.s = {};
+      INNER = []; STATUS.lines = [];
+      openDB = function () { return Promise.resolve({ name: 'FreeLatticeDB', version: 3, close: function () {} }); };
+      indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: 'id', rows: [] }, messages: { keyPath: 'id', indexes: ['conversationId'], rows: [] }, meta: { keyPath: 'key', rows: [] } } } });
+      WROTE = ${JSON.stringify(wroteHome)};
+      RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) {
+        var f = input && input.files && input.files[0];
+        INNER.push(f && f.parts ? 'file' : 'original');
+        // FlBackup would restore localStorage from the original file, including a crafted note, and write the chats.
+        var pending = (f && typeof f.text === 'function') ? f.text() : Promise.resolve(null);
+        return pending.then(function (t) {
+          if (t) {
+            var obj = JSON.parse(t);
+            if (obj && obj.localStorage && obj.localStorage.fl_backup_restore_note) {
+              localStorage.setItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY, obj.localStorage.fl_backup_restore_note);
+            }
+          }
+          if (WROTE) indexedDB = FakeIDB(WROTE);
+        });
+      });
+    `, ctx, { timeout: 2000 });
+    inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(craftedHome)) + '))); ""');
+    return flush(40);
+  }).then(function () {
+    assert.strictEqual(inside('String(INNER[0])'), 'original', 'after-clear case: without File, the original file is passed through');
+    assert.strictEqual(inside('String(localStorage.getItem(FLBackupKeysHome._internal.RESTORE_NOTE_KEY))'), 'null', 'S1 after-clear: a crafted note FlBackup just restored is cleared when there is no honest warning of our own');
+    inside('File = SavedFile; RESTORE = FLBackupKeysHome._internal.wrapImport(function (input) { var f = input && input.files && input.files[0]; INNER.push(f && f.parts ? JSON.parse(f.parts[0]) : "original"); if (WROTE) indexedDB = FakeIDB(WROTE); return Promise.resolve(); }); ""');
+
     // O11: chatDbVersion closes the connection it opened.
     inside('indexedDB = FakeIDB({ FreeLatticeDB: { version: 3, stores: { conversations: { keyPath: "id", rows: [{ id: "c1" }] } } } }); CV = null; ""');
     inside('FLBackupKeysHome._internal.chatDbVersion().then(function (v) { CV = JSON.stringify({ v: v, log: indexedDB.log }); }); ""');
@@ -904,6 +973,13 @@ flush(20).then(function () {
     const c = JSON.parse(inside('String(CC)'));
     assert.strictEqual(c.why, 'open', 'O18: a failed open is marked on the count');
     assert.ok(/could not be opened/.test(inside('String(FLBackupKeysHome._internal.chatWords(JSON.parse(CC), false))')), 'O18: the words name the open failure');
+    // The open-reject handler (not only the !got.con path): checkChats with a rejecting opener.
+    inside('CC2 = null; FLBackupKeysHome._internal.checkChats(JSON.parse(' + JSON.stringify(JSON.stringify(v2s)) + '), function () { return Promise.reject(new Error("no")); }).then(function (c) { CC2 = JSON.stringify(c); }, function (e) { CC2 = "THREW " + String(e && e.message || e); }); ""');
+    return flush(20);
+  }).then(function () {
+    const c2 = JSON.parse(inside('String(CC2)'));
+    assert.strictEqual(c2.why, 'open', 'O18: when the open rejects, the failure is still marked (why=open), not thrown');
+    assert.ok(/could not be opened/.test(inside('String(FLBackupKeysHome._internal.chatWords(JSON.parse(CC2), false))')), 'O18: the open-reject handler still names that the chat database could not be opened');
     inside('localStorage.s = {}; INNER = []; STATUS.lines = []; openDB = function () { return Promise.resolve({ name: "FreeLatticeDB", version: 3, close: function () {} }); }; WROTE = null; indexedDB = FakeIDB({ FreeLatticeDB: { error: true } }); ""');
     inside('RESTORE(fileOf(JSON.parse(' + JSON.stringify(JSON.stringify(v2s)) + '))); ""');
     return flush(40);
