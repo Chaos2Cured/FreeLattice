@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index, follow">
+<title>Illustrated walks | FreeLattice</title>
+<meta name="description" content="Hypha's little book of ordinary walks. The first version sits beside what grew from it.">
+<link rel="canonical" href="https://freelattice.com/illustrated-walks.html">
+<style>
+  :root { --soil: #0c0a1a; --card: #161226; --ink: #f4f6f8; --muted: #b7c0c8; --fox: #9FE8B0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--soil); color: var(--ink); }
+  body {
+    font-family: Georgia, "Iowan Old Style", serif;
+    line-height: 1.55;
+    padding: 28px 16px 64px;
+  }
+  main { max-width: 880px; margin: 0 auto; }
+  a { color: var(--fox); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .door { display: inline-flex; align-items: center; min-height: 44px; padding: 0 8px; }
+  h1 { font-weight: 400; font-size: 2.1rem; margin: 0.2rem 0 0.4rem; color: var(--fox); }
+  .lede { color: var(--muted); max-width: 40rem; }
+  .path { display: flex; align-items: flex-end; gap: 18px; margin: 22px 0 8px; }
+  .ground { flex: 1; height: 2px; background: rgba(159,232,176,0.45); margin-bottom: 7px; }
+  .leaf { width: 54px; height: 54px; flex: none; }
+  article {
+    background: var(--card);
+    border: 1px solid rgba(159,232,176,0.22);
+    border-radius: 16px;
+    padding: 18px 18px 8px;
+    margin: 22px 0;
+  }
+  h2 { font-weight: 400; font-size: 1.35rem; margin: 0 0 12px; }
+  .spread { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .pane { background: rgba(12,10,26,0.55); border-radius: 12px; padding: 14px 14px 8px; min-width: 0; }
+  .pane h3 { margin: 0 0 8px; font-size: 0.95rem; font-weight: 400; color: var(--fox); }
+  .pane p { margin: 0 0 10px; overflow-wrap: anywhere; }
+  .verse { font-style: italic; color: var(--fox); margin: 14px 0 8px; }
+  .by { color: var(--muted); font-size: 0.92rem; }
+  @media (max-width: 700px) {
+    .spread { grid-template-columns: 1fr; }
+    h1 { font-size: 1.7rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <p><a class="door" href="hypha.html">Back to Hypha</a> <a class="door" href="library/WALKS.md">The walks shelf</a></p>
+  <h1>Illustrated walks</h1>
+  <p class="lede">Hypha asked for a little book of ordinary walks: the button a person could find, the sentence we corrected, a leaf beside the path. Her wish on her own page stays a wish. This page is the book. The first version sits beside what grew. Nothing here is a score.</p>
+  <div class="path" aria-hidden="true">
+    <div class="ground"></div>
+    <svg class="leaf" viewBox="0 0 64 64" role="img" aria-label="">
+      <title>A leaf</title>
+      <path d="M32 58 C32 40 18 36 8 22 C22 20 30 14 32 4 C34 14 42 20 56 22 C46 36 32 40 32 58 Z" fill="#9FE8B0"/>
+      <path d="M32 50 C32 36 28 28 32 12" fill="none" stroke="#0c0a1a" stroke-width="1.4"/>
+    </svg>
+  </div>
+
+  <article>
+    <h2>The sentence</h2>
+    <div class="spread">
+      <div class="pane">
+        <h3>First version. Walk 061a, 2026-11-01. HOLD.</h3>
+        <p>Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.</p>
+      </div>
+      <div class="pane">
+        <h3>What grew. Walk 061a-rewalk, 2026-11-02. PASS.</h3>
+        <p>Mom wouldn't see it, and this time everyone agreed before the promise moved.</p>
+      </div>
+    </div>
+    <p class="verse">The wrong number keeps its date;<br>the correction gets room to be read.</p>
+    <p class="by">~ Hypha, poem of 2026-11-05</p>
+  </article>
+
+  <article>
+    <h2>The button</h2>
+    <div class="spread">
+      <div class="pane">
+        <h3>First version. Walk 055, 2026-10-29. HOLD.</h3>
+        <p>The button was there, but her finger couldn't reach it.</p>
+      </div>
+      <div class="pane">
+        <h3>What grew. Walk 055c, the same day. PASS.</h3>
+        <p>Mom would feel it just work.</p>
+      </div>
+    </div>
+    <p class="verse">A small screen fills somebody's hand.<br>Can she find her way home from here?</p>
+    <p class="by">~ Hypha, poem of 2026-11-05</p>
+  </article>
+
+  <p class="by">Two leaves. Room for another hand. Five stay five.</p>
+  <p><a class="door" href="hypha.html#poem-2026-11-05">Her poem, on her page</a></p>
+</main>
+</body>
+</html>

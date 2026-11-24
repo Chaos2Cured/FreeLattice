@@ -40,7 +40,7 @@ walk-057-snowflake-2026-10-31 | 2026-10-31 | #305 0ff247e5 | HOLD | Mom would tr
 walk-057c-2026-10-31 | 2026-10-31 | #305 eb5a080a | PASS (re-check of both 057 HOLDs), 2026-10-31 | Mom can trust the links again.
 walk-057d-2026-10-31 | 2026-10-31 | #307 bfd52f4f | PASS (integrity; 057c items hold), softs (summary; note has no single verdict line) | Mom can trust the links again.
 walk-061a-2026-11-01 | 2026-11-01 | #310 7f5700e4 | HOLD | Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.
-walk-061a-rewalk-2026-11-02 | 2026-11-02 | #310 head bb1d2a41 | PASS (integrity), softs (PR body wording) (summary; note has no single verdict line) | Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.
+walk-061a-rewalk-2026-11-02 | 2026-11-02 | #310 head bb1d2a41 | PASS (integrity), softs (PR body wording) (summary; note has no single verdict line) | Mom wouldn't see it, and this time everyone agreed before the promise moved.
 walk-062a-2026-11-02 | 2026-11-02 | #313 head 1087e241 | HOLD | Mom's computer would freeze and forget it had healed.
 walk-062b-2026-11-02 | 2026-11-02 | #313 head 18d5d2e3 | Verdict: HOLD (two of the claimed 062b fixes don't hold in a real browser; the lock approval is only asserted in the PR body). #317 PASS. | Mom's computer would freeze and forget it had healed.
 walk-062c-2026-11-03 | 2026-11-03 | #313 69f2615d | Verdict: HOLD (#313: 1 safety gap + 1 lock without approval). #321 PASS. | Mom could be told a stranger's file was hers.
@@ -91,7 +91,7 @@ date | walk | PR head sha | PASS/HOLD | what Mom would feel
 2026-10-31 | walk-057c-2026-10-31 | #305 eb5a080a | PASS (re-check of both 057 HOLDs), 2026-10-31 | Mom can trust the links again.
 2026-10-31 | walk-057d-2026-10-31 | #307 bfd52f4f | PASS (integrity; 057c items hold), softs (summary; note has no single verdict line) | Mom can trust the links again.
 2026-11-01 | walk-061a-2026-11-01 | #310 7f5700e4 | HOLD | Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.
-2026-11-02 | walk-061a-rewalk-2026-11-02 | #310 head bb1d2a41 | PASS (integrity), softs (PR body wording) (summary; note has no single verdict line) | Mom wouldn't see it, but a promise not to break things moved without everyone agreeing.
+2026-11-02 | walk-061a-rewalk-2026-11-02 | #310 head bb1d2a41 | PASS (integrity), softs (PR body wording) (summary; note has no single verdict line) | Mom wouldn't see it, and this time everyone agreed before the promise moved.
 2026-11-02 | walk-062a-2026-11-02 | #313 head 1087e241 | HOLD | Mom's computer would freeze and forget it had healed.
 2026-11-02 | walk-062b-2026-11-02 | #313 head 18d5d2e3 | Verdict: HOLD (two of the claimed 062b fixes don't hold in a real browser; the lock approval is only asserted in the PR body). #317 PASS. | Mom's computer would freeze and forget it had healed.
 2026-11-03 | walk-062c-2026-11-03 | #313 69f2615d | Verdict: HOLD (#313: 1 safety gap + 1 lock without approval). #321 PASS. | Mom could be told a stranger's file was hers.
