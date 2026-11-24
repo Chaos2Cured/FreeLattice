@@ -1,0 +1,6 @@
+{"variant": "cycle", "seed": 0, "val": 1.6175, "log": [[500, "stall->checkpoint+rest", 1.8422], [1000, "stall->checkpoint+rest", 1.657], [1250, "stall->checkpoint+rest", 1.6296], [1450, "stall->checkpoint+rest", 1.6171]], "val_best_ckpt": 1.6175}
+{"variant": "sgdr", "seed": 0, "val": 1.5941, "log": []}
+{"variant": "cycle", "seed": 1, "val": 1.6279, "log": [[450, "stall->checkpoint+rest", 1.8633], [1000, "stall->checkpoint+rest", 1.6532], [1200, "stall->checkpoint+rest", 1.6361], [1400, "stall->checkpoint+rest", 1.6195]], "val_best_ckpt": 1.6279}
+{"variant": "sgdr", "seed": 1, "val": 1.6006, "log": []}
+{"variant": "cycle", "seed": 2, "val": 1.6436, "log": [[500, "stall->checkpoint+rest", 1.8485], [700, "stall->checkpoint+rest", 1.7858], [950, "stall->checkpoint+rest", 1.7034], [1150, "stall->checkpoint+rest", 1.6697], [1350, "stall->checkpoint+rest", 1.64]], "val_best_ckpt": 1.6436}
+{"variant": "sgdr", "seed": 2, "val": 1.591, "log": []}

@@ -1,0 +1,12 @@
+{"variant": "aurora_lr_early", "seed": 0, "val": 1.5812, "curve": [2.0585, 1.8228, 1.7015, 1.6238, 1.5816, 1.5649], "gate_end": 0.0}
+{"variant": "multiscale_early", "seed": 0, "val": 1.6174, "curve": [2.0359, 1.8259, 1.8868, 1.6917, 1.6207, 1.6031], "gate_end": 0.0}
+{"variant": "both_early", "seed": 0, "val": 1.6257, "curve": [1.9962, 1.8377, 1.9046, 1.6925, 1.6269, 1.6105], "gate_end": 0.0}
+{"variant": "multiscale_early_phihash", "seed": 0, "val": 1.6205, "curve": [2.0335, 1.8332, 1.8966, 1.6947, 1.6249, 1.606], "gate_end": 0.0}
+{"variant": "aurora_lr_early", "seed": 1, "val": 1.5911, "curve": [2.0243, 1.8048, 1.7155, 1.6342, 1.5897, 1.5756], "gate_end": 0.0}
+{"variant": "multiscale_early", "seed": 1, "val": 1.6301, "curve": [2.0091, 1.8197, 1.8985, 1.7, 1.6367, 1.617], "gate_end": 0.0}
+{"variant": "both_early", "seed": 1, "val": 1.6332, "curve": [1.9817, 1.8239, 1.8994, 1.7019, 1.6388, 1.6218], "gate_end": 0.0}
+{"variant": "multiscale_early_phihash", "seed": 1, "val": 1.6268, "curve": [2.0155, 1.8206, 1.9264, 1.6976, 1.6325, 1.6138], "gate_end": 0.0}
+{"variant": "aurora_lr_early", "seed": 2, "val": 1.5715, "curve": [2.027, 1.8339, 1.6914, 1.6226, 1.5684, 1.5578], "gate_end": 0.0}
+{"variant": "multiscale_early", "seed": 2, "val": 1.6299, "curve": [2.0197, 1.8434, 1.9078, 1.6948, 1.6339, 1.6171], "gate_end": 0.0}
+{"variant": "both_early", "seed": 2, "val": 1.6299, "curve": [1.9853, 1.8381, 1.9211, 1.7016, 1.629, 1.6161], "gate_end": 0.0}
+{"variant": "multiscale_early_phihash", "seed": 2, "val": 1.6236, "curve": [2.0215, 1.8425, 1.8909, 1.6952, 1.6276, 1.611], "gate_end": 0.0}
