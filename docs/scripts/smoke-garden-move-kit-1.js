@@ -28,12 +28,16 @@ const ALLOW = [KIT, PAGE, NOTE, DOOR, AUTONOMY, APP, ROOT_INDEX, SAFETY, SW, ROO
 // Pins from main b5bf33a9: these files must stay exactly as they are.
 const PINS = {
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
-  'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
-  'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
+  // before (199de1b6): 'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
+  'docs/app.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
+  // before (199de1b6): 'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
+  'index.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
   'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc',
   'docs/modules/fractal-safety.js': 'c1b7acb9d2e2cee94e52fffba5aec758',
-  'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
-  'sw.js': '70fcb7a9f821cd3ffd4ad449df397976'
+  // before (199de1b6): 'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
+  'docs/sw.js': '5740728cf3ffa8a52f8b992d3811863e',
+  // before (199de1b6): 'sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
+  'sw.js': '5740728cf3ffa8a52f8b992d3811863e'
 };
 // md5 of the one line that names the private rooms the kit never packs (kept out of this file on purpose).
 const PRIVATE_RULE_LINE_MD5 = '753fde10a9ca44dce580d0f15371a402';

@@ -31,7 +31,8 @@ const note = readAllowed('docs/modules/WORKSHOP-POLISH-1.md');
 assert.strictEqual(app, index, 'docs/app.html and index.html must be byte-identical');
 
 const appMd5 = crypto.createHash('md5').update(app, 'utf8').digest('hex');
-assert.strictEqual(appMd5, 'ab8589557950e7074b4e0b97dcccd23d', 'app.html md5 matches LOCK pin');
+// before (199de1b6): assert.strictEqual(appMd5, 'ab8589557950e7074b4e0b97dcccd23d', 'app.html md5 matches LOCK pin');
+assert.strictEqual(appMd5, '5fcc913fc6b5ff3a20f828c1026ff2a0', 'app.html md5 matches LOCK pin');
 
 const lockJson = JSON.parse(lock);
 const appRows = lockJson.files['docs/app.html'];
@@ -40,7 +41,9 @@ assert.ok(appRows && appRows.length >= 13, 'LOCK docs/app.html still has prior p
 assert.ok(indexRows && indexRows.length >= 13, 'LOCK index.html still has prior pins');
 assert.strictEqual(appRows[appRows.length - 1].md5, appMd5, 'LOCK last docs/app.html row');
 assert.strictEqual(indexRows[indexRows.length - 1].md5, appMd5, 'LOCK last index.html row');
-assert.strictEqual(appRows[appRows.length - 1].since, 'v-workshop-polish-1-hold-1');
+// before (199de1b6): assert.strictEqual(appRows[appRows.length - 1].since, 'v-workshop-polish-1-hold-1');
+assert.ok(appRows.some(function (r) { return r.since === 'v-workshop-polish-1-hold-1' && r.md5 === 'ab8589557950e7074b4e0b97dcccd23d'; }), 'workshop-polish-1-hold-1 pin kept');
+assert.strictEqual(appRows[appRows.length - 1].since, 'v-chat-clay-calm-v0.1');
 assert.ok(appRows.some(function (r) { return r.md5 === 'b0937409c5b8481d007069eeaa458478'; }), 'legacy clay-glass pin kept');
 assert.ok(appRows.some(function (r) { return r.md5 === 'f8dc2462a213589bd3c705a545774e48'; }), 'workshop-polish-1 pin kept');
 
