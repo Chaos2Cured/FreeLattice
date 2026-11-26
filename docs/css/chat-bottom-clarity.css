@@ -62,7 +62,12 @@
   align-self: center;
   opacity: 1;
   font-family: var(--font);
-  border-radius: 999px;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg-card);
   color: var(--text-primary);
@@ -193,6 +198,22 @@
   padding: var(--space-xs) var(--space-md) var(--space-sm);
   font-family: var(--font);
   color: var(--text-primary);
+}
+
+#fl-clay-dock[hidden],
+#chatPresenceRow[hidden] {
+  display: none !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 0 !important;
+}
+
+#contextBudgetBar.is-idle .context-budget-track {
+  flex: 0 0 48px;
+}
+
+#flChatSearchRow[hidden] {
+  display: none !important;
 }
 
 #fl-clay-dock p {
@@ -448,9 +469,11 @@
     background: var(--bg-secondary);
     border-top: 1px solid var(--border);
   }
-  #tab-chat .chat-input-row #flChatAddBtn,
-  #tab-chat .chat-input-row [data-honest-just] {
+  #tab-chat .chat-input-row #flChatAddBtn {
     order: 0;
+  }
+  #tab-chat .chat-input-row [data-honest-just] {
+    order: 2;
   }
   #tab-chat .chat-input-row::after {
     content: "";

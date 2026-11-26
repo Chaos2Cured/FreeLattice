@@ -426,6 +426,22 @@
     }
   }
 
+  function calmHosts() {
+    var d = doc();
+    if (!d || !d.getElementById) return;
+    var row = d.getElementById('chatPresenceRow');
+    if (row && !row.classList.contains('open') && !row.querySelector('#chatPresenceToggle')) {
+      row.setAttribute('hidden', '');
+    }
+    var bar = d.getElementById('contextBudgetBar');
+    var fill = d.getElementById('contextBudgetFill');
+    if (bar && fill) {
+      var width = parseFloat(fill.style.width || '0');
+      if (width) bar.classList.remove('is-idle');
+      else bar.classList.add('is-idle');
+    }
+  }
+
   function arrange() {
     if (arranging) return;
     arranging = true;
@@ -451,6 +467,7 @@
       sayPlaceholder();
       syncSpeak();
       syncSearchWords();
+      calmHosts();
     } catch (e) {}
     arranging = false;
   }

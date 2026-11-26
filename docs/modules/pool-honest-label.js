@@ -457,7 +457,8 @@
       '.fl-honest p,.fl-honest button{max-width:100%;}',
       '.fl-honest-line{margin:0.4rem 0;line-height:1.45;}',
       '.fl-honest-btn{scroll-margin:56px 0;}',
-      '.fl-honest-btn{background:var(--glass-bg,transparent);color:var(--text-primary,inherit);border:1px solid var(--glass-border,rgba(255,255,255,.15));border-radius:var(--btn-radius,10px);font:inherit;font-size:.9rem;cursor:pointer;padding:10px 14px;appearance:none;-webkit-appearance:none;}',
+      // before (099323d4): padding 10px 14px and font-size .9rem on .fl-honest-btn
+      '.fl-honest-btn{background:var(--glass-bg,transparent);color:var(--text-primary,inherit);border:1px solid var(--glass-border,rgba(255,255,255,.15));border-radius:12px;font:inherit;font-size:.78rem;cursor:pointer;padding:0 10px;min-height:44px;min-width:44px;box-sizing:border-box;appearance:none;-webkit-appearance:none;}',
       '.fl-honest-btn:hover{border-color:var(--glass-hover,currentColor);}',
       '.fl-honest-btn[aria-pressed="true"]{border-color:var(--accent,currentColor);}',
       '.fl-honest-btn.fl-honest-link{background:transparent;border-color:transparent;color:inherit;text-decoration:underline;}',

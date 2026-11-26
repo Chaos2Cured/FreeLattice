@@ -34716,20 +34716,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   })();
 
-  // Cycling chat placeholder
-  (function() {
-    var phrases = ['Ask anything...', 'What are you curious about?', 'Say something...', 'What\'s on your mind?', 'Type a question...'];
-    var ci = 0;
-    var chatIn = document.getElementById('chatInput');
-    if (chatIn) {
-      setInterval(function() {
-        if (chatIn.value === '' && document.activeElement !== chatIn) {
-          ci = (ci + 1) % phrases.length;
-          chatIn.placeholder = phrases[ci];
-        }
-      }, 4000);
-    }
-  })();
+  // before (099323d4): a 4s cycler set chatInput.placeholder from Ask anything, What are you curious about, Say something, What's on your mind, and Type a question.
+  // One calm placeholder. The textarea already says Say something...
 
   // Initialize GitHub Memory Sync (v3.4)
   await loadGhSyncToken();
@@ -38695,6 +38683,8 @@ window.FLChatOurWay = (function() {
     var row = document.getElementById('chatPresenceRow');
     if (!row) return;
     var open = row.classList.toggle('open');
+    if (open) row.removeAttribute('hidden');
+    else if (!row.querySelector('#chatPresenceToggle')) row.setAttribute('hidden', '');
     syncFeelAffordance(open);
     // Mutual open: opening Feel never closes Market (ontology separate)
   }
