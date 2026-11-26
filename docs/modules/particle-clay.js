@@ -69,7 +69,8 @@
     white: '#f8fafc', black: '#111827', gray: '#9ca3af', grey: '#9ca3af',
     cyan: '#06b6d4', teal: '#14b8a6', violet: '#8b5cf6', amber: '#f59e0b', silver: '#cbd5e1'
   };
-  var memoryOn = false;
+  // before (099323d4): var memoryOn = false;
+  var memoryOn = true;
   var forcedReduced = null;
   var lastCall = 0;
   var lastGesture = '';
@@ -1114,6 +1115,10 @@
     var labeled = (labelEl && labelEl.textContent) || (sayEl && sayEl.textContent) || (liveEl && liveEl.textContent);
     var holding = canvas && canvas.parentNode === dock;
     dock.style.display = (offer || labeled || holding) ? 'block' : 'none';
+    if (dock.style.display === 'none') {
+      dock.style.padding = '0';
+      dock.style.flex = '0 0 0';
+    }
   }
   function placeCanvas() {
     if (!canvas || !isOn()) return;
@@ -1970,6 +1975,18 @@
     stopLoop();
     syncDock();
   }
+  function flipClay() {
+    var next = !isOn();
+    setOn(next);
+    if (!next && root.FLClayCorner && typeof root.FLClayCorner.setOn === 'function') {
+      try { root.FLClayCorner.setOn(false); } catch (eCorner) {}
+    }
+  }
+  function styleComposerToggle(toggle) {
+    if (!toggle) return;
+    toggle.setAttribute('aria-label', 'Clay on/off');
+    toggle.style.cssText = 'min-height:44px;min-width:44px;padding:0 10px;box-sizing:border-box;border-radius:12px;border:1px solid rgba(167,139,250,0.55);background:rgba(15,15,26,0.45);color:#e9e4f5;font:inherit;font-size:0.78rem;line-height:1.1;cursor:pointer;';
+  }
   function setOn(on) {
     memoryOn = !!on;
     var box = storage();
@@ -2019,7 +2036,8 @@
     var toggle = button(doc, isOn() ? WORDS.on : WORDS.off);
     toggle.id = 'fl-clay-toggle';
     toggle.setAttribute('aria-pressed', isOn() ? 'true' : 'false');
-    toggle.addEventListener('click', function () { setOn(!isOn()); });
+    toggle.addEventListener('click', function () { flipClay(); });
+    styleComposerToggle(toggle);
     root.__clayToggle = toggle;
     row.appendChild(toggle);
     dock.appendChild(row);
@@ -2060,6 +2078,7 @@
     currentForm = currentForm || homeForm();
     if (isOn()) ensureCanvas();
     ensurePill();
+    syncDock();
     return dock;
   }
   function boot() {
@@ -2136,7 +2155,6 @@
     if (!doc || !doc.getElementById) return;
     var pill = doc.getElementById('fl-clay-pill');
     var panel = doc.getElementById('fl-clay-pill-panel');
-    var pause = doc.getElementById('fl-clay-pause');
     var open = pillOpen();
     var nextLabel = open ? 'Clay \u25BE' : 'Clay \u25B8';
     var nextExpanded = open ? 'true' : 'false';
@@ -2148,9 +2166,9 @@
       if (open) panel.removeAttribute('hidden');
       else panel.setAttribute('hidden', '');
     }
-    if (pause) pause.style.display = isOn() ? 'inline-flex' : 'none';
-    var mute = doc.getElementById('fl-clay-voice-mute');
-    if (mute) mute.style.display = isOn() ? 'inline-flex' : 'none';
+    // before (099323d4): #fl-clay-pause and #fl-clay-voice-mute were shown here while clay was on.
+    var toggle = doc.getElementById('fl-clay-toggle');
+    if (toggle) styleComposerToggle(toggle);
     try {
       if (root.FLClayVoice && typeof root.FLClayVoice.paintMuteButtons === 'function') {
         root.FLClayVoice.paintMuteButtons();
@@ -2168,8 +2186,8 @@
     if (!doc || !doc.getElementById) return;
     var panel = doc.getElementById('fl-clay-pill-panel');
     if (!panel) return;
-    var toggle = doc.getElementById('fl-clay-toggle') || root.__clayToggle;
-    var ids = [toggle, doc.getElementById('fl-ws-open'), doc.getElementById('fl-ws-view-open')];
+    // before (099323d4): the clay toggle was folded into this panel with the notebook buttons.
+    var ids = [doc.getElementById('fl-ws-open'), doc.getElementById('fl-ws-view-open')];
     for (var i = 0; i < ids.length; i++) {
       var el = ids[i];
       if (!el || el.parentNode === panel) continue;
@@ -2180,6 +2198,10 @@
     var doc = root.document;
     if (!doc || !doc.createElement || !doc.getElementById) return null;
     if (doc.getElementById('fl-clay-pill')) {
+      var held = doc.getElementById('fl-clay-pill-wrap');
+      var heldToggle = doc.getElementById('fl-clay-toggle') || root.__clayToggle;
+      if (held && heldToggle && heldToggle.parentNode !== held) held.appendChild(heldToggle);
+      if (heldToggle) styleComposerToggle(heldToggle);
       foldButtons();
       paintPill();
       return doc.getElementById('fl-clay-pill');
@@ -2195,28 +2217,8 @@
     pill.style.cssText = 'min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:rgba(148,163,184,0.12);color:#cbd5e1;font-family:Georgia,serif;cursor:pointer;box-sizing:border-box;';
     pill.setAttribute('aria-controls', 'fl-clay-pill-panel');
     pill.addEventListener('click', function () { setPillOpen(!pillOpen()); });
-    var pause = doc.createElement('button');
-    pause.type = 'button';
-    pause.id = 'fl-clay-pause';
-    pause.setAttribute('aria-label', 'Pause');
-    pause.textContent = '\u25CF';
-    pause.style.cssText = 'min-height:44px;min-width:44px;box-sizing:border-box;border-radius:22px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:#94a3b8;font-size:10px;line-height:44px;cursor:pointer;';
-    pause.addEventListener('click', function () { setOn(false); });
-    var mute = doc.createElement('button');
-    mute.type = 'button';
-    mute.id = 'fl-clay-voice-mute';
-    mute.style.cssText = 'min-height:44px;padding:10px 14px;box-sizing:border-box;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:transparent;color:#94a3b8;cursor:pointer;';
-    try {
-      if (root.FLClayVoice && typeof root.FLClayVoice.bindMuteButton === 'function') {
-        root.FLClayVoice.bindMuteButton(mute);
-      } else {
-        mute.textContent = 'Mute tones';
-        mute.setAttribute('title', 'Mute or unmute tones on this device only. This does not change what the mind made.');
-        mute.setAttribute('aria-label', 'Mute or unmute tones on this device only. This does not change what the mind made.');
-      }
-    } catch (eMuteBind) {
-      mute.textContent = 'Mute tones';
-    }
+    // before (099323d4): #fl-clay-pause lived here, a 44px circle with text ●, and its click called setOn(false).
+    // before (099323d4): #fl-clay-voice-mute lived here and was bound with FLClayVoice.bindMuteButton. The corner mute remains.
     var panel = doc.createElement('div');
     panel.id = 'fl-clay-pill-panel';
     panel.style.cssText = 'max-width:100%;flex-basis:100%;';
@@ -2225,8 +2227,15 @@
     quietEl.style.cssText = 'margin:8px 0 0;font-size:0.75rem;color:#94a3b8;';
     panel.appendChild(quietEl);
     wrap.appendChild(pill);
-    wrap.appendChild(pause);
-    wrap.appendChild(mute);
+    var composerToggle = doc.getElementById('fl-clay-toggle') || root.__clayToggle;
+    if (!composerToggle) {
+      composerToggle = button(doc, isOn() ? WORDS.on : WORDS.off);
+      composerToggle.id = 'fl-clay-toggle';
+      composerToggle.addEventListener('click', function () { flipClay(); });
+      root.__clayToggle = composerToggle;
+    }
+    styleComposerToggle(composerToggle);
+    wrap.appendChild(composerToggle);
     host.appendChild(wrap);
     if (host.id === 'chatFeelMarketBand' && host.parentNode) {
       var market = doc.getElementById('chatMarketPanel');

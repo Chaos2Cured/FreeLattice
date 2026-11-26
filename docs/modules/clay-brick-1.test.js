@@ -175,8 +175,8 @@ var math = require('./clay-math.js');
 var clay = require('./particle-clay.js');
 var corner = require('./clay-corner.js');
 
-assert.strictEqual(clay.isOn(), false, 'clay starts off');
-assert.strictEqual(clay.promptDelta(), '', 'off means no prompt delta');
+assert.strictEqual(clay.isOn(), true, 'no saved choice starts clay on');
+assert.notStrictEqual(clay.promptDelta(), '', 'on means a prompt delta');
 assert.strictEqual(clay.autoSend(), false, 'nothing sends itself');
 assert.strictEqual(clay.BRICK, 'v-clay-brick-1-v0.1', 'clay brick id');
 assert.strictEqual(corner.BRICK, 'v-clay-brick-1-v0.1', 'corner brick id');

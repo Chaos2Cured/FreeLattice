@@ -310,11 +310,8 @@
     yesBtn = el('button', 'Yes, show the clay corner');
     yesBtn.type = 'button';
     yesBtn.style.minHeight = '44px';
-    pauseBtn = el('button', 'Pause');
-    pauseBtn.type = 'button';
-    pauseBtn.style.minHeight = '44px';
+    // before (099323d4): pauseBtn = el('button', 'Pause'); pauseBtn.type = 'button'; pauseBtn.style.minHeight = '44px'; its click called pause(), which calls setOn(false).
     yesBtn.addEventListener('click', function () { setOn(true); });
-    pauseBtn.addEventListener('click', function () { pause(); });
     muteBtn = el('button', 'Mute tones');
     muteBtn.type = 'button';
     muteBtn.id = 'fl-clay-corner-mute';
@@ -329,7 +326,6 @@
     } catch (eMuteBind) {}
     box.appendChild(canvas);
     box.appendChild(yesBtn);
-    box.appendChild(pauseBtn);
     box.appendChild(muteBtn);
     doc.body.appendChild(box);
     paintChrome();
@@ -355,6 +351,12 @@
       } catch (e) {}
     }
     if (root.addEventListener) {
+      var nudge = function () {
+        if (!box || box.style.display === 'none') return;
+        place();
+      };
+      root.addEventListener('resize', nudge);
+      root.addEventListener('scroll', nudge, true);
       root.addEventListener('storage', function (ev) {
         if (!ev || (ev.key !== KEY && String(ev.key || '').indexOf(STATE_KEY) !== 0)) return;
         if (ev.key === KEY && ev.newValue !== 'yes') settle();

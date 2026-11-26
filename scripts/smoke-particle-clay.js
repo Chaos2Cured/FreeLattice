@@ -74,9 +74,19 @@ var mathSrc = fs.readFileSync(path.join(__dirname, '../docs/modules/clay-math.js
 var dimAt = mathSrc.indexOf('function dimension');
 ok(dimAt !== -1 && mathSrc.slice(0, dimAt).indexOf('2.914') === -1, '2.914 lives only in dimension');
 
-ok(clay.promptDelta() === '', 'off means no prompt delta');
-ok(clay.canvasMounted() === false, 'off means no canvas');
-ok(clay.isOn() === false, 'clay starts off');
+ok(clay.isOn() === true, 'no saved choice starts clay on');
+ok(clay.promptDelta() !== '', 'on means a prompt delta');
+ok(clay.canvasMounted() === false, 'on does not mount a canvas until asked');
+var offWrites = 0;
+global.document = {};
+global.localStorage = {
+  getItem: function (key) { return key === 'fl_clay' ? 'off' : null; },
+  setItem: function () { offWrites += 1; }
+};
+ok(clay.isOn() === false, 'a saved off stays off');
+ok(offWrites === 0, 'reading the choice does not write fl_clay');
+global.document = undefined;
+global.localStorage = undefined;
 clay.setReduced(true);
 clay.setOn(true);
 var before = clay.rafHandles();
