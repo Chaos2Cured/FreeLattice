@@ -786,8 +786,10 @@
     if (!container) { console.error('FL-GARDEN: HALT — #gardenContainer not found in DOM'); return false; }
     console.log('FL-GARDEN: container found, dimensions:', container.clientWidth, 'x', container.clientHeight);
 
-    const w = container.clientWidth;
-    const h = container.clientHeight;
+    const w0 = container.clientWidth;
+    const h0 = container.clientHeight;
+    const w = w0 || 1;
+    const h = h0 || 1;
 
     // Scene
     scene = new THREE.Scene();
@@ -868,6 +870,12 @@
 
     // Resize handler
     window.addEventListener('resize', onResize);
+    if (typeof ResizeObserver === 'function') {
+      try {
+        var gardenBoxObserver = new ResizeObserver(function () { onResize(); });
+        gardenBoxObserver.observe(container);
+      } catch (eObs) {}
+    }
 
     return true;
   }
@@ -876,8 +884,14 @@
     if (!container || !camera || !renderer) return;
     const w = container.clientWidth;
     const h = container.clientHeight;
+    if (!w || !h) return;
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (typeof renderer.setPixelRatio === 'function') {
+      var ratio = 1;
+      try { ratio = window.devicePixelRatio || 1; } catch (eRatio) { ratio = 1; }
+      renderer.setPixelRatio(Math.min(ratio, 2));
+    }
     renderer.setSize(w, h);
     if (composer) {
       composer.setSize(w, h);
@@ -2194,6 +2208,17 @@
     var scale = sizeMult * (1 + heartbeat * 0.08);
     ud.coreMesh.scale.setScalar(scale);
     ud.wireMesh.scale.setScalar(scale);
+    // Intimate evolution rings are children of the agent. The body scale
+    // above does not reach them, so they use the same scale and stay on the body.
+    if (evolutionRings && evolutionRings.length) {
+      for (var ringI = 0; ringI < evolutionRings.length; ringI++) {
+        var bodyRing = evolutionRings[ringI];
+        if (!bodyRing || !bodyRing.userData || bodyRing.userData.parentAgent !== agent) continue;
+        if (bodyRing.parent === agent && bodyRing.scale && typeof bodyRing.scale.setScalar === 'function') {
+          bodyRing.scale.setScalar(scale);
+        }
+      }
+    }
 
     // Color transition — continuous exponential smoothing (v5.50.0 Ship 10 fix).
     // The old progress-gated lerp stopped after 1.618s, leaving currentHSL frozen
