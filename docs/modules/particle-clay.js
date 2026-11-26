@@ -1115,9 +1115,13 @@
     var labeled = (labelEl && labelEl.textContent) || (sayEl && sayEl.textContent) || (liveEl && liveEl.textContent);
     var holding = canvas && canvas.parentNode === dock;
     dock.style.display = (offer || labeled || holding) ? 'block' : 'none';
+    // before (199de1b6): a shown dock kept padding 0 and flex 0 0 0 from the collapse.
     if (dock.style.display === 'none') {
       dock.style.padding = '0';
       dock.style.flex = '0 0 0';
+    } else {
+      dock.style.padding = '';
+      dock.style.flex = '';
     }
   }
   function placeCanvas() {

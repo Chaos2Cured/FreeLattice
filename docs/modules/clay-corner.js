@@ -28,7 +28,7 @@
   var box = null;
   var canvas = null;
   var yesBtn = null;
-  var pauseBtn = null;
+  // before (199de1b6): var pauseBtn = null;
   var muteBtn = null;
   var lastForm = 'seed';
   var lastMood = '';
@@ -126,7 +126,7 @@
     var on = isOn();
     if (canvas) canvas.style.display = on ? 'block' : 'none';
     if (yesBtn) yesBtn.style.display = on ? 'none' : 'block';
-    if (pauseBtn) pauseBtn.style.display = on ? 'block' : 'none';
+    // before (199de1b6): if (pauseBtn) pauseBtn.style.display = on ? 'block' : 'none';
     if (muteBtn) muteBtn.style.display = on ? 'block' : 'none';
     try {
       if (root.FLClayVoice && typeof root.FLClayVoice.paintMuteButtons === 'function') {
