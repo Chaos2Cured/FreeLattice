@@ -456,9 +456,14 @@ function memoryHalf() {
           var dock = documentStub.getElementById('fl-clay-dock');
           ok(!!dock, 'clay dock exists');
           dock.children.forEach(function (child) {
-            if (String(child.tagName).toLowerCase() === 'p') child.textContent = '';
+            if (String(child.tagName).toLowerCase() === 'p') child.textContent = 'shaped by the AI';
           });
           clay.setOn(false);
+          dock.children.forEach(function (child) {
+            if (String(child.tagName).toLowerCase() === 'p') {
+              ok(child.textContent === '', 'turning Clay off clears the dock line');
+            }
+          });
           ok(dock.style.display === 'none', 'empty dock collapses');
           ok(dock.style.padding === '0' && dock.style.flex === '0 0 0', 'collapse sets inline flex and padding');
           var paras = dock.children.filter(function (child) {

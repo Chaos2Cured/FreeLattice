@@ -2007,12 +2007,17 @@
       } catch (eSoft) {}
       if (morphTimer) clearTimeout(morphTimer);
       morphTimer = 0;
+      // before (49a3004f): the dock label, say line, and live line stayed after Clay was turned off.
+      if (labelEl) labelEl.textContent = '';
+      if (sayEl) sayEl.textContent = '';
+      if (liveEl) liveEl.textContent = '';
       dropCanvas();
       syncDock();
     } else ensureCanvas();
     paintToggle();
     paintPill();
     hideOffer();
+    if (!on) syncDock();
     return isOn();
   }
   function paintToggle() {
@@ -2218,7 +2223,8 @@
     var pill = doc.createElement('button');
     pill.type = 'button';
     pill.id = 'fl-clay-pill';
-    pill.style.cssText = 'min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:rgba(148,163,184,0.12);color:#cbd5e1;font-family:Georgia,serif;cursor:pointer;box-sizing:border-box;';
+    // before (49a3004f): font-family:Georgia,serif on this pill. The app font stays.
+    pill.style.cssText = 'min-height:44px;padding:10px 14px;border-radius:12px;border:1px solid rgba(148,163,184,0.45);background:rgba(148,163,184,0.12);color:#cbd5e1;cursor:pointer;box-sizing:border-box;';
     pill.setAttribute('aria-controls', 'fl-clay-pill-panel');
     pill.addEventListener('click', function () { setPillOpen(!pillOpen()); });
     // before (099323d4): #fl-clay-pause lived here, a 44px circle with text ●, and its click called setOn(false).
