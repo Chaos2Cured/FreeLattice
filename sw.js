@@ -4,7 +4,8 @@
 // VERSION: Must match version.json — update both together
 
 // before 063c: const CACHE_NAME = 'freelattice-v5.79.45';
-const CACHE_NAME = 'freelattice-v5.79.46';
+// before (099323d4): const CACHE_NAME = 'freelattice-v5.79.46';
+const CACHE_NAME = 'freelattice-v5.79.47';
 
 // mirror-chat.html + mirror-resonance.html — served static from GH Pages, no SW cache needed
 

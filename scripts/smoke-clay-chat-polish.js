@@ -194,10 +194,14 @@ console.log('SMOKE_OK clay place v0.1');
 
 clay.ensurePill();
 var pill = documentStub.getElementById('fl-clay-pill');
-var pause = documentStub.getElementById('fl-clay-pause');
+var claySwitch = documentStub.getElementById('fl-clay-toggle');
 var panel = documentStub.getElementById('fl-clay-pill-panel');
-ok(pill && pause && panel, 'pill present');
-ok(pill.style.minHeight === '44px' && pause.style.minHeight === '44px', 'pill 44px');
+var wrap = documentStub.getElementById('fl-clay-pill-wrap');
+ok(pill && claySwitch && panel && wrap, 'pill present');
+ok(!documentStub.getElementById('fl-clay-pause'), 'composer pause is gone');
+ok(!documentStub.getElementById('fl-clay-voice-mute'), 'composer mute is gone');
+ok(pill.style.minHeight === '44px' && claySwitch.style.minHeight === '44px', 'pill 44px');
+ok(claySwitch.getAttribute('aria-label') === 'Clay on/off', 'clay switch is labeled');
 ok(pill.getAttribute('aria-controls') === 'fl-clay-pill-panel', 'pill names its panel');
 var toggle = documentStub.getElementById('fl-clay-toggle');
 var notebook = makeEl('button');
@@ -211,7 +215,7 @@ var spiralHits = 0;
 spiral.addEventListener('click', function () { spiralHits += 1; });
 documentStub.body.appendChild(spiral);
 clay.ensurePill();
-ok(toggle && toggle.parentNode === panel, 'clay toggle moved into the pill');
+ok(toggle && toggle.parentNode === wrap, 'clay toggle stays on the composer');
 ok(notebook.parentNode === panel && spiral.parentNode === panel, 'notebook and spiral moved into the pill');
 var toggleHits = 0;
 var prior = toggle._ev.click;
@@ -224,9 +228,11 @@ ok(toggle.id === 'fl-clay-toggle' && notebook.id === 'fl-ws-open' && spiral.id =
 clay.setPillOpen(false);
 ok(pill.getAttribute('aria-expanded') === 'false' && panel.hidden === true, 'pill can close');
 clay.setOn(true);
-ok(pause.style.display !== 'none', 'pause shows while clay runs');
-pause.click();
-ok(clay.isOn() === false, 'Pause works with the pill closed');
+ok(claySwitch.getAttribute('aria-label') === 'Clay on/off', 'switch stays labeled while clay runs');
+claySwitch.click();
+ok(clay.isOn() === false, 'the clay switch turns clay off with the pill closed');
+claySwitch.click();
+ok(clay.isOn() === true, 'the clay switch turns clay back on');
 console.log('SMOKE_OK clay pill v0.1');
 
 var wave = clay.sanitize({
@@ -447,6 +453,27 @@ function memoryHalf() {
           ok(!new RegExp('\\beval\\s*\\(').test(added), 'no eval');
           ok(!new RegExp('new\\s+Function\\s*\\(').test(added), 'no Function constructor');
           ok(fs.readFileSync(path.join(rootDir, 'docs/modules/memory-file.js'), 'utf8').indexOf('fetch(') === -1, 'memory file has no network');
+          var dock = documentStub.getElementById('fl-clay-dock');
+          ok(!!dock, 'clay dock exists');
+          dock.children.forEach(function (child) {
+            if (String(child.tagName).toLowerCase() === 'p') child.textContent = 'shaped by the AI';
+          });
+          clay.setOn(false);
+          dock.children.forEach(function (child) {
+            if (String(child.tagName).toLowerCase() === 'p') {
+              ok(child.textContent === '', 'turning Clay off clears the dock line');
+            }
+          });
+          ok(dock.style.display === 'none', 'empty dock collapses');
+          ok(dock.style.padding === '0' && dock.style.flex === '0 0 0', 'collapse sets inline flex and padding');
+          var paras = dock.children.filter(function (child) {
+            return String(child.tagName).toLowerCase() === 'p';
+          });
+          ok(paras.length >= 1, 'dock has a line');
+          paras[paras.length - 1].textContent = 'back';
+          clay.setOn(true);
+          ok(dock.style.display === 'block', 'dock shows again when it has a line');
+          ok(dock.style.padding === '' && dock.style.flex === '', 'shown dock clears the collapse inline flex and padding');
           console.log('SMOKE_OK memory file v0.1');
           console.log('SMOKE_OK chat polish v0.1');
           console.log('checks passed ' + passed);

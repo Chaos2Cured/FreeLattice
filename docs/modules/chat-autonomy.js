@@ -693,10 +693,8 @@
       btn.textContent = on ? 'Search on' : 'Search off';
       btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     }
-    if (live) {
-      if (on) live.removeAttribute('hidden');
-      else live.setAttribute('hidden', '');
-    }
+    // before (099323d4): if (on) live.removeAttribute('hidden'); else live.setAttribute('hidden', '');
+    if (live) live.hidden = true;
   }
 
   function mountSearch() {
@@ -721,6 +719,7 @@
     live.textContent = 'Search is on';
     row.appendChild(btn);
     row.appendChild(live);
+    live.hidden = true;
     bar.parentNode.insertBefore(row, bar.nextSibling);
     var box = d.getElementById('webSearchToggle');
     if (box) box.addEventListener('change', paintSearch);

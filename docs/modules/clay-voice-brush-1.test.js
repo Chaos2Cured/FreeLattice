@@ -586,8 +586,10 @@ Promise.resolve(pic.picture).then(function (result) {
         sb.document.body.appendChild(dock);
         clay.mount(dock);
         clay.ensurePill();
-        var pillPause = sb.document.getElementById('fl-clay-pause');
-        assert.ok(pillPause, 'the clay pill Pause button is present');
+        var pillPause = sb.document.getElementById('fl-clay-toggle');
+        assert.ok(pillPause, 'the clay on/off chip is present');
+        assert.strictEqual(pillPause.getAttribute('aria-label'), 'Clay on/off', 'the chip is the clay switch');
+        assert.ok(!sb.document.getElementById('fl-clay-pause'), 'the composer Pause button is gone');
 
         voice.resetAll();
         voice.setMute(false);
@@ -598,28 +600,20 @@ Promise.resolve(pic.picture).then(function (result) {
         var osc1 = started[0];
         sb.__audio.currentTime = 0.5;
         sb.document.dispatchEvent(evClick(pillPause, true));
-        assert.ok(Math.abs((osc1._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'pill Pause click fades and then stops the tone');
+        assert.ok(Math.abs((osc1._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'clay switch off fades and then stops the tone');
 
         sb.FLClayCorner.mount();
         var corner = sb.document.getElementById('fl-clay-corner');
         assert.ok(corner, 'the clay corner is mounted');
         var cornerPause = null;
+        var cornerMute = sb.document.getElementById('fl-clay-corner-mute');
         var kids = corner.children || [];
         var ci;
         for (ci = 0; ci < kids.length; ci++) {
           if (kids[ci] && kids[ci].textContent === 'Pause') cornerPause = kids[ci];
         }
-        assert.ok(cornerPause, 'the corner Pause button is present');
-        voice.resetAll();
-        voice.setMute(false);
-        voice.markGesture();
-        started.length = 0;
-        sb.__audio.currentTime = 0;
-        voice.fromMindTag({ melody: 'G4 E4 D4 C4 G4' }, { role: 'mind' });
-        var osc2 = started[0];
-        sb.__audio.currentTime = 0.5;
-        sb.document.dispatchEvent(evClick(cornerPause, true));
-        assert.ok(Math.abs((osc2._stopAt || 0) - (0.5 + voice.SOFT_STOP_S)) < 0.001, 'corner Pause click fades and then stops the tone');
+        assert.ok(!cornerPause, 'the corner Pause button is gone');
+        assert.ok(cornerMute && cornerMute.parentNode === corner, 'the corner mute remains');
 
         console.log('SMOKE_OK clay-voice-brush-1 tests passed');
       });
