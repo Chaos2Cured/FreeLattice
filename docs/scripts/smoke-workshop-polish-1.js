@@ -33,7 +33,8 @@ assert.strictEqual(app, index, 'docs/app.html and index.html must be byte-identi
 const appMd5 = crypto.createHash('md5').update(app, 'utf8').digest('hex');
 // before (199de1b6): assert.strictEqual(appMd5, 'ab8589557950e7074b4e0b97dcccd23d', 'app.html md5 matches LOCK pin');
 // before (472de215): assert.strictEqual(appMd5, '5fcc913fc6b5ff3a20f828c1026ff2a0', 'app.html md5 matches LOCK pin');
-assert.strictEqual(appMd5, '724394925650cb0abb8aead5ced1f5b7', 'app.html md5 matches LOCK pin');
+// before (cee5cbe1): assert.strictEqual(appMd5, '724394925650cb0abb8aead5ced1f5b7', 'app.html md5 matches LOCK pin');
+assert.strictEqual(appMd5, '7ba3c92f924c9db1c9a71f1c7519c34d', 'app.html md5 matches LOCK pin');
 
 const lockJson = JSON.parse(lock);
 const appRows = lockJson.files['docs/app.html'];
@@ -46,6 +47,7 @@ assert.strictEqual(indexRows[indexRows.length - 1].md5, appMd5, 'LOCK last index
 assert.ok(appRows.some(function (r) { return r.since === 'v-workshop-polish-1-hold-1' && r.md5 === 'ab8589557950e7074b4e0b97dcccd23d'; }), 'workshop-polish-1-hold-1 pin kept');
 // before (472de215): assert.strictEqual(appRows[appRows.length - 1].since, 'v-chat-clay-calm-v0.1');
 assert.ok(appRows.some(function (r) { return r.since === 'v-chat-clay-calm-v0.1' && r.md5 === '5fcc913fc6b5ff3a20f828c1026ff2a0'; }), 'chat-clay-calm pin kept');
+assert.ok(appRows.some(function (r) { return r.since === 'v-gc-front-door-v0.1' && r.md5 === '724394925650cb0abb8aead5ced1f5b7'; }), 'first front-door pin kept');
 assert.strictEqual(appRows[appRows.length - 1].since, 'v-gc-front-door-v0.1');
 assert.ok(appRows.some(function (r) { return r.md5 === 'b0937409c5b8481d007069eeaa458478'; }), 'legacy clay-glass pin kept');
 assert.ok(appRows.some(function (r) { return r.md5 === 'f8dc2462a213589bd3c705a545774e48'; }), 'workshop-polish-1 pin kept');

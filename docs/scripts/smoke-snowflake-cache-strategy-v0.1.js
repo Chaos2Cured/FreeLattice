@@ -29,7 +29,8 @@ if (slice.indexOf('return networkResponse;') < 0) fail('non-200 is not returned'
 if (slice.indexOf('caches.match(event.request)') < 0) fail('network-failure fallback missing');
 var live = swText.match(/^\s*const CACHE_NAME\s*=\s*'freelattice-v([^']+)'/m);
 // before (099323d4): live cache constant was 5.79.46
-if (!live || live[1] !== '5.79.47') fail('live cache constant ' + (live && live[1]));
+// before (cee5cbe1): if (!live || live[1] !== '5.79.47') fail('live cache constant ' + (live && live[1]));
+if (!live || live[1] !== '5.79.48') fail('live cache constant ' + (live && live[1]));
 
 function worker(who, fetchCall) {
   return [

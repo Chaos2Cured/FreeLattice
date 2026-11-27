@@ -37,7 +37,7 @@ const app = read('docs/app.html');
 const index = read('index.html');
 assert.strictEqual(app, index, 'docs/app.html and index.html must be byte-identical');
 const appMd5 = md5(app);
-assert.strictEqual(appMd5, '724394925650cb0abb8aead5ced1f5b7', 'front door twin md5');
+assert.strictEqual(appMd5, '7ba3c92f924c9db1c9a71f1c7519c34d', 'front door twin md5');
 
 const lock = JSON.parse(read('docs/library/LOCK_MANIFEST_v0.1.json'));
 ['docs/app.html', 'index.html'].forEach(function (rel) {
@@ -49,6 +49,9 @@ const lock = JSON.parse(read('docs/library/LOCK_MANIFEST_v0.1.json'));
   assert.ok(rows.some(function (r) {
     return r.md5 === '5fcc913fc6b5ff3a20f828c1026ff2a0' && r.since === 'v-chat-clay-calm-v0.1';
   }), rel + ' keeps the clay-calm row');
+  assert.ok(rows.some(function (r) {
+    return r.md5 === '724394925650cb0abb8aead5ced1f5b7' && r.since === 'v-gc-front-door-v0.1';
+  }), rel + ' keeps the first front-door row');
 });
 
 const chatBtn = app.indexOf('<button type="button" class="fl-welcome-chat" id="flWelcomeChat" aria-label="Chat. The message box stays ready.">Chat</button>');
@@ -66,9 +69,16 @@ assert.ok(app.indexOf('Skip &mdash; just explore') !== -1, 'Skip copy stays');
   assert.ok(app.indexOf(call) !== -1, 'provider stays: ' + call);
 });
 
+const dismiss = between(app, 'function flDismissWelcome()', 'function flWelcomeChat()');
+assert.ok(dismiss.indexOf('chatInput') === -1, 'Skip does not focus Chat');
+
 const doorFn = between(app, 'function flWelcomeChat()', 'function flWelcomeBackToProviders');
 assert.ok(/flDismissWelcome\(\)/.test(doorFn), 'Chat dismisses the welcome');
-assert.ok(/switchTab\('chat'\)/.test(doorFn), 'Chat opens Chat');
+assert.ok(/flMobileNav\('chat'\)/.test(doorFn), 'Chat lights the phone bar');
+assert.ok(/switchTab\('chat'\)/.test(doorFn), 'Chat still has the tab fallback');
+assert.ok(/getElementById\('chatInput'\)/.test(doorFn), 'Chat finds the message box');
+assert.ok(/focus\(\{ preventScroll: true \}\)/.test(doorFn), 'Chat focuses without jumping');
+assert.ok(doorFn.indexOf('scrollIntoView') === -1, 'Chat does not scroll the page');
 assert.ok(/},\s*550\)/.test(doorFn), 'Chat waits for the overlay to leave');
 assert.ok(doorFn.indexOf('FLWizard') === -1, 'Chat does not open a second wizard');
 assert.ok(doorFn.indexOf('confirm(') === -1, 'Chat adds no confirm');
@@ -88,8 +98,28 @@ assert.ok(/\.ollama-suggest-actions button \{[^}]*min-height:\s*44px;/.test(app)
 assert.ok(app.indexOf('id="ollamaSuggestBanner"') !== -1, 'the existing local offer stays');
 assert.ok(app.indexOf('owAcceptSuggestion()') !== -1 && app.indexOf('owDismissSuggestion()') !== -1, 'offer buttons stay');
 
-assert.strictEqual((read('sw.js').match(/freelattice-v5\.79\.47/g) || []).length > 0, true, 'root cache name stays');
-assert.strictEqual((read('docs/sw.js').match(/freelattice-v5\.79\.47/g) || []).length > 0, true, 'docs cache name stays');
-assert.ok(read('sw.js').indexOf('freelattice-v5.79.48') === -1, 'this brick does not bump the cache');
+assert.ok(app.indexOf('<div class="model-switcher-wrap" id="modelSwitcherWrap">') !== -1, 'the composer chip can be tapped');
+assert.ok(app.indexOf('id="modelSwitcherDropdown" style="display:none !important;"') !== -1, 'the old model list stays hidden');
+assert.ok(/before \(cee5cbe1\): <div class="model-switcher-wrap" id="modelSwitcherWrap" style="pointer-events:none;">/.test(app), 'the old no-tap style stays as a before comment');
+const chip = between(app, "var chip = document.getElementById('modelSwitcherBtn');", '// Close on outside click');
+assert.ok(/window\.openProviderModal\(\)/.test(chip), 'the chip opens the existing connection door');
+assert.ok(chip.indexOf('toggle(') === -1, 'the chip does not open the old list');
+assert.ok(chip.indexOf('localStorage') === -1 && chip.indexOf('fl_apiKey') === -1 && chip.indexOf('removeItem') === -1, 'the chip clears no key');
+
+function liveCache(rel) {
+  var m = read(rel).match(/^\s*const CACHE_NAME\s*=\s*'freelattice-v([^']+)'/m);
+  assert.ok(m, rel + ' has a live cache name');
+  return m[1];
+}
+assert.strictEqual(liveCache('sw.js'), '5.79.48', 'root cache name');
+assert.strictEqual(liveCache('docs/sw.js'), '5.79.48', 'docs cache name');
+assert.strictEqual(read('sw.js'), read('docs/sw.js'), 'the workers match');
+assert.ok(/before \(cee5cbe1\): const CACHE_NAME = 'freelattice-v5\.79\.47';/.test(read('sw.js')), 'the old cache name stays as a before comment');
+['sw.js', 'docs/sw.js'].forEach(function (rel) {
+  var rows = lock.files[rel];
+  assert.strictEqual(rows[rows.length - 1].md5, md5(read(rel)), rel + ' last lock row');
+  assert.strictEqual(rows[rows.length - 1].since, 'v-gc-front-door-v0.1');
+  assert.ok(rows.some(function (r) { return r.md5 === '5740728cf3ffa8a52f8b992d3811863e'; }), rel + ' keeps the 5.79.47 row');
+});
 
 console.log('smoke-gc-front-door-v0.1: PASS');

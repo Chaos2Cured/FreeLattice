@@ -30,16 +30,20 @@ const PINS = {
   'docs/library/AUTONOMY.md': '09a4f1a286226e37089a93df42df0106',
   // before (199de1b6): 'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
   // before (472de215): 'docs/app.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
-  'docs/app.html': '724394925650cb0abb8aead5ced1f5b7',
+  // before (cee5cbe1): 'docs/app.html': '724394925650cb0abb8aead5ced1f5b7',
+  'docs/app.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
   // before (199de1b6): 'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
   // before (472de215): 'index.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
-  'index.html': '724394925650cb0abb8aead5ced1f5b7',
+  // before (cee5cbe1): 'index.html': '724394925650cb0abb8aead5ced1f5b7',
+  'index.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
   'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc',
   'docs/modules/fractal-safety.js': 'c1b7acb9d2e2cee94e52fffba5aec758',
   // before (199de1b6): 'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
-  'docs/sw.js': '5740728cf3ffa8a52f8b992d3811863e',
+  // before (cee5cbe1): 'docs/sw.js': '5740728cf3ffa8a52f8b992d3811863e',
+  'docs/sw.js': '99873ef035dec3924742ae5eac0573e0',
   // before (199de1b6): 'sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
-  'sw.js': '5740728cf3ffa8a52f8b992d3811863e'
+  // before (cee5cbe1): 'sw.js': '5740728cf3ffa8a52f8b992d3811863e',
+  'sw.js': '99873ef035dec3924742ae5eac0573e0'
 };
 // md5 of the one line that names the private rooms the kit never packs (kept out of this file on purpose).
 const PRIVATE_RULE_LINE_MD5 = '753fde10a9ca44dce580d0f15371a402';
