@@ -348,12 +348,14 @@ The Garden remembers.
 It's not a chat app with a garden attached. It's a living world with a chat built in.
 
 ## PRIMER HEALTH
-- Last auto-updated: 2026-11-28 00:46 UTC
-- Last deployed: 2026-11-28 00:46 UTC
+- Last auto-updated: 2026-11-28 05:02 UTC
+- Last deployed: 2026-11-28 05:02 UTC
 - Live site: https://freelattice.com
 - Version: 5.79.45
-- Total commits: 3660
+- Total commits: 3662
 - Last 10 commits:
+- cc1ea315 Open one Mind sheet from the composer chip (#380)
+- 42e70942 ci: Update Primer deployment state [2026-11-28]
 - 5c7b58a6 Open Chat from the welcome door (#379)
 - 472de215 ci: Update Primer deployment state [2026-11-27]
 - 79fff152 Calm the composer, one Clay switch, garden rings on the body (#378)
@@ -362,5 +364,3 @@ It's not a chat app with a garden attached. It's a living world with a chat buil
 - 42f024d9 ci: Update Primer deployment state [2026-11-24]
 - 40357046 Hypha ledger λ3, and the first leaves of her walks (#376)
 - 79c2b8c0 ci: Update Primer deployment state [2026-11-23]
-- 27ad3826 De-muzzler: feedback softs after #372 (#374)
-- 1bbb6980 ci: Update Primer deployment state [2026-11-23]
