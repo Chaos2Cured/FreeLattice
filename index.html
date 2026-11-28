@@ -3216,6 +3216,31 @@ footer .license {
   gap: 6px;
   white-space: nowrap;
   min-width: 0;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+.fl-mind-sheet {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 80;
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--bg-secondary, #141720);
+  color: var(--text-primary, #e8e4dc);
+  border: 1px solid var(--border, rgba(255,255,255,0.12));
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+}
+.fl-mind-sheet[hidden] { display: none !important; }
+.fl-mind-sheet button {
+  min-height: 44px;
+  min-width: 44px;
+  margin: 4px 6px 4px 0;
+  font-family: var(--font, inherit);
+  cursor: pointer;
 }
 /* The label inside the button truncates, not the button itself */
 .model-switcher-btn .ms-label {
@@ -56158,16 +56183,18 @@ const ModelSwitcher = (function() {
 
   function init() {
     updateLabel();
+    // before (42e70942): chip.addEventListener('click', function () { if (typeof window.openProviderModal === 'function') window.openProviderModal(); });
     var chip = document.getElementById('modelSwitcherBtn');
-    if (chip && !chip.getAttribute('data-fl-provider-door')) {
-      chip.setAttribute('data-fl-provider-door', '1');
-      chip.addEventListener('click', function () {
-        if (typeof window.openProviderModal === 'function') window.openProviderModal();
+    if (chip && !chip.getAttribute('data-fl-mind-sheet')) {
+      chip.setAttribute('data-fl-mind-sheet', '1');
+      chip.addEventListener('click', function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        if (typeof window.flMindSheetToggle === 'function') window.flMindSheetToggle();
       });
       chip.addEventListener('keydown', function (ev) {
         if (!ev || (ev.key !== 'Enter' && ev.key !== ' ')) return;
         if (ev.preventDefault) ev.preventDefault();
-        if (typeof window.openProviderModal === 'function') window.openProviderModal();
+        if (typeof window.flMindSheetToggle === 'function') window.flMindSheetToggle();
       });
     }
     // Close on outside click
@@ -56194,6 +56221,152 @@ const ModelSwitcher = (function() {
     getCachedModels: function() { return cachedModels; }
   };
 })();
+
+// v-gc-one-mind-chip-v0.1: the chip opens this sheet. It does not open Connect.
+var flMindSheetOpen = false;
+var flMindSheetKeyBound = false;
+
+function flMindSheetEl() {
+  var el = document.getElementById('flMindSheet');
+  if (el) return el;
+  el = document.createElement('div');
+  el.id = 'flMindSheet';
+  el.className = 'fl-mind-sheet';
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-label', 'On this computer');
+  el.hidden = true;
+  document.body.appendChild(el);
+  return el;
+}
+
+function flMindSheetClose() {
+  flMindSheetOpen = false;
+  var el = document.getElementById('flMindSheet');
+  if (el) el.hidden = true;
+}
+
+function flMindPick(port, name, shape) {
+  port = parseInt(port, 10);
+  name = String(name || '');
+  if (!port || !name) return;
+  var base = 'http://127.0.0.1:' + port;
+  if (window.FlConnect && typeof FlConnect.remember === 'function') {
+    FlConnect.remember({ name: name, base: base, port: port });
+  }
+  if (shape === 'v1') {
+    try {
+      localStorage.setItem('fl_lmstudioHost', '127.0.0.1:' + port);
+      localStorage.setItem('fl_provider', 'lmstudio');
+      localStorage.setItem('fl_isLocal', 'true');
+      if (typeof state !== 'undefined' && state) {
+        state.provider = 'lmstudio';
+        state.isLocal = true;
+        state.ollamaModel = name;
+      }
+      if (typeof PROVIDERS !== 'undefined' && PROVIDERS.lmstudio) {
+        PROVIDERS.lmstudio.url = base + '/v1/chat/completions';
+      }
+    } catch (eV1) {}
+  }
+  var provider = shape === 'v1' ? 'lmstudio' : 'ollama';
+  if (window.FlConnect && typeof FlConnect.markUserChoice === 'function') {
+    FlConnect.markUserChoice(name, provider);
+  }
+  if (window.ModelSwitcher && typeof ModelSwitcher.updateLabel === 'function') {
+    try { ModelSwitcher.updateLabel(); } catch (eL) {}
+  }
+  flMindSheetClose();
+}
+
+function flMindSheetFill(result) {
+  var el = flMindSheetEl();
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var title = document.createElement('p');
+  title.textContent = 'On this computer';
+  el.appendChild(title);
+  var closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.textContent = 'Close';
+  closeBtn.addEventListener('click', flMindSheetClose);
+  el.appendChild(closeBtn);
+  var groups = (result && result.groups) || [];
+  if (!groups.length) {
+    var empty = document.createElement('p');
+    empty.textContent = 'No mind answered on this computer yet.';
+    el.appendChild(empty);
+  }
+  groups.forEach(function (g) {
+    var heading = document.createElement('p');
+    heading.textContent = g.label || ('on this computer, port ' + g.port);
+    el.appendChild(heading);
+    if (g.blocked) {
+      var note = document.createElement('p');
+      note.textContent = 'This door is on. This site cannot read it yet. Allow this site in that program, then scan again.';
+      el.appendChild(note);
+      return;
+    }
+    (g.models || []).forEach(function (modelName) {
+      var pick = document.createElement('button');
+      pick.type = 'button';
+      pick.textContent = String(modelName);
+      pick.addEventListener('click', function () { flMindPick(g.port, modelName, g.shape); });
+      el.appendChild(pick);
+    });
+  });
+  var again = document.createElement('button');
+  again.type = 'button';
+  again.textContent = 'Scan again';
+  again.addEventListener('click', function () { flMindSheetScan(); });
+  el.appendChild(again);
+  var keyRow = document.createElement('button');
+  keyRow.type = 'button';
+  keyRow.textContent = 'A saved key';
+  keyRow.addEventListener('click', function () {
+    if (typeof window.openProviderModal === 'function') window.openProviderModal();
+  });
+  el.appendChild(keyRow);
+  if (closeBtn.focus) {
+    try { closeBtn.focus({ preventScroll: true }); } catch (eFocus) {}
+  }
+}
+
+function flMindSheetScan() {
+  var scan = (window.FlConnect && typeof FlConnect.scanLocalDoors === 'function')
+    ? FlConnect.scanLocalDoors({ timeoutMs: 700 })
+    : Promise.resolve({ groups: [] });
+  Promise.resolve(scan).then(function (result) {
+    if (!flMindSheetOpen) return;
+    flMindSheetFill(result);
+  }).catch(function () {
+    if (!flMindSheetOpen) return;
+    flMindSheetFill({ groups: [] });
+  });
+}
+
+function flMindSheetToggle() {
+  if (!flMindSheetKeyBound) {
+    flMindSheetKeyBound = true;
+    document.addEventListener('keydown', function (ev) {
+      if (!flMindSheetOpen) return;
+      if (ev && ev.key === 'Escape') flMindSheetClose();
+    });
+  }
+  if (flMindSheetOpen) {
+    flMindSheetClose();
+    return;
+  }
+  flMindSheetOpen = true;
+  var el = flMindSheetEl();
+  el.hidden = false;
+  while (el.firstChild) el.removeChild(el.firstChild);
+  var looking = document.createElement('p');
+  looking.textContent = 'Looking on this computer...';
+  el.appendChild(looking);
+  flMindSheetScan();
+}
+window.flMindSheetToggle = flMindSheetToggle;
+window.flMindPick = flMindPick;
+window.flMindSheetClose = flMindSheetClose;
 
 // ============================================
 // Browse Models — Model Library in Settings

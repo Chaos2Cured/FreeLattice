@@ -122,11 +122,14 @@ assert.ok(!/data-flc-model="' \+ String\(name\)/.test(mod), 'no HTML-concat mode
 assert.ok(/Temperature:/.test(family) || /Temperature:/.test(md), 'temperature');
 assert.ok(/v-connect-port-picker-v0/.test(flint), 'Flint');
 // before (cee5cbe1): assert.strictEqual(rootSw, mainSw, 'sw identical to main');
-// Named lock: CACHE_NAME freelattice-v5.79.48. Any other worker byte still fails.
-const swFolded = rootSw
-  .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
-  .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
-assert.strictEqual(swFolded, mainSw, 'sw matches main aside from cache freelattice-v5.79.48');
+// before (42e70942): fold rewrote 5.79.48 back to 5.79.47, which no longer matches main.
+// Named lock: CACHE_NAME freelattice-v5.79.49. Any other worker byte still fails.
+function foldNamedCache(text) {
+  return text
+    .replace("// before (42e70942): const CACHE_NAME = 'freelattice-v5.79.48';\n", '')
+    .replace("const CACHE_NAME = 'freelattice-v5.79.49';", "const CACHE_NAME = 'freelattice-v5.79.48';");
+}
+assert.strictEqual(foldNamedCache(rootSw), mainSw, 'sw matches main aside from cache freelattice-v5.79.49');
 assert.strictEqual(indexHtml, app, 'index identical to docs/app.html');
 assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw');
 

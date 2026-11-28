@@ -50,6 +50,7 @@ assert.strictEqual(app.split(link).length - 1, 1, 'linked once');
 assert.ok(app.indexOf(link) < app.indexOf('</head>') && app.indexOf(link) > app.indexOf('modules/fl-pool.js'), 'linked last in head');
 assert.ok(app === idx, 'index matches app');
 assert.ok(/function renderCardGrid\(cards, options\)/.test(app), 'card renderer unchanged');
-assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+// before (42e70942): assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), '57c3ec867aff3964f6b587f8ed8ea3d0', 'fl-connect one mind scan pin');
 
 console.log('SMOKE_OK fl card glow v0');

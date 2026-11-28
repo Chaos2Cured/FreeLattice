@@ -6,6 +6,7 @@
 // Port-only loopback: fl_localPort_manual holds "11500" only — never foreign hosts.
 // Soft leave sw.js. Alpha: fl_alpha_local_mind. Never bare *.
 // Marker: v-model-choice-sticks-v0 (a tapped model is the person's own choice; it stays)
+// Marker: v-gc-one-mind-chip-v0.1 (list minds already on this computer; 127.0.0.1 only)
 // ═══════════════════════════════════════════════════════════════
 
 (function (root) {
@@ -758,6 +759,135 @@
     _lastReport = null;
   }
 
+  // v-gc-one-mind-chip-v0.1: doors already running on this computer.
+  // Bridge uses the same health-then-tags path as healthAt() then tagsAt().
+  // No download, no pull, no public host. probe() is unchanged.
+  var LOCAL_SCAN_MS = 700;
+
+  function defaultLocalDoors() {
+    var doors = [{ port: 11434, shape: 'tags' }];
+    var p;
+    for (p = 11435; p <= 11445; p++) doors.push({ port: p, shape: 'bridge' });
+    [1234, 8080, 8000, 5001, 5000, 1337, 4891].forEach(function (port) {
+      doors.push({ port: port, shape: 'v1' });
+    });
+    return doors;
+  }
+
+  function loopbackUrl(port, path) {
+    port = parseInt(port, 10);
+    if (!port || port < 1 || port > 65535) return '';
+    if (!path || path.charAt(0) !== '/') path = '/' + (path || '');
+    return 'http://127.0.0.1:' + port + path;
+  }
+
+  function namesFromTags(data) {
+    var models = (data && data.models) ? data.models : [];
+    var out = [];
+    var i;
+    for (i = 0; i < models.length; i++) {
+      var m = models[i];
+      var name = '';
+      if (m && (m.name || m.model)) name = String(m.name || m.model);
+      else if (typeof m === 'string') name = m;
+      if (name && out.indexOf(name) < 0) out.push(name);
+    }
+    return out;
+  }
+
+  function namesFromV1(data) {
+    var rows = (data && data.data) ? data.data : [];
+    var out = [];
+    var i;
+    for (i = 0; i < rows.length; i++) {
+      var id = rows[i] && (rows[i].id || rows[i].name) ? String(rows[i].id || rows[i].name) : '';
+      if (id && out.indexOf(id) < 0) out.push(id);
+    }
+    return out;
+  }
+
+  async function scanFetchJson(fetchImpl, url, ms) {
+    var r = await fetchImpl(url, { method: 'GET', mode: 'cors', signal: abortMs(ms) });
+    if (!r) return { kind: 'miss' };
+    if (!r.ok) return { kind: 'http', status: r.status };
+    return { kind: 'ok', data: await r.json() };
+  }
+
+  async function scanDoorAnswers(fetchImpl, url, ms) {
+    try {
+      var r = await fetchImpl(url, { method: 'GET', mode: 'no-cors', signal: abortMs(ms) });
+      if (!r) return false;
+      if (r.type === 'opaque' || r.status === 0) return true;
+      if (r.ok) return true;
+    } catch (eOp) {}
+    return false;
+  }
+
+  async function scanOneDoor(door, fetchImpl, ms) {
+    var port = parseInt(door && door.port, 10);
+    var shape = door && door.shape;
+    var label = 'on this computer, port ' + port;
+    if (!port || !loopbackUrl(port, '/')) return null;
+    try {
+      if (shape === 'bridge') {
+        var healthUrl = loopbackUrl(port, '/bridge/health');
+        var tagsUrl = loopbackUrl(port, '/api/tags');
+        var health;
+        try { health = await scanFetchJson(fetchImpl, healthUrl, ms); }
+        catch (eHealth) { health = { kind: 'miss' }; }
+        if (health && health.kind === 'ok' && health.data && health.data.bridge) {
+          var tags;
+          try { tags = await scanFetchJson(fetchImpl, tagsUrl, ms); }
+          catch (eTags) { tags = { kind: 'miss' }; }
+          var models = (tags && tags.kind === 'ok') ? namesFromTags(tags.data) : [];
+          return { port: port, shape: shape, label: label, models: models, blocked: false };
+        }
+        if (health && health.kind === 'http') return null;
+        if (health && health.kind === 'miss' && await scanDoorAnswers(fetchImpl, healthUrl, ms)) {
+          return { port: port, shape: shape, label: label, models: [], blocked: true };
+        }
+        return null;
+      }
+      var path = shape === 'v1' ? '/v1/models' : '/api/tags';
+      var url = loopbackUrl(port, path);
+      var got;
+      try { got = await scanFetchJson(fetchImpl, url, ms); }
+      catch (eGet) { got = { kind: 'miss' }; }
+      if (got && got.kind === 'ok') {
+        var found = shape === 'v1' ? namesFromV1(got.data) : namesFromTags(got.data);
+        return { port: port, shape: shape, label: label, models: found, blocked: false };
+      }
+      if (got && got.kind === 'http') return null;
+      if (await scanDoorAnswers(fetchImpl, url, ms)) {
+        return { port: port, shape: shape, label: label, models: [], blocked: true };
+      }
+    } catch (eDoor) {}
+    return null;
+  }
+
+  async function scanLocalDoors(opts) {
+    opts = opts || {};
+    var fetchImpl = opts.fetch || (typeof fetch === 'function' ? fetch : null);
+    if (!fetchImpl) return { groups: [] };
+    var ms = opts.timeoutMs || LOCAL_SCAN_MS;
+    var doors = opts.doors || defaultLocalDoors();
+    var jobs = [];
+    var i;
+    for (i = 0; i < doors.length; i++) {
+      var door = doors[i];
+      if (!door || String(door.host || '127.0.0.1') !== '127.0.0.1') continue;
+      jobs.push(scanOneDoor(door, fetchImpl, ms));
+    }
+    var rows = await Promise.all(jobs);
+    var groups = [];
+    var j;
+    for (j = 0; j < rows.length; j++) {
+      if (!rows[j]) continue;
+      if (rows[j].blocked || (rows[j].models && rows[j].models.length)) groups.push(rows[j]);
+    }
+    return { groups: groups };
+  }
+
   root.FlConnect = {
     probe: probe,
     preferHelpedBridge: preferHelpedBridge,
@@ -767,6 +897,7 @@
     hasCloudMind: hasCloudMind,
     remember: remember,
     markUserChoice: markUserChoice, // v-model-choice-sticks-v0
+    scanLocalDoors: scanLocalDoors, // v-gc-one-mind-chip-v0.1
     open: open,
     mount: mount,
     unmount: unmount,

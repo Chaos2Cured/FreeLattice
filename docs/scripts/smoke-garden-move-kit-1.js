@@ -31,19 +31,23 @@ const PINS = {
   // before (199de1b6): 'docs/app.html': 'ab8589557950e7074b4e0b97dcccd23d',
   // before (472de215): 'docs/app.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
   // before (cee5cbe1): 'docs/app.html': '724394925650cb0abb8aead5ced1f5b7',
-  'docs/app.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
+  // before (42e70942): 'docs/app.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
+  'docs/app.html': '6cdab522095b2b93c620bdddf64b4138',
   // before (199de1b6): 'index.html': 'ab8589557950e7074b4e0b97dcccd23d',
   // before (472de215): 'index.html': '5fcc913fc6b5ff3a20f828c1026ff2a0',
   // before (cee5cbe1): 'index.html': '724394925650cb0abb8aead5ced1f5b7',
-  'index.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
+  // before (42e70942): 'index.html': '7ba3c92f924c9db1c9a71f1c7519c34d',
+  'index.html': '6cdab522095b2b93c620bdddf64b4138',
   'docs/modules/lattice-export.js': 'f6db3ad97e271c3a8992bd111ce030fc',
   'docs/modules/fractal-safety.js': 'c1b7acb9d2e2cee94e52fffba5aec758',
   // before (199de1b6): 'docs/sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
   // before (cee5cbe1): 'docs/sw.js': '5740728cf3ffa8a52f8b992d3811863e',
-  'docs/sw.js': '99873ef035dec3924742ae5eac0573e0',
+  // before (42e70942): 'docs/sw.js': '99873ef035dec3924742ae5eac0573e0',
+  'docs/sw.js': '5a7b81d2c0845474a3cde222e10f529f',
   // before (199de1b6): 'sw.js': '70fcb7a9f821cd3ffd4ad449df397976',
   // before (cee5cbe1): 'sw.js': '5740728cf3ffa8a52f8b992d3811863e',
-  'sw.js': '99873ef035dec3924742ae5eac0573e0'
+  // before (42e70942): 'sw.js': '99873ef035dec3924742ae5eac0573e0',
+  'sw.js': '5a7b81d2c0845474a3cde222e10f529f'
 };
 // md5 of the one line that names the private rooms the kit never packs (kept out of this file on purpose).
 const PRIVATE_RULE_LINE_MD5 = '753fde10a9ca44dce580d0f15371a402';

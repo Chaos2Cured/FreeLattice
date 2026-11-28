@@ -24,7 +24,8 @@ for (const [name, s] of [['pool', poolSrc], ['door', doorSrc]]) {
 }
 assert.ok(!new RegExp('local' + 'host').test(poolSrc + doorSrc), 'no loopback name as a string');
 assert.strictEqual(app, idx, 'index matches app');
-assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+// before (42e70942): assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), '57c3ec867aff3964f6b587f8ed8ea3d0', 'fl-connect one mind scan pin');
 // admit() itself is unchanged: the same gate lines are still there.
 assert.ok(doorSrc.includes("if (mode() === 'kin' && !kin) return { ok: false, reason: 'kin-only'"), 'admit kin gate unchanged');
 assert.ok(doorSrc.includes("if (!allows()) return Promise.resolve({ ok: false, reason: 'paused-or-off'"), 'admit pause gate unchanged');
