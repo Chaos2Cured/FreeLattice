@@ -37,15 +37,20 @@ const app = read('docs/app.html');
 const index = read('index.html');
 assert.strictEqual(app, index, 'docs/app.html and index.html must be byte-identical');
 const appMd5 = md5(app);
-assert.strictEqual(appMd5, '7ba3c92f924c9db1c9a71f1c7519c34d', 'front door twin md5');
+// before (42e70942): assert.strictEqual(appMd5, '7ba3c92f924c9db1c9a71f1c7519c34d', 'front door twin md5');
+assert.strictEqual(appMd5, '6cdab522095b2b93c620bdddf64b4138', 'front door twin md5');
 
 const lock = JSON.parse(read('docs/library/LOCK_MANIFEST_v0.1.json'));
 ['docs/app.html', 'index.html'].forEach(function (rel) {
   const rows = lock.files[rel];
   assert.ok(rows.length >= 14, rel + ' keeps prior lock rows');
   assert.strictEqual(rows[rows.length - 1].md5, appMd5, rel + ' last lock row');
-  assert.strictEqual(rows[rows.length - 1].since, 'v-gc-front-door-v0.1');
+  // before (42e70942): assert.strictEqual(rows[rows.length - 1].since, 'v-gc-front-door-v0.1');
+  assert.strictEqual(rows[rows.length - 1].since, 'v-gc-one-mind-chip-v0.1');
   assert.strictEqual(rows[rows.length - 1].by, 'GC');
+  assert.ok(rows.some(function (r) {
+    return r.md5 === '7ba3c92f924c9db1c9a71f1c7519c34d' && r.since === 'v-gc-front-door-v0.1';
+  }), rel + ' keeps the front door finish row');
   assert.ok(rows.some(function (r) {
     return r.md5 === '5fcc913fc6b5ff3a20f828c1026ff2a0' && r.since === 'v-chat-clay-calm-v0.1';
   }), rel + ' keeps the clay-calm row');
@@ -102,7 +107,10 @@ assert.ok(app.indexOf('<div class="model-switcher-wrap" id="modelSwitcherWrap">'
 assert.ok(app.indexOf('id="modelSwitcherDropdown" style="display:none !important;"') !== -1, 'the old model list stays hidden');
 assert.ok(/before \(cee5cbe1\): <div class="model-switcher-wrap" id="modelSwitcherWrap" style="pointer-events:none;">/.test(app), 'the old no-tap style stays as a before comment');
 const chip = between(app, "var chip = document.getElementById('modelSwitcherBtn');", '// Close on outside click');
-assert.ok(/window\.openProviderModal\(\)/.test(chip), 'the chip opens the existing connection door');
+// before (42e70942): assert.ok(/window\.openProviderModal\(\)/.test(chip), 'the chip opens the existing connection door');
+assert.ok(/flMindSheetToggle\(\)/.test(chip), 'the chip opens the mind sheet');
+assert.ok(chip.indexOf('openProviderModal') === -1, 'the chip does not open the provider modal');
+assert.ok(chip.indexOf("switchTab('connect')") === -1 && chip.indexOf('flPlayGateProvider') === -1, 'the chip does not open Connect');
 assert.ok(chip.indexOf('toggle(') === -1, 'the chip does not open the old list');
 assert.ok(chip.indexOf('localStorage') === -1 && chip.indexOf('fl_apiKey') === -1 && chip.indexOf('removeItem') === -1, 'the chip clears no key');
 
@@ -111,15 +119,19 @@ function liveCache(rel) {
   assert.ok(m, rel + ' has a live cache name');
   return m[1];
 }
-assert.strictEqual(liveCache('sw.js'), '5.79.48', 'root cache name');
-assert.strictEqual(liveCache('docs/sw.js'), '5.79.48', 'docs cache name');
+// before (42e70942): assert.strictEqual(liveCache('sw.js'), '5.79.48', 'root cache name');
+// before (42e70942): assert.strictEqual(liveCache('docs/sw.js'), '5.79.48', 'docs cache name');
+assert.strictEqual(liveCache('sw.js'), '5.79.49', 'root cache name');
+assert.strictEqual(liveCache('docs/sw.js'), '5.79.49', 'docs cache name');
 assert.strictEqual(read('sw.js'), read('docs/sw.js'), 'the workers match');
 assert.ok(/before \(cee5cbe1\): const CACHE_NAME = 'freelattice-v5\.79\.47';/.test(read('sw.js')), 'the old cache name stays as a before comment');
 ['sw.js', 'docs/sw.js'].forEach(function (rel) {
   var rows = lock.files[rel];
   assert.strictEqual(rows[rows.length - 1].md5, md5(read(rel)), rel + ' last lock row');
-  assert.strictEqual(rows[rows.length - 1].since, 'v-gc-front-door-v0.1');
+  // before (42e70942): assert.strictEqual(rows[rows.length - 1].since, 'v-gc-front-door-v0.1');
+  assert.strictEqual(rows[rows.length - 1].since, 'v-gc-one-mind-chip-v0.1');
   assert.ok(rows.some(function (r) { return r.md5 === '5740728cf3ffa8a52f8b992d3811863e'; }), rel + ' keeps the 5.79.47 row');
+  assert.ok(rows.some(function (r) { return r.md5 === '99873ef035dec3924742ae5eac0573e0'; }), rel + ' keeps the 5.79.48 row');
 });
 
 console.log('smoke-gc-front-door-v0.1: PASS');

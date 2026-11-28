@@ -84,13 +84,15 @@ try {
   function swOnlyCacheMove(rel) {
     const live = fs.readFileSync(path.join(repo, rel), 'utf8');
     const mainText = execFileSync('git', ['show', 'origin/main:' + rel], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    // before (42e70942): .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
+    // before (42e70942): .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
     const folded = live
-      .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
-      .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
+      .replace("// before (42e70942): const CACHE_NAME = 'freelattice-v5.79.48';\n", '')
+      .replace("const CACHE_NAME = 'freelattice-v5.79.49';", "const CACHE_NAME = 'freelattice-v5.79.48';");
     return folded === mainText;
   }
   if (changed.includes('sw.js') || changed.includes('docs/sw.js')) {
-    assert.ok(swOnlyCacheMove('sw.js') && swOnlyCacheMove('docs/sw.js'), 'sw.js differs from main only by cache freelattice-v5.79.48');
+    assert.ok(swOnlyCacheMove('sw.js') && swOnlyCacheMove('docs/sw.js'), 'sw.js differs from main only by cache freelattice-v5.79.49');
   }
   assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
   // Brick-scoped like the v3 smoke (#121): binds only while the v3 page itself is in the diff.

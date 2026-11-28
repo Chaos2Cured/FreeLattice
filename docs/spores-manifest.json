@@ -130,9 +130,9 @@
      "bytes": 48839
     },
     "modules/fl-connect.js": {
-     "sha256": "8854b485b02afb215472cac1206a96715084fd2479c7b4139c1d013596e17e41",
-     "sri": "sha256-iFS0hbAq+yFUcsrBIGqWcVCE/SR5x7QTnB0BNZbhfkE=",
-     "bytes": 34475
+     "sha256": "c4d4ff40eeeca609687d59f48a38590ca71d37b2695c9e1337410e02737acd3a",
+     "sri": "sha256-xNT/QO7spglofVn0ijhZDKcdN7JpXJ4TN0EOAnN6zTo=",
+     "bytes": 39515
     },
     "modules/fl-gathering.js": {
      "sha256": "81288994fd72c7e444208c86320b915b0d0e137a34844ab53e967cb3f4c48df0",

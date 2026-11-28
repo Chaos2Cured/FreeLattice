@@ -164,6 +164,7 @@ assert.ok(/market-stall-link v-science-garden-seed-v0" href="science-garden\.htm
 assert.ok(/Gift Grove/.test(app) && /Exchange Ring/.test(app) && /Quest Lamp/.test(app), 'older stalls kept');
 assert.ok(app === idx, 'index matches app');
 assert.ok(fs.existsSync(path.join(docs, 'modules/science-garden.js')), 'the older in-app Science Garden stays');
-assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(docs, 'modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+// before (42e70942): assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(docs, 'modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(docs, 'modules/fl-connect.js'))).digest('hex'), '57c3ec867aff3964f6b587f8ed8ea3d0', 'fl-connect one mind scan pin');
 
 console.log('SMOKE_OK science garden seed v0');

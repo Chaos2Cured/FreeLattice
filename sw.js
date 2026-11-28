@@ -6,7 +6,8 @@
 // before 063c: const CACHE_NAME = 'freelattice-v5.79.45';
 // before (099323d4): const CACHE_NAME = 'freelattice-v5.79.46';
 // before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';
-const CACHE_NAME = 'freelattice-v5.79.48';
+// before (42e70942): const CACHE_NAME = 'freelattice-v5.79.48';
+const CACHE_NAME = 'freelattice-v5.79.49';
 
 // mirror-chat.html + mirror-resonance.html — served static from GH Pages, no SW cache needed
 

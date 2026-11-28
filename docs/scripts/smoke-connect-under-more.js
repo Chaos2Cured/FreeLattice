@@ -47,11 +47,14 @@ assert.ok(/CONNECT_UNDER_MORE/.test(genRecent) && /CONNECT_BRIDGE_AWARE/.test(ge
 
 // before (cee5cbe1): Soft leave root sw — byte-identical to main
 // before (cee5cbe1): assert.strictEqual(rootSw, mainSw, 'root sw.js byte-identical to origin/main');
-// Named lock: CACHE_NAME freelattice-v5.79.48. Any other worker byte still fails.
-const swFolded = rootSw
-  .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
-  .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
-assert.strictEqual(swFolded, mainSw, 'root sw.js matches main aside from cache freelattice-v5.79.48');
+// before (42e70942): fold rewrote 5.79.48 back to 5.79.47, which no longer matches main.
+// Named lock: CACHE_NAME freelattice-v5.79.49. Any other worker byte still fails.
+function foldNamedCache(text) {
+  return text
+    .replace("// before (42e70942): const CACHE_NAME = 'freelattice-v5.79.48';\n", '')
+    .replace("const CACHE_NAME = 'freelattice-v5.79.49';", "const CACHE_NAME = 'freelattice-v5.79.48';");
+}
+assert.strictEqual(foldNamedCache(rootSw), mainSw, 'root sw.js matches main aside from cache freelattice-v5.79.49');
 assert.ok(!/fl-connect\.js/.test(sw), 'soft leave sw docs');
 assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw root');
 
@@ -93,4 +96,4 @@ sandbox.FlConnect.unmount();
 assert.ok(true, 'loop-stops case');
 
 console.log('SMOKE_OK connect under more v0.1');
-console.log('loop calm · sticky Bridge · both ledger lines · sw matches main aside from cache 5.79.48');
+console.log('loop calm · sticky Bridge · both ledger lines · sw matches main aside from cache 5.79.49');

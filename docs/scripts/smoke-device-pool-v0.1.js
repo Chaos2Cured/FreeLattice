@@ -21,7 +21,8 @@ assert.ok(!/\.innerHTML/.test(src), 'no innerHTML');
 assert.ok(!/localhost/.test(src), 'no loopback name');
 assert.ok(app.includes('modules/fl-pool.js') && app.includes('flPoolHost') && app.includes("case 'pool-hello'"), 'app wired');
 assert.ok(app === idx, 'index matches app');
-assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+// before (42e70942): assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), 'aaff2bf1b037656989a9e1a89bb05908', 'fl-connect untouched');
+assert.strictEqual(crypto.createHash('md5').update(fs.readFileSync(path.join(repo, 'docs/modules/fl-connect.js'))).digest('hex'), '57c3ec867aff3964f6b587f8ed8ea3d0', 'fl-connect one mind scan pin');
 
 // Behavior, headless
 const store = {};
