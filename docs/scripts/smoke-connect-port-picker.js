@@ -121,7 +121,12 @@ assert.ok(!/data-flc-model="' \+ String\(name\)/.test(mod), 'no HTML-concat mode
 
 assert.ok(/Temperature:/.test(family) || /Temperature:/.test(md), 'temperature');
 assert.ok(/v-connect-port-picker-v0/.test(flint), 'Flint');
-assert.strictEqual(rootSw, mainSw, 'sw identical to main');
+// before (cee5cbe1): assert.strictEqual(rootSw, mainSw, 'sw identical to main');
+// Named lock: CACHE_NAME freelattice-v5.79.48. Any other worker byte still fails.
+const swFolded = rootSw
+  .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
+  .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
+assert.strictEqual(swFolded, mainSw, 'sw matches main aside from cache freelattice-v5.79.48');
 assert.strictEqual(indexHtml, app, 'index identical to docs/app.html');
 assert.ok(!/fl-connect\.js/.test(rootSw), 'soft leave sw');
 

@@ -967,6 +967,7 @@ header .mantra {
 .ollama-suggest-actions { display: flex; gap: 8px; }
 .ollama-suggest-actions button {
   padding: 6px 16px;
+  min-height: 44px;
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
@@ -11555,6 +11556,22 @@ input:checked + .sf-slider:before { transform: translateX(16px); }
   margin: 0 0 24px;
   font-family: Georgia, serif;
 }
+.fl-welcome-chat {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  margin: 0 0 16px;
+  padding: 10px 16px;
+  background: #d4a017;
+  color: #0a0a14;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.fl-welcome-chat:hover { filter: brightness(1.06); }
 .fl-welcome-options {
   display: flex;
   flex-direction: column;
@@ -16094,6 +16111,7 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
     <div id="flWelcomeConnect">
       <h1>&#x2726; Welcome to FreeLattice</h1>
       <p class="fl-welcome-lead">Your AI. Local. Free. Yours.</p>
+      <button type="button" class="fl-welcome-chat" id="flWelcomeChat" aria-label="Chat. The message box stays ready.">Chat</button>
 
       <!-- Front-door link to the engineering case. Strangers and AIs both land here first. -->
       <div style="text-align:center;margin:-4px 0 10px;font-size:0.78rem;">
@@ -16739,10 +16757,13 @@ textarea.ag-input { min-height: 60px; resize: vertical; font-family: inherit; }
             </p>
           </div>
           <div class="chat-input-secondary" id="chatInputSecondary">
-            <!-- Read-only status: shows what AI you're talking to. No tap action. -->
-            <!-- To change models, go to Settings. Chat is for chatting. -->
-            <div class="model-switcher-wrap" id="modelSwitcherWrap" style="pointer-events:none;">
-              <div class="model-switcher-btn" id="modelSwitcherBtn" style="cursor:default;">
+            <!-- before (cee5cbe1): Read-only status: shows what AI you're talking to. No tap action. -->
+            <!-- before (cee5cbe1): To change models, go to Settings. Chat is for chatting. -->
+            <!-- The name stays. A tap opens the existing connection door. The old list stays hidden. -->
+            <!-- before (cee5cbe1): <div class="model-switcher-wrap" id="modelSwitcherWrap" style="pointer-events:none;"> -->
+            <div class="model-switcher-wrap" id="modelSwitcherWrap">
+              <!-- before (cee5cbe1): <div class="model-switcher-btn" id="modelSwitcherBtn" style="cursor:default;"> -->
+              <div class="model-switcher-btn" id="modelSwitcherBtn" role="button" tabindex="0">
                 <span class="ms-dot"></span>
                 <span class="ms-label" id="msLabel">Model</span>
               </div>
@@ -29226,8 +29247,9 @@ const AiSetup = (function() {
     var banner = document.getElementById('aiSetupBanner');
     if (!banner) return;
     if (isConnected()) {
-      banner.className = 'ai-setup-banner ai-setup-connected';
-      banner.innerHTML = '<div class="ai-connected-status"><span class="status-dot"></span><span>\u2713 ' + getStatusText() + '</span></div><button class="ai-connected-change" onclick="AiSetup.showFull()">Change</button>';
+      // before (472de215): banner.className = 'ai-setup-banner ai-setup-connected';
+      // before (472de215): banner.innerHTML = '<div class="ai-connected-status"><span class="status-dot"></span><span>\u2713 ' + getStatusText() + '</span></div><button class="ai-connected-change" onclick="AiSetup.showFull()">Change</button>';
+      banner.style.display = 'none';
     } else {
       banner.style.display = '';
       banner.className = 'ai-setup-banner';
@@ -32958,6 +32980,21 @@ function flDismissWelcome() {
     if (typeof owAutoDetect === 'function') owAutoDetect();
   }, 500);
 }
+
+function flWelcomeChat() {
+  flDismissWelcome();
+  setTimeout(function() {
+    if (typeof flMobileNav === 'function') flMobileNav('chat');
+    else if (typeof switchTab === 'function') switchTab('chat');
+    var box = document.getElementById('chatInput');
+    if (box && box.focus) box.focus({ preventScroll: true });
+  }, 550);
+}
+// The button id matches this function name, so an inline call would see the element. Bind the click here.
+(function () {
+  var chatDoor = document.getElementById('flWelcomeChat');
+  if (chatDoor) chatDoor.addEventListener('click', flWelcomeChat);
+})();
 
 // --- Welcome Door: provider picker handlers ---
 var _flWelcomeProvider = null;
@@ -56121,6 +56158,18 @@ const ModelSwitcher = (function() {
 
   function init() {
     updateLabel();
+    var chip = document.getElementById('modelSwitcherBtn');
+    if (chip && !chip.getAttribute('data-fl-provider-door')) {
+      chip.setAttribute('data-fl-provider-door', '1');
+      chip.addEventListener('click', function () {
+        if (typeof window.openProviderModal === 'function') window.openProviderModal();
+      });
+      chip.addEventListener('keydown', function (ev) {
+        if (!ev || (ev.key !== 'Enter' && ev.key !== ' ')) return;
+        if (ev.preventDefault) ev.preventDefault();
+        if (typeof window.openProviderModal === 'function') window.openProviderModal();
+      });
+    }
     // Close on outside click
     document.addEventListener('click', function(e) {
       if (!isOpen) return;

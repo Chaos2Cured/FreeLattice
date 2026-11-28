@@ -100,7 +100,19 @@ if (v2Main !== null) {
 // sw.js and Kimi untouched when a git base is available
 try {
   const changed = execFileSync('git', ['diff', '--name-only', 'origin/main'], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).split('\n').filter(Boolean);
-  assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
+  // before (cee5cbe1): assert.ok(!changed.includes('sw.js') && !changed.includes('docs/sw.js'), 'sw.js untouched');
+  // Named lock: CACHE_NAME freelattice-v5.79.48. Any other worker byte still fails.
+  function swOnlyCacheMove(rel) {
+    const live = fs.readFileSync(path.join(repo, rel), 'utf8');
+    const mainText = execFileSync('git', ['show', 'origin/main:' + rel], { cwd: repo, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    const folded = live
+      .replace("// before (cee5cbe1): const CACHE_NAME = 'freelattice-v5.79.47';\n", '')
+      .replace("const CACHE_NAME = 'freelattice-v5.79.48';", "const CACHE_NAME = 'freelattice-v5.79.47';");
+    return folded === mainText;
+  }
+  if (changed.includes('sw.js') || changed.includes('docs/sw.js')) {
+    assert.ok(swOnlyCacheMove('sw.js') && swOnlyCacheMove('docs/sw.js'), 'sw.js differs from main only by cache freelattice-v5.79.48');
+  }
   assert.ok(!changed.some((f) => /kimi|voice-shelf|VOICE_SHELF/i.test(f)), "Kimi's pages untouched");
   // Brick-scoped: binds only while the Love Logic v3 page itself is in the diff (#119).
   // Later bricks (for example connect heal v0.4) may touch app.html / index.html.
